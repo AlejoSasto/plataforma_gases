@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block page_title %}Roles y permisos{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Matriz de roles × permisos (solo lectura en UI).</p>
+  </div>
+</div>
+<div class="panel panel-flush">
+  <div class="table-responsive-wrap">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Rol</th>
+          {% for p in permissions %}<th class="small">{{ p.code }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in roles %}
+        <tr>
+          <td class="fw-medium">{{ r.name }}<div class="small text-secondary">{{ r.description }}</div></td>
+          {% for p in permissions %}
+            <td class="text-center">{% if p.code in r.permissions %}✓{% else %}·{% endif %}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="small text-secondary mt-3 mb-0">Para editar usa la API <code>/api/roles</code> o el seed.</p>
+{% endblock %}

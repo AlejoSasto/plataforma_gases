@@ -1,0 +1,8 @@
+{% set level_u = (level or 'DESCONOCIDO')|upper %}
+{% set css = {
+  'NORMAL': 'badge-risk-normal',
+  'PRECAUCION': 'badge-risk-precaucion',
+  'ALERTA': 'badge-risk-alerta',
+  'CRITICO': 'badge-risk-critico'
+} %}
+<span class="badge badge-risk {{ css.get(level_u, 'bg-secondary') }}">{{ level_u }}</span>

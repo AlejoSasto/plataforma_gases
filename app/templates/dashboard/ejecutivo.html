@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block page_title %}Resumen ejecutivo{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Indicadores del periodo seleccionado para partes interesadas.</p>
+  </div>
+  {% if can_reports %}
+  <div class="page-header-actions">
+    <button class="btn btn-primary btn-sm" type="button" id="btn-dl-ejecutivo">Descargar Excel</button>
+    <a class="btn btn-outline-secondary btn-sm" href="/reports">Más reportes</a>
+  </div>
+  {% endif %}
+</div>
+
+<form class="filters-bar" method="get">
+  <div>
+    <label class="form-label" for="days">Periodo (días)</label>
+    <input class="form-control" type="number" min="1" max="365" name="days" id="days" value="{{ days }}" style="width: 7rem;">
+  </div>
+  <div>
+    <button class="btn btn-outline-primary" type="submit">Aplicar</button>
+  </div>
+</form>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    {% with label="Alertas totales", value=kpis.total %}{% include "partials/_kpi_card.html" %}{% endwith %}
+  </div>
+  <div class="col-md-3">
+    {% with label="Críticas", value=kpis.by_level.get('CRITICO', 0), value_class="text-danger" %}{% include "partials/_kpi_card.html" %}{% endwith %}
+  </div>
+  <div class="col-md-3">
+    {% with label="Tiempo medio resolución (h)", value=kpis.avg_resolution_hours if kpis.avg_resolution_hours is not none else "—" %}{% include "partials/_kpi_card.html" %}{% endwith %}
+  </div>
+  <div class="col-md-3">
+    {% with label="Sitio con más incidencias", value=(kpis.top_site.name if kpis.top_site else "—"), hint=(kpis.top_site.count|string ~ " alertas" if kpis.top_site else None) %}{% include "partials/_kpi_card.html" %}{% endwith %}
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="panel h-100">
+      <h2 class="section-title mb-3">Por nivel</h2>
+      <canvas id="levelChart" height="180"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="panel h-100">
+      <h2 class="section-title mb-3">Tendencia</h2>
+      <canvas id="trendChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const byLevel = {{ kpis.by_level | tojson }};
+  const trend = {{ kpis.trend | tojson }};
+  const colors = { NORMAL: "#16A34A", PRECAUCION: "#D97706", ALERTA: "#EA580C", CRITICO: "#DC2626" };
+  const levels = Object.keys(byLevel);
+  new Chart(document.getElementById("levelChart"), {
+    type: "doughnut",
+    data: {
+      labels: levels,
+      datasets: [{ data: levels.map((l) => byLevel[l]), backgroundColor: levels.map((l) => colors[l] || "#64748B") }],
+    },
+    options: { plugins: { legend: { position: "bottom" } } },
+  });
+  new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: {
+      labels: trend.map((t) => t.date),
+      datasets: [{
+        label: "Alertas",
+        data: trend.map((t) => t.count),
+        borderColor: "#0284C8",
+        backgroundColor: "rgba(2,132,200,0.12)",
+        fill: true,
+        tension: 0.3,
+      }],
+    },
+    options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+  });
+
+  const dlBtn = document.getElementById("btn-dl-ejecutivo");
+  if (dlBtn) {
+    dlBtn.addEventListener("click", async () => {
+      const days = Number(document.getElementById("days").value) || 30;
+      const end = new Date();
+      const start = new Date(Date.now() - days * 864e5);
+      const fmt = (d) => d.toISOString().slice(0, 10);
+      dlBtn.disabled = true;
+      dlBtn.textContent = "Generando…";
+      try {
+        const data = await PG.api("/api/reports/ejecutivo", {
+          method: "POST",
+          body: { start: fmt(start), end: fmt(end) },
+        });
+        window.location.href = data.report.download_url;
+      } catch (e) {
+        alert(e.message || "No se pudo generar el reporte");
+      } finally {
+        dlBtn.disabled = false;
+        dlBtn.textContent = "Descargar Excel";
+      }
+    });
+  }
+</script>
+{% endblock %}

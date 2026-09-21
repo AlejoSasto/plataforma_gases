@@ -1,0 +1,5 @@
+<div class="kpi-card">
+  <div class="kpi-label">{{ label }}</div>
+  <div class="kpi-value {% if value_class %}{{ value_class }}{% endif %}">{{ value }}</div>
+  {% if hint %}<div class="small text-secondary mt-2">{{ hint }}</div>{% endif %}
+</div>

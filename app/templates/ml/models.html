@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% from "partials/_metric_gate.html" import gate_badge %}
+{% block page_title %}Catálogo de modelos{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Matriz unificada thesis: métricas, umbrales y estado de promoción.</p>
+  </div>
+  <div class="page-header-actions">
+    <a class="btn btn-outline-secondary btn-sm" href="/ml/compare">Comparar</a>
+    {% if 'reports.export' in permissions %}
+    <a class="btn btn-outline-secondary btn-sm" href="/reports">Reportes</a>
+    {% endif %}
+    <a class="btn btn-primary btn-sm" href="/ml/train">Entrenar</a>
+  </div>
+</div>
+
+<div class="filters-bar mb-4">
+  <div>
+    <label class="form-label" for="f-family">Familia</label>
+    <select id="f-family" class="form-select">
+      <option value="">Todas</option>
+      <option value="tabular">Tabular</option>
+      <option value="sequence">Deep Learning</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label" for="f-status">Estado</label>
+    <select id="f-status" class="form-select">
+      <option value="">Todos</option>
+      <option value="production">production</option>
+      <option value="staging">staging</option>
+      <option value="archived">archived</option>
+    </select>
+  </div>
+</div>
+
+<div class="panel panel-flush mb-4">
+  <div class="table-responsive-wrap">
+    <table class="table table-hover align-middle mb-0" id="models-table">
+      <thead class="table-light">
+        <tr>
+          <th>Modelo</th>
+          <th>Familia</th>
+          <th>Tarea</th>
+          <th>Recall</th>
+          <th>Precisión</th>
+          <th>F1</th>
+          <th>FN%</th>
+          <th>RMSE</th>
+          <th>Lead hit</th>
+          <th>Thesis</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for m in models %}
+        {% set g = (m.metrics or {}).get('gates') or {} %}
+        {% set fam = m.family or (m.params or {}).get('family') or '—' %}
+        {% set task = m.task or (m.params or {}).get('task') or '—' %}
+        <tr class="{% if m.status == 'production' %}model-production{% endif %}"
+            data-family="{{ fam }}" data-status="{{ m.status }}">
+          <td>
+            <a class="fw-semibold text-decoration-none" href="/ml/models/{{ m.id }}">{{ m.name }}</a>
+            <div class="small text-secondary">{{ m.algorithm }} · v{{ m.version }}</div>
+          </td>
+          <td><span class="badge text-bg-light border">{{ fam }}</span></td>
+          <td class="small">{{ task }}</td>
+          <td>{{ "%.3f"|format(m.metrics.recall) if m.metrics.get('recall') is not none else "—" }}</td>
+          <td>{{ "%.3f"|format(m.metrics.precision) if m.metrics.get('precision') is not none else "—" }}</td>
+          <td>{{ "%.3f"|format(m.metrics.f1) if m.metrics.get('f1') is not none else "—" }}</td>
+          <td>{{ "%.1f%%"|format((m.metrics.false_negative_rate or 0)*100) if m.metrics.get('false_negative_rate') is not none else "—" }}</td>
+          <td>{{ "%.4f"|format(m.metrics.rmse) if m.metrics.get('rmse') is not none else "—" }}</td>
+          <td>{{ "%.0f%%"|format((m.metrics.lead_time_hit_rate or 0)*100) if m.metrics.get('lead_time_hit_rate') is not none else "—" }}</td>
+          <td>{{ gate_badge(g.get('meets_thesis')) }}</td>
+          <td><span class="badge text-bg-light border fw-normal">{{ m.status }}</span></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="11" class="text-secondary text-center py-5">Aún no hay modelos. Entrena el primero.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel">
+  <h2 class="section-title mb-2">Umbrales thesis</h2>
+  <p class="section-desc mb-0">Recall ≥ 0.95 · Precisión ≥ 0.90 · F1 ≥ 0.92 · FN ≤ 5% · RMSE ≤ 0.05 · Alerta anticipada 5–10 min</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const fam = document.getElementById("f-family");
+  const st = document.getElementById("f-status");
+  function apply() {
+    document.querySelectorAll("#models-table tbody tr[data-family]").forEach((tr) => {
+      const okF = !fam.value || tr.dataset.family === fam.value;
+      const okS = !st.value || tr.dataset.status === st.value;
+      tr.style.display = okF && okS ? "" : "none";
+    });
+  }
+  fam.addEventListener("change", apply);
+  st.addEventListener("change", apply);
+</script>
+{% endblock %}

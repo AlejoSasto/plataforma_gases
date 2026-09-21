@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block page_title %}Reportes{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Genera PDF/Excel y consulta el historial de descargas.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="panel">
+      <h2 class="section-title mb-3">Generar reporte</h2>
+      <form id="report-form" class="vstack gap-3">
+        <div>
+          <label class="form-label" for="rtype">Tipo</label>
+          <select class="form-select" id="rtype" required>
+            <option value="alertas">Alertas por periodo (PDF)</option>
+            <option value="ejecutivo">Resumen ejecutivo (Excel)</option>
+            <option value="modelo">Desempeño de modelo (PDF)</option>
+          </select>
+        </div>
+        <div class="row g-3" id="period-fields">
+          <div class="col-6">
+            <label class="form-label" for="start">Desde</label>
+            <input type="date" class="form-control" id="start" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="end">Hasta</label>
+            <input type="date" class="form-control" id="end" required>
+          </div>
+        </div>
+        <div id="model-field" class="d-none">
+          <label class="form-label" for="model_id">ID de modelo</label>
+          <input type="number" class="form-control" id="model_id" min="1" placeholder="ej. 1">
+          {% if models %}
+          <label class="form-label mt-2" for="model_pick">O elegir del catálogo</label>
+          <select class="form-select" id="model_pick">
+            <option value="">—</option>
+            {% for m in models %}
+            <option value="{{ m.id }}">#{{ m.id }} {{ m.name }} v{{ m.version }} ({{ m.status }})</option>
+            {% endfor %}
+          </select>
+          {% endif %}
+        </div>
+        <button class="btn btn-primary" type="submit">Generar y descargar</button>
+        <div id="report-msg" class="small"></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="panel panel-flush">
+      <div class="panel-body">
+        <h2 class="section-title">Historial</h2>
+      </div>
+      <div class="table-responsive-wrap">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>ID</th><th>Tipo</th><th>Periodo</th><th>Fecha</th><th></th></tr>
+          </thead>
+          <tbody>
+          {% for r in reports %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td><code>{{ r.type }}</code></td>
+              <td class="small">
+                {% if r.period_start %}{{ r.period_start }} → {{ r.period_end }}{% else %}—{% endif %}
+              </td>
+              <td class="small text-secondary">{{ r.created_at }}</td>
+              <td><a class="btn btn-sm btn-outline-primary" href="{{ r.download_url }}">Descargar</a></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-secondary text-center py-5">Aún no hay reportes generados</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const today = new Date().toISOString().slice(0, 10);
+  const monthAgo = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+  document.getElementById("end").value = today;
+  document.getElementById("start").value = monthAgo;
+
+  const rtype = document.getElementById("rtype");
+  const periodFields = document.getElementById("period-fields");
+  const modelField = document.getElementById("model-field");
+  const modelPick = document.getElementById("model_pick");
+  if (modelPick) {
+    modelPick.addEventListener("change", () => {
+      if (modelPick.value) document.getElementById("model_id").value = modelPick.value;
+    });
+  }
+  function syncType() {
+    const isModel = rtype.value === "modelo";
+    periodFields.classList.toggle("d-none", isModel);
+    modelField.classList.toggle("d-none", !isModel);
+    document.getElementById("start").required = !isModel;
+    document.getElementById("end").required = !isModel;
+  }
+  rtype.addEventListener("change", syncType);
+  syncType();
+
+  document.getElementById("report-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("report-msg");
+    msg.textContent = "Generando…";
+    msg.className = "small";
+    try {
+      let url, body;
+      if (rtype.value === "alertas") {
+        url = "/api/reports/alertas";
+        body = { start: document.getElementById("start").value, end: document.getElementById("end").value };
+      } else if (rtype.value === "ejecutivo") {
+        url = "/api/reports/ejecutivo";
+        body = { start: document.getElementById("start").value, end: document.getElementById("end").value };
+      } else {
+        const id = document.getElementById("model_id").value;
+        if (!id) throw new Error("Indica el ID del modelo");
+        url = `/api/reports/modelo/${id}`;
+        body = {};
+      }
+      const data = await PG.api(url, { method: "POST", body });
+      const dl = data.report && data.report.download_url;
+      msg.textContent = "Listo. Descargando…";
+      msg.className = "small text-success";
+      if (dl) window.location.href = dl;
+      else location.reload();
+    } catch (err) {
+      msg.textContent = err.message || "Error al generar";
+      msg.className = "small text-danger";
+    }
+  });
+</script>
+{% endblock %}

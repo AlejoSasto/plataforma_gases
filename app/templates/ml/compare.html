@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "partials/_metric_gate.html" import gate_badge %}
+{% block page_title %}Comparativa de modelos{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Vista thesis: métricas clave y cumplimiento de umbrales.</p>
+  </div>
+  <div class="page-header-actions">
+    <a class="btn btn-outline-secondary btn-sm" href="/ml/models">Catálogo</a>
+    {% if 'reports.export' in permissions %}
+    <button class="btn btn-primary btn-sm" type="button" id="btn-xlsx">Descargar Excel</button>
+    {% endif %}
+  </div>
+</div>
+
+<div class="panel mb-4">
+  <h2 class="section-title mb-3">F1 / Recall / Precisión</h2>
+  <canvas id="compareChart" height="110"></canvas>
+</div>
+
+<div class="panel panel-flush">
+  <div class="table-responsive-wrap">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Algoritmo</th><th>Familia</th><th>F1</th><th>Recall</th><th>Precisión</th>
+          <th>FN%</th><th>RMSE</th><th>Lead</th><th>Thesis</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for m in compare %}
+        {% set g = (m.metrics or {}).get('gates') or {} %}
+        <tr>
+          <td><a href="/ml/models/{{ m.id }}">{{ m.algorithm }}</a></td>
+          <td>{{ m.family or "—" }}</td>
+          <td>{{ "%.3f"|format(m.metrics.f1) if m.metrics.get('f1') is not none else "—" }}</td>
+          <td>{{ "%.3f"|format(m.metrics.recall) if m.metrics.get('recall') is not none else "—" }}</td>
+          <td>{{ "%.3f"|format(m.metrics.precision) if m.metrics.get('precision') is not none else "—" }}</td>
+          <td>{{ "%.1f%%"|format((m.metrics.false_negative_rate or 0)*100) if m.metrics.get('false_negative_rate') is not none else "—" }}</td>
+          <td>{{ "%.4f"|format(m.metrics.rmse) if m.metrics.get('rmse') is not none else "—" }}</td>
+          <td>{{ "%.0f%%"|format((m.metrics.lead_time_hit_rate or 0)*100) if m.metrics.get('lead_time_hit_rate') is not none else "—" }}</td>
+          <td>{{ gate_badge(g.get('meets_thesis')) }}</td>
+          <td>{{ m.status }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="10" class="text-center text-secondary py-5">Sin modelos para comparar</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const compare = {{ compare | tojson }};
+  const labels = compare.map((m) => m.algorithm + "#" + m.id);
+  new Chart(document.getElementById("compareChart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "F1", data: compare.map((m) => (m.metrics || {}).f1 || 0), backgroundColor: "#0F766E" },
+        { label: "Recall", data: compare.map((m) => (m.metrics || {}).recall || 0), backgroundColor: "#0284C8" },
+        { label: "Precisión", data: compare.map((m) => (m.metrics || {}).precision || 0), backgroundColor: "#64748B" },
+      ],
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true, max: 1 } } },
+  });
+  const btn = document.getElementById("btn-xlsx");
+  if (btn) {
+    btn.addEventListener("click", async () => {
+      const data = await PG.api("/api/reports/comparativa", { method: "POST", body: {} });
+      window.location = `/api/reports/${data.report.id}/download`;
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block page_title %}Semáforo operativo{% endblock %}
+{% block topbar_extra %}
+<span class="meta-chip" id="last-updated">—</span>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Estado en vivo por sensor. Actualización automática cada pocos segundos.</p>
+  </div>
+</div>
+
+<div class="filters-bar">
+  <div>
+    <label class="form-label" for="site-filter">Sitio</label>
+    <select id="site-filter" class="form-select" style="min-width: 14rem;">
+      <option value="">Todos los sitios</option>
+      {% for s in sites %}
+      <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+{% if not cards %}
+  {% with title="Aún no hay sensores registrados", message="Configura sitios e ingesta datos para ver el semáforo.", action_href="/ingestion" if can_manage_sensors else None, action_label="Ir a ingesta" if can_manage_sensors else None %}
+  {% include "partials/_empty_state.html" %}
+  {% endwith %}
+{% else %}
+<div class="row g-4" id="semaforo-grid">
+  {% for c in cards %}
+  <div class="col-12 col-md-6 col-xl-4">
+    <a href="/sensors/{{ c.sensor_id }}" class="text-decoration-none text-reset">
+      <article class="sensor-card risk-{{ c.risk_level }}">
+        <div class="sensor-card-head">
+          <div class="sensor-card-identity">
+            <div class="sensor-card-title" title="{{ c.sensor_code }}">{{ c.sensor_code }}</div>
+            <div class="sensor-card-sub">{{ c.site_name }} · {{ c.gas_type }}</div>
+          </div>
+          {% with level=c.risk_level %}{% include "partials/_risk_badge.html" %}{% endwith %}
+        </div>
+        <div class="sensor-card-value">
+          {{ c.last_value if c.last_value is not none else "—" }}{% if c.unit %}<span class="unit">{{ c.unit }}</span>{% endif %}
+        </div>
+        <div class="sensor-card-meta">{{ c.last_at or "Sin lecturas" }}</div>
+      </article>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="mt-5">
+  <div class="panel-header px-1 mb-3">
+    <h2 class="section-title">Alertas activas</h2>
+    <a href="/alerts" class="small fw-semibold text-decoration-none">Ver todas</a>
+  </div>
+  {% with alerts=alerts, empty_message="No hay alertas activas en este momento" %}
+  {% include "partials/_alerts_table.html" %}
+  {% endwith %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const grid = document.getElementById("semaforo-grid");
+  const siteFilter = document.getElementById("site-filter");
+  const updatedEl = document.getElementById("last-updated");
+
+  function riskBadge(level) {
+    const map = {
+      NORMAL: "badge-risk-normal",
+      PRECAUCION: "badge-risk-precaucion",
+      ALERTA: "badge-risk-alerta",
+      CRITICO: "badge-risk-critico",
+    };
+    const cls = map[level] || "bg-secondary";
+    return `<span class="badge badge-risk ${cls}">${level || "—"}</span>`;
+  }
+
+  function renderCards(items) {
+    if (!grid) return;
+    if (!items.length) {
+      grid.innerHTML = `<div class="col-12"><div class="empty-state">Sin sensores para este filtro</div></div>`;
+      return;
+    }
+    grid.innerHTML = items.map((c) => {
+      const value = c.last_value != null ? c.last_value : "—";
+      const unit = c.unit ? `<span class="unit">${c.unit}</span>` : "";
+      const when = c.last_at || "Sin lecturas";
+      return `
+      <div class="col-12 col-md-6 col-xl-4">
+        <a href="/sensors/${c.sensor_id}" class="text-decoration-none text-reset">
+          <article class="sensor-card risk-${c.risk_level || "DESCONOCIDO"}">
+            <div class="sensor-card-head">
+              <div class="sensor-card-identity">
+                <div class="sensor-card-title" title="${c.sensor_code}">${c.sensor_code}</div>
+                <div class="sensor-card-sub">${c.site_name} · ${c.gas_type}</div>
+              </div>
+              ${riskBadge(c.risk_level)}
+            </div>
+            <div class="sensor-card-value">${value}${unit}</div>
+            <div class="sensor-card-meta">${when}</div>
+          </article>
+        </a>
+      </div>`;
+    }).join("");
+  }
+
+  async function refresh() {
+    try {
+      const siteId = siteFilter ? siteFilter.value : "";
+      const q = siteId ? `?site_id=${siteId}` : "";
+      const data = await PG.api(`/dashboard/api/semaforo${q}`);
+      renderCards(data.items || []);
+      if (updatedEl) {
+        const t = new Date(data.updated_at);
+        updatedEl.textContent = "Actualizado " + t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      }
+    } catch (e) {
+      if (updatedEl) updatedEl.textContent = "Error al actualizar";
+    }
+  }
+
+  if (siteFilter) siteFilter.addEventListener("change", refresh);
+  setInterval(refresh, 8000);
+  if (updatedEl) {
+    updatedEl.textContent = "Actualizado " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+</script>
+{% endblock %}

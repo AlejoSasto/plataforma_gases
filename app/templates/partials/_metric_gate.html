@@ -1,0 +1,9 @@
+{% macro gate_badge(ok) -%}
+  {% if ok is none %}
+    <span class="badge text-bg-light border text-secondary">N/A</span>
+  {% elif ok %}
+    <span class="badge text-bg-success-subtle text-success border border-success-subtle">OK</span>
+  {% else %}
+    <span class="badge text-bg-danger-subtle text-danger border border-danger-subtle">No</span>
+  {% endif %}
+{%- endmacro %}

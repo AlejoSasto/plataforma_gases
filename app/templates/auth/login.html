@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="login-page">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-5 col-lg-4">
+        <div class="text-center mb-4">
+          <div class="login-brand">Plataforma Gases</div>
+          <p class="text-secondary mb-0 mt-2">Monitoreo y predicción de gases</p>
+        </div>
+        <div class="login-card">
+          <form id="login-form" class="vstack gap-3">
+            <div>
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control form-control-lg" id="email" name="email" required autocomplete="username">
+            </div>
+            <div>
+              <label for="password" class="form-label">Contraseña</label>
+              <input type="password" class="form-control form-control-lg" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <div id="error" class="alert alert-danger d-none py-2 mb-0" role="alert"></div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">Iniciar sesión</button>
+            <p class="small text-secondary text-center mb-0 mt-1">
+              <span title="Fase futura">¿Olvidaste tu contraseña?</span>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById("login-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const errorEl = document.getElementById("error");
+    errorEl.classList.add("d-none");
+    try {
+      await PG.api("/auth/login", {
+        method: "POST",
+        body: {
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        },
+      });
+      window.location.href = "/";
+    } catch (err) {
+      errorEl.textContent = (err.data && err.data.message) || "Credenciales inválidas";
+      errorEl.classList.remove("d-none");
+    }
+  });
+</script>
+{% endblock %}

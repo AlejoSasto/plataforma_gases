@@ -1,0 +1,19 @@
+﻿Descripción,Sensor,Número de Periodo,Gas,Leyendo,Unidad,STEL Máx,TWA máximo,Tiempo de Inicio,Tiempo de finalización,Sitio,Factor de Respuesta,Factor,Alarma,Temperatura
+LEL(CH4),Sensor SN: 24062BR010#S0021,Periodo 2,Gas combustible,0.0,%vol,,,2024-12-11 14:45:31,2024-12-11 14:46:01,,,Metano,,18.0
+H2S,Sensor SN: 160541U005#S0002,Periodo 2,Sulfuro de hidrógeno,0.0,ppm,"0,00","0,07",2024-12-11 14:45:31,2024-12-11 14:46:01,,,,,18.0
+O2,Sensor SN: 23050W8028#S0020,Periodo 2,Oxígeno,20.7000007629395,%vol,,,2024-12-11 14:45:31,2024-12-11 14:46:01,,,,,18.0
+CO2,Sensor SN: 17020PE013#S0011,Periodo 2,Dióxido de carbono,0.0199999995529652,%vol,"0,00","0,01",2024-12-11 14:45:31,2024-12-11 14:46:01,,,,,18.0
+CO,Sensor SN: 160541U005#S0001,Periodo 2,Monóxido de carbono,0.0,ppm,"0,00","0,02",2024-12-11 14:45:31,2024-12-11 14:46:01,,,,,18.0
+NO2,Sensor SN: 2210031012#S0004,Periodo 2,Dióxido de nitrógeno,0.0,ppm,,,2024-12-11 14:45:31,2024-12-11 14:46:01,,,,,18.0
+CO,Sensor SN: 160541U005#S0001,Periodo 1,Monóxido de carbono,27.0,ppm,"0,30","0,01",2024-12-11 14:55:54,2024-12-11 14:56:04,,,,Baja,20.0
+H2S,Sensor SN: 160541U005#S0002,Periodo 1,Sulfuro de hidrógeno,5.19999980926514,ppm,"0,06","0,00",2024-12-11 14:55:54,2024-12-11 14:56:04,,,,Alta,20.0
+CO2,Sensor SN: 17020PE013#S0011,Periodo 1,Dióxido de carbono,0.430000007152557,%vol,,,2024-12-11 14:55:54,2024-12-11 14:56:04,,,,,20.0
+NO2,Sensor SN: 2210031012#S0004,Periodo 1,Dióxido de nitrógeno,0.0,ppm,,,2024-12-11 14:55:54,2024-12-11 14:56:04,,,,,20.0
+O2,Sensor SN: 23050W8028#S0020,Periodo 1,Oxígeno,20.7999992370605,%vol,,,2024-12-11 14:55:54,2024-12-11 14:56:04,,,,,20.0
+LEL(CH4),Sensor SN: 24062BR010#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2024-12-11 14:55:54,2024-12-11 14:56:04,,,Metano,,20.0
+LEL(CH4),Sensor SN: 24062BR010#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2024-12-11 15:15:52,2024-12-11 15:16:02,,,Metano,,21.0
+NO2,Sensor SN: 2210031012#S0004,Periodo 1,Dióxido de nitrógeno,0.0,ppm,,,2024-12-11 15:15:52,2024-12-11 15:16:02,,,,,21.0
+O2,Sensor SN: 23050W8028#S0020,Periodo 1,Oxígeno,20.8999996185303,%vol,,,2024-12-11 15:15:52,2024-12-11 15:16:02,,,,,21.0
+H2S,Sensor SN: 160541U005#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2024-12-11 15:15:52,2024-12-11 15:16:02,,,,,21.0
+CO,Sensor SN: 160541U005#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2024-12-11 15:15:52,2024-12-11 15:16:02,,,,,21.0
+CO2,Sensor SN: 17020PE013#S0011,Periodo 1,Dióxido de carbono,-0.0399999991059303,%vol,,,2024-12-11 15:15:52,2024-12-11 15:16:02,,,,,21.0

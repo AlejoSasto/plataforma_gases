@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block page_title %}Bandeja de alertas{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-subtitle mb-0">Filtra y gestiona alertas abiertas, reconocidas y resueltas.</p>
+  </div>
+</div>
+
+<form class="filters-bar" method="get">
+  <div>
+    <label class="form-label">Estado</label>
+    <select name="status" class="form-select" style="min-width: 9rem;">
+      <option value="">Todos</option>
+      {% for s in ["abierta", "reconocida", "resuelta"] %}
+      <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="form-label">Nivel</label>
+    <select name="level" class="form-select" style="min-width: 9rem;">
+      <option value="">Todos</option>
+      {% for lv in ["PRECAUCION", "ALERTA", "CRITICO"] %}
+      <option value="{{ lv }}" {% if level == lv %}selected{% endif %}>{{ lv }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="form-label">Sitio</label>
+    <select name="site_id" class="form-select" style="min-width: 12rem;">
+      <option value="">Todos</option>
+      {% for s in sites %}
+      <option value="{{ s.id }}" {% if site_id|string == s.id|string %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <button class="btn btn-primary" type="submit">Filtrar</button>
+  </div>
+</form>
+
+{% with alerts=alerts, empty_message="No hay alertas con estos filtros" %}
+{% include "partials/_alerts_table.html" %}
+{% endwith %}
+
+<nav class="mt-3" aria-label="Paginación">
+  <ul class="pagination pagination-sm mb-0">
+    {% if page > 1 %}
+    <li class="page-item"><a class="page-link" href="?page={{ page - 1 }}&status={{ status }}&level={{ level }}&site_id={{ site_id }}">Anterior</a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Pág. {{ page }} · {{ total }} total</span></li>
+    {% if page * page_size < total %}
+    <li class="page-item"><a class="page-link" href="?page={{ page + 1 }}&status={{ status }}&level={{ level }}&site_id={{ site_id }}">Siguiente</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}

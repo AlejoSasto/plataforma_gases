@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ title or "Plataforma Gases" }}{% endblock %} — Plataforma Gases</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/theme.css" rel="stylesheet">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% if current_user %}
+  <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar" aria-label="Navegación principal">
+      <a class="brand" href="/">
+        <span class="brand-name">Plataforma Gases</span>
+        <span class="brand-tag">Monitoreo de gases</span>
+      </a>
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <div class="nav-section">Operación</div>
+        <a class="nav-link {% if active_nav == 'inicio' %}active{% endif %}" href="/">Inicio</a>
+        {% if 'predictions.view' in permissions or 'sensors.manage' in permissions or 'dashboard.view_all_sites' in permissions %}
+        <a class="nav-link {% if active_nav == 'sites' %}active{% endif %}" href="/sites">Sitios y sensores</a>
+        {% endif %}
+        {% if 'alerts.view' in permissions %}
+        <a class="nav-link {% if active_nav == 'alerts' %}active{% endif %}" href="/alerts">Alertas</a>
+        {% endif %}
+
+        {% if 'sensors.manage' in permissions or 'models.train' in permissions or 'reports.export' in permissions or 'admin' in roles %}
+        <div class="nav-section">Datos</div>
+        {% if 'sensors.manage' in permissions %}
+        <a class="nav-link {% if active_nav == 'ingestion' %}active{% endif %}" href="/ingestion">Ingesta / ETL</a>
+        {% endif %}
+        {% if 'models.train' in permissions %}
+        <a class="nav-link {% if active_nav == 'ml' %}active{% endif %}" href="/ml/models">Modelos</a>
+        {% endif %}
+        {% if 'reports.export' in permissions %}
+        <a class="nav-link {% if active_nav == 'reports' %}active{% endif %}" href="/reports">Reportes</a>
+        {% endif %}
+        {% if 'reports.export' in permissions or 'admin' in roles %}
+        <a class="nav-link {% if active_nav == 'executive' %}active{% endif %}" href="/executive">Resumen ejecutivo</a>
+        {% endif %}
+        {% endif %}
+
+        {% if 'users.manage' in permissions or 'roles.manage' in permissions or 'stakeholders.manage' in permissions or 'audit.view' in permissions %}
+        <div class="nav-section">Administración</div>
+        {% if 'stakeholders.manage' in permissions %}
+        <a class="nav-link {% if active_nav == 'stakeholders' %}active{% endif %}" href="/stakeholders">Partes interesadas</a>
+        {% endif %}
+        {% if 'users.manage' in permissions %}
+        <a class="nav-link {% if active_nav == 'users' %}active{% endif %}" href="/users">Usuarios</a>
+        {% endif %}
+        {% if 'roles.manage' in permissions %}
+        <a class="nav-link {% if active_nav == 'roles' %}active{% endif %}" href="/roles">Roles y permisos</a>
+        {% endif %}
+        {% if 'audit.view' in permissions %}
+        <a class="nav-link {% if active_nav == 'audit' %}active{% endif %}" href="/audit">Auditoría</a>
+        {% endif %}
+        {% endif %}
+      </nav>
+      <div class="sidebar-footer">
+        <a class="nav-link {% if active_nav == 'profile' %}active{% endif %}" href="/profile">{{ current_user.full_name or current_user.email }}</a>
+      </div>
+    </aside>
+    <div class="app-main">
+      <header class="app-topbar">
+        <button class="btn btn-outline-secondary btn-sm d-md-none" type="button" id="sidebar-toggle" aria-label="Abrir menú">☰</button>
+        <div class="flex-grow-1">
+          <h1 class="topbar-title">{% block page_title %}{{ title or "" }}{% endblock %}</h1>
+        </div>
+        {% block topbar_extra %}{% endblock %}
+      </header>
+      <main class="app-content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+{% else %}
+  {% block body %}{% endblock %}
+{% endif %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

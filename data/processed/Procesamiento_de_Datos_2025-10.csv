@@ -1,0 +1,185 @@
+﻿Descripción,Sensor,Número de Periodo,Gas,Leyendo,Unidad,STEL Máx,TWA máximo,Tiempo de Inicio,Tiempo de finalización,Sitio,Factor de Respuesta,Factor,Alarma,Temperatura
+O2,Sensor SN: 2412083053#S0020,Periodo 1,Oxígeno,21.0,%vol,,,2025-10-10 09:21:45,2025-10-10 09:22:45,,,,,22.0
+LEL(CH4),Sensor SN: 231215G022#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-10 09:21:45,2025-10-10 09:23:45,,,Metano,,22.0
+NO2,Sensor SN: 21080LJ005#S0004,Periodo 1,Dióxido de nitrógeno,0.0,ppm,,,2025-10-10 09:21:45,2025-10-10 09:23:45,,,,,22.0
+H2S,Sensor SN: 210802X034#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-10 09:21:45,2025-10-10 09:23:45,,,,,22.0
+CO,Sensor SN: 210802X034#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-10 09:21:45,2025-10-10 09:23:45,,,,,22.0
+CO2,Sensor SN: 17030B6004#S0011,Periodo 1,Dióxido de carbono,0.0,%vol,,,2025-10-10 09:21:45,2025-10-10 09:22:45,,,,,22.0
+O2,Sensor SN: 2412083053#S0020,Periodo 1,Oxígeno,20.8999996185303,%vol,,,2025-10-10 09:22:45,2025-10-10 09:23:45,,,,,22.0
+CO2,Sensor SN: 17030B6004#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,,,2025-10-10 09:22:45,2025-10-10 09:23:45,,,,,22.0
+CO2,Sensor SN: 17030B6004#S0011,Periodo 1,Dióxido de carbono,0.0799999982118607,%vol,"0,01","0,00",2025-10-10 09:24:10,2025-10-10 09:26:10,,,,,22.0
+H2S,Sensor SN: 210802X034#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-10 09:24:10,2025-10-10 09:26:10,,,,,22.0
+NO2,Sensor SN: 21080LJ005#S0004,Periodo 1,Dióxido de nitrógeno,0.0,ppm,,,2025-10-10 09:24:10,2025-10-10 09:26:10,,,,,22.0
+LEL(CH4),Sensor SN: 231215G022#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-10 09:24:10,2025-10-10 09:26:10,,,Metano,,22.0
+O2,Sensor SN: 2412083053#S0020,Periodo 1,Oxígeno,20.8999996185303,%vol,,,2025-10-10 09:24:10,2025-10-10 09:25:10,,,,,22.0
+CO,Sensor SN: 210802X034#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-10 09:24:10,2025-10-10 09:26:10,,,,,22.0
+O2,Sensor SN: 2412083053#S0020,Periodo 1,Oxígeno,20.7999992370605,%vol,,,2025-10-10 09:25:10,2025-10-10 09:26:10,,,,,22.0
+CO2,Sensor SN: 17030B6004#S0011,Periodo 1,Dióxido de carbono,0.0,%vol,,,2025-10-10 09:27:06,2025-10-10 09:28:06,,,,,23.0
+H2S,Sensor SN: 210802X034#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-10 09:27:06,2025-10-10 09:28:06,,,,,23.0
+LEL(CH4),Sensor SN: 231215G022#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-10 09:27:06,2025-10-10 09:28:06,,,Metano,,23.0
+NO2,Sensor SN: 21080LJ005#S0004,Periodo 1,Dióxido de nitrógeno,0.0,ppm,,,2025-10-10 09:27:06,2025-10-10 09:28:06,,,,,23.0
+O2,Sensor SN: 2412083053#S0020,Periodo 1,Oxígeno,20.8999996185303,%vol,,,2025-10-10 09:27:06,2025-10-10 09:28:06,,,,,23.0
+CO,Sensor SN: 210802X034#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-10 09:27:06,2025-10-10 09:28:06,,,,,23.0
+LEL(CH4),Sensor SN: 231215G022#S0021,Periodo 2,Gas combustible,0.0,%vol,,,2025-10-10 09:28:38,2025-10-10 09:39:38,,,Metano,,23.0
+CO2,Sensor SN: 17030B6004#S0011,Periodo 2,Dióxido de carbono,0.0,%vol,,,2025-10-10 09:28:38,2025-10-10 09:39:38,,,,,23.0
+H2S,Sensor SN: 210802X034#S0002,Periodo 2,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-10 09:28:38,2025-10-10 09:39:38,,,,,23.0
+O2,Sensor SN: 2412083053#S0020,Periodo 2,Oxígeno,21.0,%vol,,,2025-10-10 09:28:38,2025-10-10 09:39:38,,,,,23.0
+CO,Sensor SN: 210802X034#S0001,Periodo 2,Monóxido de carbono,0.0,ppm,,,2025-10-10 09:28:38,2025-10-10 09:39:38,,,,,23.0
+NO2,Sensor SN: 21080LJ005#S0004,Periodo 2,Dióxido de nitrógeno,0.0,ppm,,,2025-10-10 09:28:38,2025-10-10 09:39:38,,,,,23.0
+CO2,Sensor SN: 17030B6004#S0011,Periodo 3,Dióxido de carbono,0.0,%vol,,,2025-10-17 15:12:47,2025-10-17 15:13:47,,,,,16.0
+NO2,Sensor SN: 21080LJ005#S0004,Periodo 3,Dióxido de nitrógeno,0.0,ppm,,,2025-10-17 15:12:47,2025-10-17 15:13:47,,,,,16.0
+H2S,Sensor SN: 210802X034#S0002,Periodo 3,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-17 15:12:47,2025-10-17 15:13:47,,,,,16.0
+CO,Sensor SN: 210802X034#S0001,Periodo 3,Monóxido de carbono,0.0,ppm,,,2025-10-17 15:12:47,2025-10-17 15:13:47,,,,,16.0
+O2,Sensor SN: 2412083053#S0020,Periodo 3,Oxígeno,20.8999996185303,%vol,,,2025-10-17 15:12:47,2025-10-17 15:13:47,,,,,16.0
+LEL(CH4),Sensor SN: 231215G022#S0021,Periodo 3,Gas combustible,0.0,%vol,,,2025-10-17 15:12:47,2025-10-17 15:13:47,,,Metano,,16.0
+CO2,Sensor SN: 24011Y1009#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,,,2025-10-24 14:59:55,2025-10-24 15:00:55,,,,,16.0
+O2,Sensor SN: 2510140176#S0020,Periodo 1,Oxígeno,23.7000007629395,%vol,,,2025-10-24 14:59:55,2025-10-24 15:00:55,,,,Alta,16.0
+NO2,Sensor SN: 23110Z4010#S0004,Periodo 1,Dióxido de nitrógeno,0.0,ppm,,,2025-10-24 14:59:55,2025-10-24 15:00:55,,,,,16.0
+LEL(CH4),Sensor SN: 23110AS018#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-24 14:59:55,2025-10-24 15:00:55,,,Metano,,16.0
+CO,Sensor SN: 231025H023#S0001,Periodo 1,Monóxido de carbono,-3.0,ppm,,,2025-10-24 14:59:55,2025-10-24 15:00:55,,,,,16.0
+H2S,Sensor SN: 231025H023#S0002,Periodo 1,Sulfuro de hidrógeno,-0.699999988079071,ppm,,,2025-10-24 14:59:55,2025-10-24 15:00:55,,,,,16.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:07:52,2025-10-27 10:08:12,,,,,27.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:07:52,2025-10-27 10:08:12,,,,,27.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 1,Gas combustible,0.0,%lel,,,2025-10-27 10:07:52,2025-10-27 10:08:12,,,Pentano,,27.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 1,Oxígeno,0.0,%vol,,,2025-10-27 10:07:52,2025-10-27 10:08:12,,,,Baja,27.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0,%vol,,,2025-10-27 10:07:52,2025-10-27 10:08:12,,,,,27.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,2.30999994277954,%vol,"0,31","0,01",2025-10-27 10:13:01,2025-10-27 10:15:01,,,,Alta,28.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:13:01,2025-10-27 10:15:01,,,,,28.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 1,Oxígeno,0.0,%vol,,,2025-10-27 10:13:01,2025-10-27 10:15:01,,,,Baja,28.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 1,Gas combustible,0.0,%lel,,,2025-10-27 10:13:01,2025-10-27 10:15:01,,,Pentano,,28.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:13:01,2025-10-27 10:15:01,,,,,28.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 2,Oxígeno,0.0,%vol,,,2025-10-27 10:26:05,2025-10-27 10:26:45,,,,Baja,27.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,0.0,%lel,,,2025-10-27 10:26:05,2025-10-27 10:26:45,,,Pentano,,27.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0099999997764825,%vol,"0,00","0,01",2025-10-27 10:26:05,2025-10-27 10:26:35,,,,,27.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:26:05,2025-10-27 10:26:45,,,,,27.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:26:05,2025-10-27 10:26:45,,,,,27.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0199999995529652,%vol,"0,00","0,01",2025-10-27 10:26:35,2025-10-27 10:26:45,,,,,27.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 3,Gas combustible,0.0,%lel,,,2025-10-27 10:39:33,2025-10-27 10:40:03,,,Pentano,,29.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 3,Dióxido de carbono,0.0199999995529652,%vol,"0,00","0,01",2025-10-27 10:39:33,2025-10-27 10:40:03,,,,,29.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 3,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:39:33,2025-10-27 10:39:53,,,,,29.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 3,Monóxido de carbono,4.0,ppm,"0,04","0,00",2025-10-27 10:39:33,2025-10-27 10:39:43,,,,,29.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 3,Oxígeno,0.0,%vol,,,2025-10-27 10:39:33,2025-10-27 10:40:03,,,,Baja,29.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 3,Monóxido de carbono,0.0,ppm,"0,04","0,00",2025-10-27 10:39:43,2025-10-27 10:40:03,,,,,29.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 3,Sulfuro de hidrógeno,-0.5,ppm,,,2025-10-27 10:39:53,2025-10-27 10:40:03,,,,,29.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:42:02,2025-10-27 10:43:12,,,,,29.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,0.699999988079071,ppm,"0,01","0,00",2025-10-27 10:42:02,2025-10-27 10:42:12,,,,,29.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 1,Oxígeno,0.0,%vol,,,2025-10-27 10:42:02,2025-10-27 10:43:12,,,,Baja,29.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 1,Gas combustible,0.0,%lel,,,2025-10-27 10:42:02,2025-10-27 10:43:12,,,Pentano,,29.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:42:02,2025-10-27 10:42:42,,,,,29.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,"0,01","0,00",2025-10-27 10:42:12,2025-10-27 10:42:22,,,,,29.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,-0.600000023841858,ppm,"0,01","0,00",2025-10-27 10:42:22,2025-10-27 10:42:32,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,-1.0,ppm,"0,01","0,00",2025-10-27 10:42:32,2025-10-27 10:42:42,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,-0.800000011920929,ppm,"0,01","0,00",2025-10-27 10:42:42,2025-10-27 10:43:02,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0,%vol,,,2025-10-27 10:42:42,2025-10-27 10:42:52,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,,,2025-10-27 10:42:52,2025-10-27 10:43:12,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,-1.0,ppm,"0,01","0,00",2025-10-27 10:43:02,2025-10-27 10:43:12,,,,,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 2,Oxígeno,0.0,%vol,,,2025-10-27 10:43:21,2025-10-27 10:45:21,,,,Baja,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:43:21,2025-10-27 10:44:01,,,,,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,0.0,%lel,,,2025-10-27 10:43:21,2025-10-27 10:44:01,,,Pentano,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,-1.0,ppm,,,2025-10-27 10:43:21,2025-10-27 10:43:31,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0399999991059303,%vol,,,2025-10-27 10:43:21,2025-10-27 10:43:31,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,-0.600000023841858,ppm,,,2025-10-27 10:43:31,2025-10-27 10:43:41,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0299999993294477,%vol,,,2025-10-27 10:43:31,2025-10-27 10:43:41,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:43:41,2025-10-27 10:44:01,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:43:41,2025-10-27 10:44:01,,,,,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,71.0,ppm,"0,79","0,02",2025-10-27 10:44:01,2025-10-27 10:44:11,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,14.6000003814697,ppm,"0,16","0,01",2025-10-27 10:44:01,2025-10-27 10:44:11,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.540000021457672,%vol,"0,01","0,00",2025-10-27 10:44:01,2025-10-27 10:44:11,,,,Baja,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,30.0,%lel,,,2025-10-27 10:44:01,2025-10-27 10:44:11,,,Pentano,Alta,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,59.0,%lel,,,2025-10-27 10:44:11,2025-10-27 10:44:21,,,Pentano,Alta,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,98.0,ppm,"1,88","0,06",2025-10-27 10:44:11,2025-10-27 10:44:21,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,1.75,%vol,"0,03","0,00",2025-10-27 10:44:11,2025-10-27 10:44:21,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,21.1000003814697,ppm,"0,40","0,01",2025-10-27 10:44:11,2025-10-27 10:44:21,,,,Alta,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,101.0,ppm,"5,24","0,16",2025-10-27 10:44:21,2025-10-27 10:44:51,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,22.2000007629395,ppm,"0,64","0,02",2025-10-27 10:44:21,2025-10-27 10:44:31,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,2.10999989509583,%vol,"0,05","0,00",2025-10-27 10:44:21,2025-10-27 10:44:31,,,,Alta,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,61.0,%lel,,,2025-10-27 10:44:21,2025-10-27 10:45:21,,,Pentano,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,22.8999996185303,ppm,"0,90","0,03",2025-10-27 10:44:31,2025-10-27 10:44:41,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,2.25999999046326,%vol,"0,08","0,00",2025-10-27 10:44:31,2025-10-27 10:44:41,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,23.2000007629395,ppm,"1,16","0,04",2025-10-27 10:44:41,2025-10-27 10:44:51,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,2.27999997138977,%vol,"0,10","0,00",2025-10-27 10:44:41,2025-10-27 10:44:51,,,,Alta,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,102.0,ppm,"8,64","0,27",2025-10-27 10:44:51,2025-10-27 10:45:21,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,23.6000003814697,ppm,"1,42","0,04",2025-10-27 10:44:51,2025-10-27 10:45:01,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,2.29999995231628,%vol,"0,13","0,00",2025-10-27 10:44:51,2025-10-27 10:45:01,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,23.7999992370605,ppm,"1,68","0,05",2025-10-27 10:45:01,2025-10-27 10:45:11,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,2.33999991416931,%vol,"0,15","0,00",2025-10-27 10:45:01,2025-10-27 10:45:11,,,,Alta,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 1,Monóxido de carbono,102.0,ppm,"2,27","0,07",2025-10-27 10:45:07,2025-10-27 10:45:27,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,24.1000003814697,ppm,"0,27","0,01",2025-10-27 10:45:07,2025-10-27 10:45:17,,,,Alta,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 1,Gas combustible,60.0,%lel,,,2025-10-27 10:45:07,2025-10-27 10:45:27,,,Pentano,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,2.49000000953674,%vol,"0,03","0,00",2025-10-27 10:45:07,2025-10-27 10:45:17,,,,Alta,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 1,Oxígeno,0.0,%vol,,,2025-10-27 10:45:07,2025-10-27 10:45:37,,,,Baja,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,24.0,ppm,"1,95","0,06",2025-10-27 10:45:11,2025-10-27 10:45:21,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,2.34999990463257,%vol,"0,18","0,01",2025-10-27 10:45:11,2025-10-27 10:45:21,,,,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,24.0,ppm,"0,53","0,02",2025-10-27 10:45:17,2025-10-27 10:45:27,,,,Alta,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,2.5,%vol,"0,06","0,00",2025-10-27 10:45:17,2025-10-27 10:45:27,,,,Alta,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 1,Gas combustible,23.0,%lel,,,2025-10-27 10:45:27,2025-10-27 10:45:37,,,Pentano,Alta,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,8.0,ppm,"0,62","0,02",2025-10-27 10:45:27,2025-10-27 10:45:37,,,,Baja,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 1,Monóxido de carbono,27.0,ppm,"2,57","0,08",2025-10-27 10:45:27,2025-10-27 10:45:37,,,,Baja,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,1.27999997138977,%vol,"0,07","0,00",2025-10-27 10:45:27,2025-10-27 10:45:37,,,,Alta,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,0.0,%lel,,,2025-10-27 10:46:01,2025-10-27 10:47:11,,,Pentano,,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 2,Oxígeno,0.0,%vol,,,2025-10-27 10:46:01,2025-10-27 10:47:11,,,,Baja,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,0.5,ppm,"0,01","0,02",2025-10-27 10:46:01,2025-10-27 10:46:11,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:46:01,2025-10-27 10:47:11,,,,,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,0.0,ppm,"0,00","0,08",2025-10-27 10:46:01,2025-10-27 10:47:11,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,0.0,ppm,"0,01","0,02",2025-10-27 10:46:11,2025-10-27 10:47:11,,,,,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 3,Monóxido de carbono,0.0,ppm,"0,00","0,08",2025-10-27 10:47:14,2025-10-27 10:47:44,,,,,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 3,Oxígeno,0.0,%vol,,,2025-10-27 10:47:14,2025-10-27 10:47:44,,,,Baja,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 3,Gas combustible,0.0,%lel,,,2025-10-27 10:47:14,2025-10-27 10:47:44,,,Pentano,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 3,Sulfuro de hidrógeno,-0.600000023841858,ppm,"0,00","0,02",2025-10-27 10:47:14,2025-10-27 10:47:24,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 3,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:47:14,2025-10-27 10:47:44,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 3,Sulfuro de hidrógeno,0.0,ppm,"0,00","0,02",2025-10-27 10:47:24,2025-10-27 10:47:44,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:47:38,2025-10-27 10:47:48,,,,,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:47:38,2025-10-27 10:48:38,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:47:38,2025-10-27 10:48:38,,,,,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 1,Oxígeno,0.0,%vol,,,2025-10-27 10:47:38,2025-10-27 10:48:38,,,,Baja,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 1,Gas combustible,0.0,%lel,,,2025-10-27 10:47:38,2025-10-27 10:48:38,,,Pentano,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,,,2025-10-27 10:47:48,2025-10-27 10:47:58,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0399999991059303,%vol,,,2025-10-27 10:47:58,2025-10-27 10:48:18,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,,,2025-10-27 10:48:18,2025-10-27 10:48:28,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 1,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:48:28,2025-10-27 10:48:38,,,,,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 2,Monóxido de carbono,0.0,ppm,,,2025-10-27 10:48:54,2025-10-27 11:12:34,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:48:54,2025-10-27 10:49:14,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 2,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 10:48:54,2025-10-27 11:12:34,,,,,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 2,Gas combustible,0.0,%lel,,,2025-10-27 10:48:54,2025-10-27 11:12:34,,,Pentano,,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 2,Oxígeno,0.0,%vol,,,2025-10-27 10:48:54,2025-10-27 11:12:34,,,,Baja,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0,%vol,,,2025-10-27 10:49:14,2025-10-27 10:50:24,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:50:24,2025-10-27 10:50:54,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0,%vol,,,2025-10-27 10:50:54,2025-10-27 10:58:34,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 10:58:34,2025-10-27 10:58:44,,,,,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 2,Dióxido de carbono,0.0,%vol,,,2025-10-27 10:58:44,2025-10-27 11:12:34,,,,,30.0
+LEL,Sensor SN: 22081FT036#S0022,Periodo 3,Gas combustible,0.0,%lel,,,2025-10-27 11:12:51,2025-10-27 11:13:21,,,Pentano,,30.0
+CO,Sensor SN: 22061PG059#S0001,Periodo 3,Monóxido de carbono,0.0,ppm,,,2025-10-27 11:12:51,2025-10-27 11:13:21,,,,,30.0
+O2,Sensor SN: 22081JU008#S0020,Periodo 3,Oxígeno,0.0,%vol,,,2025-10-27 11:12:51,2025-10-27 11:13:21,,,,Baja,30.0
+CO2,Sensor SN: 220929G001#S0011,Periodo 3,Dióxido de carbono,0.0099999997764825,%vol,,,2025-10-27 11:12:51,2025-10-27 11:13:21,,,,,30.0
+H2S,Sensor SN: 22061PG059#S0002,Periodo 3,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 11:12:51,2025-10-27 11:13:21,,,,,30.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,20.7999992370605,%vol,,,2025-10-27 14:46:47,2025-10-27 14:47:47,,,,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,-0.0299999993294477,%vol,,,2025-10-27 14:46:47,2025-10-27 14:47:47,,,,,26.0
+LEL(CH4),Sensor SN: 25042V7005#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-27 14:46:47,2025-10-27 14:47:47,,,Metano,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,0.0,ppm,,,2025-10-27 14:46:47,2025-10-27 14:47:47,,,,,26.0
+CO,Sensor SN: 19052Q1004#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 14:46:47,2025-10-27 14:47:47,,,,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.230000004172325,%vol,"0,02","0,00",2025-10-27 14:59:39,2025-10-27 15:00:39,,,,,26.0
+CO,Sensor SN: 19052Q1004#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 14:59:39,2025-10-27 15:01:39,,,,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.100000001490116,ppm,,,2025-10-27 14:59:39,2025-10-27 15:00:39,,,,,26.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,19.3999996185303,%vol,,,2025-10-27 14:59:39,2025-10-27 15:00:39,,,,Baja,26.0
+LEL(CH4),Sensor SN: 25042V7005#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-27 14:59:39,2025-10-27 15:01:39,,,Metano,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,-0.159999996423721,%vol,"0,02","0,00",2025-10-27 15:00:39,2025-10-27 15:01:39,,,,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.600000023841858,ppm,,,2025-10-27 15:00:39,2025-10-27 15:01:39,,,,,26.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,20.8999996185303,%vol,,,2025-10-27 15:00:39,2025-10-27 15:01:39,,,,,26.0
+LEL(CH4),Sensor SN: 25042V7005#S0021,Periodo 1,Gas combustible,0.0,%vol,,,2025-10-27 15:04:31,2025-10-27 15:18:31,,,Metano,,26.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,20.5,%vol,,,2025-10-27 15:04:31,2025-10-27 15:05:31,,,,,26.0
+CO,Sensor SN: 19052Q1004#S0001,Periodo 1,Monóxido de carbono,0.0,ppm,,,2025-10-27 15:04:31,2025-10-27 15:18:31,,,,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.100000001490116,ppm,,,2025-10-27 15:04:31,2025-10-27 15:05:31,,,,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.360000014305115,%vol,"0,02","0,00",2025-10-27 15:04:31,2025-10-27 15:05:31,,,,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.600000023841858,ppm,,,2025-10-27 15:05:31,2025-10-27 15:06:31,,,,,27.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,20.8999996185303,%vol,,,2025-10-27 15:05:31,2025-10-27 15:07:31,,,,,27.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,"0,03","0,00",2025-10-27 15:05:31,2025-10-27 15:08:31,,,,,27.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.699999988079071,ppm,,,2025-10-27 15:06:31,2025-10-27 15:10:31,,,,,27.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,21.0,%vol,,,2025-10-27 15:07:31,2025-10-27 15:16:31,,,,,27.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.0099999997764825,%vol,"0,03","0,00",2025-10-27 15:08:31,2025-10-27 15:09:31,,,,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,"0,03","0,00",2025-10-27 15:09:31,2025-10-27 15:13:31,,,,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.800000011920929,ppm,,,2025-10-27 15:10:31,2025-10-27 15:16:31,,,,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.0299999993294477,%vol,"0,04","0,00",2025-10-27 15:13:31,2025-10-27 15:14:31,,,,,26.0
+CO2,Sensor SN: 161107V011#S0011,Periodo 1,Dióxido de carbono,0.0199999995529652,%vol,"0,04","0,00",2025-10-27 15:14:31,2025-10-27 15:18:31,,,,,26.0
+H2S,Sensor SN: 19052Q1004#S0002,Periodo 1,Sulfuro de hidrógeno,-0.899999976158142,ppm,,,2025-10-27 15:16:31,2025-10-27 15:18:31,,,,,26.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,21.1000003814697,%vol,,,2025-10-27 15:16:31,2025-10-27 15:17:31,,,,,26.0
+O2,Sensor SN: 25031AY140#S0020,Periodo 1,Oxígeno,21.0,%vol,,,2025-10-27 15:17:31,2025-10-27 15:18:31,,,,,25.0
