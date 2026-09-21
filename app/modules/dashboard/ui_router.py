@@ -223,7 +223,14 @@ def ingestion_page(request: Request, db: DbSession, user: CurrentUser, _: CanSen
     from app.modules.sensors_ingestion import service as ingestion_svc
 
     items, _total = ingest_repo.list_etl_runs(db, offset=0, limit=30)
-    runs = [ingestion_svc.etl_run_to_dict(r) for r in items]
+    from app.shared.formatting import format_datetime_short
+
+    runs = []
+    for r in items:
+        d = ingestion_svc.etl_run_to_dict(r)
+        d["started_at"] = format_datetime_short(d.get("started_at"))
+        d["finished_at"] = format_datetime_short(d.get("finished_at"))
+        runs.append(d)
     return _render(
         request,
         "ingestion/panel.html",

@@ -45,12 +45,31 @@ def _train_one(
     device = torch.device("cpu")
     model = model.to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
-    bce = nn.BCEWithLogitsLoss()
+
+    # Normalizar features por canal (train)
+    mean = x_train.mean(axis=(0, 1), keepdims=True)
+    std = x_train.std(axis=(0, 1), keepdims=True)
+    std = np.where(std < 1e-6, 1.0, std)
+    x_train_n = ((x_train - mean) / std).astype(np.float32)
+    x_test_n = ((x_test - mean) / std).astype(np.float32)
+
+    pos = float(max(1, int(y_class_train.sum())))
+    neg = float(max(1, int(len(y_class_train) - pos)))
+    pos_weight = torch.tensor([neg / pos], dtype=torch.float32, device=device)
+    bce = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     mse = nn.MSELoss()
 
-    xt = torch.tensor(x_train, dtype=torch.float32)
+    # Escalar target de regresión
+    y_reg_mean = float(np.nanmean(y_reg_train)) if len(y_reg_train) else 0.0
+    y_reg_std = float(np.nanstd(y_reg_train)) if len(y_reg_train) else 1.0
+    if y_reg_std < 1e-6:
+        y_reg_std = 1.0
+    y_reg_train_n = ((y_reg_train - y_reg_mean) / y_reg_std).astype(np.float32)
+    y_reg_test_n = ((y_reg_test - y_reg_mean) / y_reg_std).astype(np.float32)
+
+    xt = torch.tensor(x_train_n, dtype=torch.float32)
     yc = torch.tensor(y_class_train, dtype=torch.float32)
-    yr = torch.tensor(y_reg_train, dtype=torch.float32)
+    yr = torch.tensor(y_reg_train_n, dtype=torch.float32)
     ds = TensorDataset(xt, yc, yr)
     loader = DataLoader(ds, batch_size=min(batch_size, max(1, len(ds))), shuffle=True)
 
@@ -60,31 +79,49 @@ def _train_one(
             xb, ycb, yrb = xb.to(device), ycb.to(device), yrb.to(device)
             opt.zero_grad()
             out = model(xb)
-            loss = torch.tensor(0.0, device=device)
+            loss = torch.zeros((), device=device)
             if "logits" in out and task in ("classification", "both"):
                 loss = loss + bce(out["logits"], ycb)
             if "reg" in out and task in ("regression", "both"):
                 loss = loss + mse(out["reg"], yrb)
-            if float(loss) == 0.0:
+            if loss.detach().item() == 0.0:
                 continue
             loss.backward()
             opt.step()
 
     model.eval()
+    thr = 0.5
     with torch.no_grad():
-        xte = torch.tensor(x_test, dtype=torch.float32).to(device)
+        xte = torch.tensor(x_test_n, dtype=torch.float32).to(device)
         out = model(xte)
         clf_m = reg_m = lead_m = None
         if "logits" in out and task in ("classification", "both"):
             probs = torch.sigmoid(out["logits"]).cpu().numpy()
-            preds = (probs >= 0.5).astype(int)
+            thr = min(0.5, max(0.15, pos / (pos + neg)))
+            preds = (probs >= thr).astype(int)
             clf_m = classification_metrics(y_class_test, preds)
             lead_m = lead_time_metrics(y_lead_test, preds)
         if "reg" in out and task in ("regression", "both"):
-            yhat = out["reg"].cpu().numpy()
+            yhat_n = out["reg"].cpu().numpy()
+            yhat = yhat_n * y_reg_std + y_reg_mean
             reg_m = regression_metrics(y_reg_test, yhat)
 
-    return model, {"clf": clf_m, "reg": reg_m, "lead": lead_m}
+    model._pg_norm_mean = mean  # type: ignore[attr-defined]
+    model._pg_norm_std = std  # type: ignore[attr-defined]
+    model._pg_reg_mean = y_reg_mean  # type: ignore[attr-defined]
+    model._pg_reg_std = y_reg_std  # type: ignore[attr-defined]
+    model._pg_cls_threshold = float(thr)  # type: ignore[attr-defined]
+
+    return model, {
+        "clf": clf_m,
+        "reg": reg_m,
+        "lead": lead_m,
+        "norm_mean": mean,
+        "norm_std": std,
+        "reg_mean": y_reg_mean,
+        "reg_std": y_reg_std,
+        "cls_threshold": float(thr),
+    }
 
 
 def train_sequence_algorithms(
@@ -101,7 +138,7 @@ def train_sequence_algorithms(
     test_months = int(params.get("test_months", 3))
     lookback = int(params.get("lookback_steps") or 20)
     horizon = float(params.get("horizon_minutes", 7.5))
-    epochs = int(params.get("epochs", 8))
+    epochs = int(params.get("epochs", 12))
 
     seq = build_sequences(
         db,
@@ -155,6 +192,7 @@ def train_sequence_algorithms(
             "n_test": seq.n_test,
             "triggered_by_user_id": triggered_by_user_id,
             "input_shape": [lookback, n_features],
+            "cls_threshold": blocks.get("cls_threshold", 0.5),
         }
 
         with mlflow.start_run(run_name=algo) as run:
@@ -173,6 +211,11 @@ def train_sequence_algorithms(
                         "n_features": n_features,
                         "lookback_steps": lookback,
                         "hidden": 64,
+                        "norm_mean": blocks.get("norm_mean"),
+                        "norm_std": blocks.get("norm_std"),
+                        "reg_mean": blocks.get("reg_mean"),
+                        "reg_std": blocks.get("reg_std"),
+                        "cls_threshold": blocks.get("cls_threshold", 0.5),
                     },
                     path,
                 )

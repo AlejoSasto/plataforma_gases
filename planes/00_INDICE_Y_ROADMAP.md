@@ -20,6 +20,7 @@
 | 10 | `10_SEGURIDAD_TESTING_HARDENING.md` | F9 | Rate limiting, hardening, pruebas de carga, auditoría de seguridad |
 | 11 | `11_UX_UI_MAPEO_PANTALLAS.md` | Complementa F6 | Mapeo de pantallas, navegación por rol, wireframes y flujos de usuario |
 | 12 | `12_MODEL_ZOO_SERIES_METRICAS_UI.md` | Extiende F3/F4/F6 | Model Zoo tabular+DL, pipeline 2D/3D, métricas thesis, UI comparativa |
+| 13 | `13_MVP_FORECAST_HOME_UX.md` | Cierra gap thesis | Forecast operativo 5–10 min, home Chart.js por gas, catálogo nombres, MVP UX |
 
 ## Reglas generales para todos los planes
 
@@ -61,3 +62,4 @@ core (config, db, security)
 | 10 Seguridad/Testing | ⬜ Pendiente | |
 | 11 UX/UI (mapeo pantallas) | ✅ Completado | 2026-09-20 |
 | 12 Model Zoo / series / métricas UI | ✅ Completado | 2026-09-21 |
+| 13 MVP forecast home + UX | ✅ Completado | 2026-09-21 |

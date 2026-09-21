@@ -7,6 +7,7 @@ from typing import Any, Optional
 from sqlalchemy.orm import Session
 
 from app.modules.audit.models import AuditLog
+from app.shared.formatting import format_datetime_short
 
 
 def record_audit(
@@ -61,7 +62,7 @@ def list_audit(
             "resource_id": r.resource_id,
             "metadata": r.metadata_,
             "details": r.details,
-            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "created_at": format_datetime_short(r.created_at),
         }
         for r in rows
     ]

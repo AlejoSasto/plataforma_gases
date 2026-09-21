@@ -42,6 +42,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - ./app:/app/app
+      - ./ml_core:/app/ml_core
+      - ./mlruns:/app/mlruns
       - ./storage/reports:/app/storage/reports
     healthcheck:
       test:

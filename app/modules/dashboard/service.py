@@ -16,7 +16,15 @@ from app.modules.sensors_ingestion.models import EtlRun, GasReading, Sensor, Sit
 from app.modules.stakeholders.models import AlertNotification
 from app.modules.stakeholders.service import alert_ids_visible_to_user
 from app.shared.exceptions import NotFoundError
-from app.shared.formatting import format_datetime_short, format_reading_value
+from app.shared.formatting import (
+    display_gas,
+    display_sensor_code,
+    display_site_name,
+    format_datetime_short,
+    format_reading_value,
+)
+from app.shared.gas_catalog import canonicalize_gas_type, thesis_priority_gases
+from app.modules.predictions import service as pred_service
 
 LEVEL_RANK = {"NORMAL": 0, "PRECAUCION": 1, "ALERTA": 2, "CRITICO": 3}
 
@@ -26,7 +34,7 @@ def list_sites(db: Session) -> list[dict[str, Any]]:
     return [
         {
             "id": s.id,
-            "name": s.name,
+            "name": display_site_name(s.name),
             "description": s.description,
             "sensors_count": len(s.sensors or []),
         }
@@ -86,11 +94,12 @@ def semaforo(db: Session, *, site_id: Optional[int] = None) -> list[dict[str, An
         result.append(
             {
                 "sensor_id": sensor.id,
-                "sensor_code": sensor.code,
-                "gas_type": sensor.gas_type,
+                "sensor_code": display_sensor_code(sensor.code),
+                "gas_type": display_gas(sensor.gas_type),
+                "gas_code": canonicalize_gas_type(sensor.gas_type),
                 "unit": sensor.unit,
                 "site_id": site.id,
-                "site_name": site.name,
+                "site_name": display_site_name(site.name),
                 "risk_level": risk,
                 "last_value": format_reading_value(last_reading.leyendo)
                 if last_reading
@@ -99,6 +108,10 @@ def semaforo(db: Session, *, site_id: Optional[int] = None) -> list[dict[str, An
                 if last_reading
                 else None,
                 "probability": last_pred.probability if last_pred else None,
+                "predicted_concentration": (
+                    last_pred.predicted_concentration if last_pred else None
+                ),
+                "horizon_minutes": last_pred.horizon_minutes if last_pred else None,
                 "open_alert_id": open_alert.id if open_alert else None,
             }
         )
@@ -133,15 +146,193 @@ def series_for_sensor(
     last = readings[-1] if readings else None
     return {
         "sensor_id": sensor.id,
-        "sensor_code": sensor.code,
-        "gas_type": sensor.gas_type,
+        "sensor_code": display_sensor_code(sensor.code),
+        "gas_type": display_gas(sensor.gas_type),
         "unit": sensor.unit,
         "site_id": sensor.site_id,
-        "site_name": site.name if site else None,
+        "site_name": display_site_name(site.name) if site else None,
         "hours": hours,
         "points": points,
         "stel_max": last.stel_max if last else None,
         "twa_max": last.twa_max if last else None,
+    }
+
+
+def forecast_by_gas(
+    db: Session,
+    *,
+    site_id: Optional[int] = None,
+    hours: int = 6,
+    horizon_minutes: float = 7.5,
+) -> dict[str, Any]:
+    """Series históricas + proyección de concentración agrupadas por gas canónico."""
+    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+    priority = thesis_priority_gases()
+    forecast_available = pred_service.has_sequence_production(db)
+
+    q = (
+        db.query(GasReading, Sensor)
+        .join(Sensor, Sensor.id == GasReading.sensor_id)
+        .filter(
+            GasReading.tiempo_inicio >= since,
+            GasReading.is_synthetic.is_(False),
+        )
+    )
+    if site_id is not None:
+        q = q.filter(Sensor.site_id == site_id)
+    rows = q.order_by(GasReading.tiempo_inicio.asc()).limit(8000).all()
+
+    # bucket: gas_code -> minute_iso -> list values
+    hist_buckets: dict[str, dict[str, list[float]]] = {g: {} for g in priority}
+    last_by_sensor: dict[int, GasReading] = {}
+    sensors_by_gas: dict[str, set[int]] = {g: set() for g in priority}
+
+    for reading, sensor in rows:
+        code = canonicalize_gas_type(sensor.gas_type)
+        if code not in hist_buckets:
+            hist_buckets[code] = {}
+            sensors_by_gas.setdefault(code, set())
+        sensors_by_gas[code].add(sensor.id)
+        minute_key = reading.tiempo_inicio.replace(second=0, microsecond=0).isoformat()
+        hist_buckets[code].setdefault(minute_key, []).append(float(reading.leyendo))
+        prev = last_by_sensor.get(sensor.id)
+        if prev is None or reading.tiempo_inicio >= prev.tiempo_inicio:
+            last_by_sensor[sensor.id] = reading
+
+    # Fallback: gases thesis sin datos en la ventana → últimas lecturas
+    for code in priority:
+        if hist_buckets.get(code):
+            continue
+        sq = (
+            db.query(GasReading, Sensor)
+            .join(Sensor, Sensor.id == GasReading.sensor_id)
+            .filter(
+                GasReading.is_synthetic.is_(False),
+                Sensor.gas_type == code,
+            )
+        )
+        if site_id is not None:
+            sq = sq.filter(Sensor.site_id == site_id)
+        fallback = sq.order_by(GasReading.tiempo_inicio.desc()).limit(200).all()
+        for reading, sensor in reversed(fallback):
+            sensors_by_gas.setdefault(code, set()).add(sensor.id)
+            minute_key = reading.tiempo_inicio.replace(second=0, microsecond=0).isoformat()
+            hist_buckets.setdefault(code, {})
+            hist_buckets[code].setdefault(minute_key, []).append(float(reading.leyendo))
+            prev = last_by_sensor.get(sensor.id)
+            if prev is None or reading.tiempo_inicio >= prev.tiempo_inicio:
+                last_by_sensor[sensor.id] = reading
+
+    gases_payload: list[dict[str, Any]] = []
+    model_bundle = None
+    if forecast_available:
+        try:
+            model_bundle = pred_service._load_production_model(db, scope="global")
+        except Exception:  # noqa: BLE001
+            forecast_available = False
+            model_bundle = None
+
+    gas_codes = list(priority)
+    for code in hist_buckets:
+        if code not in gas_codes:
+            gas_codes.append(code)
+
+    for code in gas_codes:
+        buckets = hist_buckets.get(code) or {}
+        historical = []
+        for t_key in sorted(buckets.keys()):
+            vals = buckets[t_key]
+            if not vals:
+                continue
+            historical.append(
+                {
+                    "t": t_key,
+                    "t_label": format_datetime_short(t_key),
+                    "value": round(sum(vals) / len(vals), 4),
+                }
+            )
+
+        forecast_points: list[dict[str, Any]] = []
+        if forecast_available and model_bundle is not None:
+            sensor_ids = sensors_by_gas.get(code) or set()
+            concs: list[float] = []
+            base_ts = None
+            for sid in sensor_ids:
+                reading = last_by_sensor.get(sid)
+                if reading is None:
+                    continue
+                # Preferir predicción persistida
+                pred = (
+                    db.query(Prediction)
+                    .filter(Prediction.gas_reading_id == reading.id)
+                    .order_by(Prediction.created_at.desc())
+                    .first()
+                )
+                conc = pred.predicted_concentration if pred else None
+                h = (
+                    pred.horizon_minutes
+                    if pred and pred.horizon_minutes
+                    else horizon_minutes
+                )
+                if conc is None:
+                    conc = pred_service.forecast_concentration_for_reading(
+                        db, reading, model_bundle=model_bundle
+                    )
+                if conc is not None:
+                    concs.append(float(conc))
+                    if base_ts is None or reading.tiempo_inicio > base_ts:
+                        base_ts = reading.tiempo_inicio
+
+            if concs and base_ts is not None:
+                avg_conc = sum(concs) / len(concs)
+                # Anclar: último real → proyección a t+h
+                last_real = historical[-1]["value"] if historical else avg_conc
+                last_t = (
+                    datetime.fromisoformat(historical[-1]["t"].replace("Z", "+00:00"))
+                    if historical
+                    else base_ts
+                )
+                if last_t.tzinfo is None:
+                    last_t = last_t.replace(tzinfo=timezone.utc)
+                future_t = last_t + timedelta(minutes=float(h))
+                forecast_points = [
+                    {
+                        "t": last_t.isoformat(),
+                        "t_label": format_datetime_short(last_t),
+                        "value": round(float(last_real), 4),
+                    },
+                    {
+                        "t": future_t.isoformat(),
+                        "t_label": format_datetime_short(future_t),
+                        "value": round(float(avg_conc), 4),
+                    },
+                ]
+
+        gases_payload.append(
+            {
+                "gas_code": code,
+                "gas_label": display_gas(code),
+                "unit": None,
+                "sensors_count": len(sensors_by_gas.get(code) or []),
+                "historical": historical,
+                "forecast": forecast_points,
+            }
+        )
+
+    # Solo gases con datos o prioritarios
+    gases_payload = [
+        g
+        for g in gases_payload
+        if g["historical"] or g["forecast"] or g["gas_code"] in priority
+    ]
+
+    return {
+        "hours": hours,
+        "horizon_minutes": horizon_minutes,
+        "site_id": site_id,
+        "forecast_available": forecast_available,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "gases": gases_payload,
     }
 
 
@@ -254,8 +445,8 @@ def ingeniero_snapshot(db: Session) -> dict[str, Any]:
             {
                 "id": r.id,
                 "status": r.status,
-                "started_at": r.started_at.isoformat() if r.started_at else None,
-                "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+                "started_at": format_datetime_short(r.started_at),
+                "finished_at": format_datetime_short(r.finished_at),
                 "rows_ingested": r.rows_ingested,
                 "rows_rejected": r.rows_rejected,
             }
@@ -268,8 +459,10 @@ def ingeniero_snapshot(db: Session) -> dict[str, Any]:
                 "version": m.version,
                 "algorithm": m.algorithm,
                 "status": m.status,
+                "family": (m.params or {}).get("family"),
+                "task": (m.params or {}).get("task"),
                 "metrics": m.metrics or {},
-                "trained_at": m.trained_at.isoformat() if m.trained_at else None,
+                "trained_at": format_datetime_short(m.trained_at),
             }
             for m in models
         ],
@@ -277,12 +470,14 @@ def ingeniero_snapshot(db: Session) -> dict[str, Any]:
             {
                 "id": j.id,
                 "status": j.status,
-                "started_at": j.started_at.isoformat() if j.started_at else None,
-                "finished_at": j.finished_at.isoformat() if j.finished_at else None,
+                "started_at": format_datetime_short(j.started_at),
+                "finished_at": format_datetime_short(j.finished_at),
             }
             for j in jobs
         ],
-        "gas_distribution": [{"gas_type": g or "UNKNOWN", "count": c} for g, c in gas_dist],
+        "gas_distribution": [
+            {"gas_type": display_gas(g), "count": c} for g, c in gas_dist
+        ],
     }
 
 
@@ -325,6 +520,8 @@ def recent_predictions_for_sensor(
             "probability": format_reading_value(p.probability, decimals=3),
             "risk_level": p.risk_level,
             "predicted_label": p.predicted_label,
+            "predicted_concentration": format_reading_value(p.predicted_concentration),
+            "horizon_minutes": p.horizon_minutes,
             "created_at": format_datetime_short(p.created_at),
             "model_registry_id": p.model_registry_id,
         }

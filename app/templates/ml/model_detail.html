@@ -12,6 +12,10 @@
       <span class="meta-chip">{{ model.algorithm }}</span>
       <span class="meta-chip">{{ model.family or (model.params or {}).get('family') or '—' }}</span>
       <span class="meta-chip">{{ model.task or (model.params or {}).get('task') or '—' }}</span>
+      {% set fam = (model.family or (model.params or {}).get('family') or '')|lower %}
+      {% if model.status == 'production' and fam == 'sequence' %}
+      <span class="badge text-bg-success">Forecast activo</span>
+      {% endif %}
     </div>
     <p class="page-subtitle mb-0">Evaluación contra umbrales thesis · scope {{ model.scope }}</p>
   </div>

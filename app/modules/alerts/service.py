@@ -14,6 +14,12 @@ from app.modules.predictions.models import Prediction
 from app.modules.sensors_ingestion.models import GasReading, Sensor, Site
 from app.modules.users.models import User
 from app.shared.exceptions import NotFoundError, ValidationError
+from app.shared.formatting import (
+    display_gas,
+    display_sensor_code,
+    display_site_name,
+    format_datetime_short,
+)
 
 
 def evaluate_and_create_alert(
@@ -143,22 +149,22 @@ def alert_to_dict(db: Session, alert: Alert) -> dict[str, Any]:
     site_name = None
     if sensor is not None:
         site = db.query(Site).filter(Site.id == sensor.site_id).first()
-        site_name = site.name if site else None
+        site_name = display_site_name(site.name) if site else None
     return {
         "id": alert.id,
         "prediction_id": alert.prediction_id,
         "gas_reading_id": alert.gas_reading_id,
         "sensor_id": alert.sensor_id,
-        "sensor_code": sensor.code if sensor else None,
-        "gas_type": sensor.gas_type if sensor else None,
+        "sensor_code": display_sensor_code(sensor.code) if sensor else None,
+        "gas_type": display_gas(sensor.gas_type) if sensor else None,
         "site_name": site_name,
         "level": alert.level,
         "message": alert.message,
         "recommendation": alert.recommendation,
         "status": alert.status,
-        "created_at": alert.created_at,
+        "created_at": format_datetime_short(alert.created_at),
         "acknowledged_by": alert.acknowledged_by,
-        "acknowledged_at": alert.acknowledged_at,
-        "resolved_at": alert.resolved_at,
+        "acknowledged_at": format_datetime_short(alert.acknowledged_at),
+        "resolved_at": format_datetime_short(alert.resolved_at),
         "resolution_note": alert.resolution_note,
     }

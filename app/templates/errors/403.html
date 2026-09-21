@@ -10,10 +10,9 @@
 <body>
   <div class="container py-5">
     <div class="empty-state">
-      <p class="fw-medium mb-1">No tienes permiso para ver esta página</p>
-      <p class="small mb-3">{{ message or "Solicita acceso a un administrador si lo necesitas." }}</p>
+      <p class="fw-medium mb-1">Acceso restringido</p>
+      <p class="small mb-3">{{ message or "Tu rol no incluye esta operación. Usa el inicio para continuar el monitoreo." }}</p>
       <a class="btn btn-primary btn-sm" href="/">Volver al inicio</a>
-      <a class="btn btn-outline-secondary btn-sm ms-2" href="/login">Iniciar sesión</a>
     </div>
   </div>
 </body>

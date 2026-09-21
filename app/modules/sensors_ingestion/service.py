@@ -12,6 +12,11 @@ from sqlalchemy.orm import Session
 from app.modules.audit.service import record_audit
 from app.modules.sensors_ingestion import repository as repo
 from app.modules.sensors_ingestion.models import EtlRun
+from app.shared.gas_catalog import (
+    canonicalize_gas_type,
+    normalize_sensor_code,
+    normalize_site_name,
+)
 from ml_core.augmentation import (
     load_augmentation_manifest,
     manifest_summary,
@@ -66,13 +71,15 @@ def _dataframe_to_readings(
     has_synth_col = "is_synthetic" in df.columns
     records = df.to_dict(orient="records")
     for row in records:
-        site_name = _to_str(row.get("Sitio")) or "SIN_SITIO"
+        site_name = normalize_site_name(_to_str(row.get("Sitio")))
         if site_name not in cache_site:
             cache_site[site_name] = repo.get_or_create_site(db, site_name)
         site = cache_site[site_name]
 
-        sensor_code = _to_str(row.get("Sensor")) or "UNKNOWN_SENSOR"
-        gas_type = _to_str(row.get("Descripción")) or _to_str(row.get("Gas")) or "UNKNOWN"
+        sensor_code = normalize_sensor_code(_to_str(row.get("Sensor")))
+        gas_type = canonicalize_gas_type(
+            _to_str(row.get("Descripción")) or _to_str(row.get("Gas"))
+        )
         unit = _to_str(row.get("Unidad"))
         sensor_key = (sensor_code, gas_type)
         if sensor_key not in cache_sensor:

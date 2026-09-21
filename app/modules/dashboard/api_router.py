@@ -35,6 +35,22 @@ def api_semaforo(
     }
 
 
+@router.get("/forecast-by-gas")
+def api_forecast_by_gas(
+    db: DbSession,
+    _: CanViewPred,
+    site_id: Optional[int] = None,
+    hours: int = Query(6, ge=1, le=72),
+    horizon_minutes: float = Query(7.5, ge=1.0, le=60.0),
+) -> dict:
+    return dash_service.forecast_by_gas(
+        db,
+        site_id=site_id,
+        hours=hours,
+        horizon_minutes=horizon_minutes,
+    )
+
+
 @router.get("/series/{sensor_id}")
 def api_series(
     sensor_id: int,

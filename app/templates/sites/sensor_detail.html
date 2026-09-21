@@ -40,16 +40,17 @@
       <div class="panel-body"><h2 class="section-title mb-0">Predicciones recientes</h2></div>
       <div class="table-responsive-wrap">
         <table class="table align-middle mb-0">
-          <thead class="table-light"><tr><th>Fecha</th><th>Nivel</th><th>Prob.</th></tr></thead>
+          <thead class="table-light"><tr><th>Fecha</th><th>Nivel</th><th>Prob.</th><th>Forecast</th></tr></thead>
           <tbody>
           {% for p in predictions %}
             <tr>
               <td class="small text-secondary">{{ p.created_at }}</td>
               <td>{% with level=p.risk_level %}{% include "partials/_risk_badge.html" %}{% endwith %}</td>
               <td>{{ p.probability if p.probability is not none else "—" }}</td>
+              <td class="small">{{ p.predicted_concentration if p.predicted_concentration is not none else "—" }}{% if p.horizon_minutes %}<span class="text-secondary"> (+{{ p.horizon_minutes }}m)</span>{% endif %}</td>
             </tr>
           {% else %}
-            <tr><td colspan="3" class="text-secondary text-center py-4">Sin predicciones</td></tr>
+            <tr><td colspan="4" class="text-secondary text-center py-4">Sin predicciones</td></tr>
           {% endfor %}
           </tbody>
         </table>

@@ -1,6 +1,6 @@
 # Contexto del sistema — Plataforma de Monitoreo y Predicción de Gases
 
-> **Documento canónico de contexto.** Úsalo como fuente única para agentes, onboarding y decisiones de implementación. Los planes numerados (`01`–`11`) son el historial de ejecución; este archivo describe el **estado real del sistema**.
+> **Documento canónico de contexto.** Úsalo como fuente única para agentes, onboarding y decisiones de implementación. Los planes numerados (`01`–`13`) son el historial de ejecución; este archivo describe el **estado real del sistema**.
 
 | Campo | Valor |
 |-------|--------|
@@ -17,10 +17,10 @@
 Sistema web para:
 
 1. **Ingestar** lecturas de sensores de gases (Excel/CSV).
-2. **Entrenar y promover** modelos de ML (riesgo de evento).
-3. **Predecir** riesgo por lectura y **generar alertas** tempranas.
+2. **Entrenar y promover** modelos de ML (riesgo + forecast de concentración 5–10 min).
+3. **Predecir** concentración futura y riesgo por lectura; **generar alertas** tempranas.
 4. **Notificar** a partes interesadas (email / WhatsApp stub).
-5. **Visualizar** estado operativo, ejecutivo e histórico.
+5. **Visualizar** proyección por tipo de gas, semáforo operativo, ejecutivo e histórico.
 6. **Exportar** reportes PDF/Excel.
 
 No es un microservicio; toda la lógica vive en un solo proceso FastAPI con módulos de dominio.
@@ -42,6 +42,8 @@ No es un microservicio; toda la lógica vive en un solo proceso FastAPI con mód
 | 09 Despliegue GCP / CI-CD | F8 | ⬜ Pendiente |
 | 10 Seguridad / hardening | F9 | ⬜ Pendiente |
 | 11 Mapeo UX/UI pantallas | Complementa F6 | ✅ |
+| 12 Model Zoo / series / métricas thesis | Extiende F3–F4 | ✅ |
+| 13 MVP forecast home + UX presentación | Cierra gap thesis operativo | ✅ |
 | Mejora UX consola profesional | Refino visual | ✅ |
 
 ---
@@ -74,18 +76,18 @@ plataforma-gases/
 ├── app/
 │   ├── main.py                 # App, routers, schedulers, /health
 │   ├── core/                   # config, database, security, logging
-│   ├── shared/                 # dependencies, exceptions, pagination
+│   ├── shared/                 # dependencies, exceptions, pagination, gas_catalog, formatting
 │   ├── modules/                # dominios (ver §5–§6)
 │   ├── templates/              # Jinja2 por pantalla + partials
 │   └── static/                 # css/, js/, img/
-├── ml_core/                    # features, train_model, data_io, columns
+├── ml_core/                    # features, Model Zoo, train tabular/sequence, metrics
 ├── migrations/                 # Alembic versions/
-├── scripts/                    # seed, superadmin, ETL, load CSV
+├── scripts/                    # seed, superadmin, ETL, normalize_sensors, retrain DL
 ├── tests/
 ├── data/                       # raw, processed, curated, inbox/
 ├── storage/reports/
 ├── docker/                     # Dockerfile.app, Dockerfile.mlflow
-├── planes/                     # este contexto + planes 00–11
+├── planes/                     # este contexto + planes 00–13
 ├── docker-compose.yml          # db:5433, mlflow:5000, app:8000
 └── .env.example
 ```
@@ -153,7 +155,7 @@ audit_log ── users
 | Tabla | Campos clave | Relaciones |
 |-------|--------------|------------|
 | `sites` | name (unique), description | 1:N sensors |
-| `sensors` | site_id, code, gas_type, unit; UQ (code, gas_type) | N:1 site; 1:N gas_readings |
+| `sensors` | site_id, code, gas_type (canónico CH4/CO/H2S/…), unit; UQ (code, gas_type) | N:1 site; 1:N gas_readings |
 | `etl_runs` | status, rows_ingested/rejected, source_files (JSONB), log (JSONB), triggered_by_user_id | 1:N gas_readings |
 | `gas_readings` | sensor_id, leyendo, unidad, stel_max, twa_max, alarma, temperatura, tiempo_inicio/fin, is_synthetic, source_file, etl_run_id | N:1 sensor, etl_run |
 
@@ -163,7 +165,7 @@ audit_log ── users
 |-------|--------------|------------|
 | `model_registry` | name, version, algorithm, params/metrics (JSONB), mlflow_run_id, artifact_uri, status (`staging`/`production`/`archived`), scope, trained_by, trained_at | FK users |
 | `training_jobs` | model_registry_id, status, dataset_version, params, log, triggered_by | FK registry, users |
-| `predictions` | gas_reading_id, model_registry_id, probability, predicted_label, risk_level | FK readings, registry |
+| `predictions` | gas_reading_id, model_registry_id, probability, predicted_label, risk_level, **predicted_concentration**, **horizon_minutes** | FK readings, registry |
 
 #### Alertas y stakeholders
 
@@ -223,9 +225,10 @@ La navegación del sidebar se arma por **permisos**, no por rol hardcodeado.
 1. **Upload:** `POST /api/ingestion/upload` (Excel) → limpieza `ml_core.data_io` → persistencia.
 2. **Inbox:** `data/inbox` (.xlsx/.xls); APScheduler si `ETL_INBOX_ENABLED=true`.
 3. **Scripts:** `scripts/load_processed_dataset.py`, `scripts/run_etl_inbox.py`.
-4. Por fila: get_or_create `Site`/`Sensor` → `GasReading` → `EtlRun`.
+4. Por fila: get_or_create `Site`/`Sensor` con **nombres canónicos** (`gas_catalog`: alias `LEL(CH4)`→`CH4`, limpieza `Sensor SN:`, sitios `SIN_SITIO`→“Sin sitio asignado”) → `GasReading` → `EtlRun`.
 5. Tras ETL exitoso: `run_predictions_for_etl_run` (fallo ML no aborta el ETL).
 6. Éxito inbox → `inbox/processed`; error → `inbox/failed`.
+7. Backfill opcional: `scripts/normalize_sensors_display.py`.
 
 ### 7.3 ML / entrenamiento (Model Zoo — Plan 12)
 
@@ -235,14 +238,18 @@ La navegación del sidebar se arma por **permisos**, no por rol hardcodeado.
 - Tareas: `classification` | `regression` | `both`.
 - `POST /api/ml/train` acepta `algorithms[]`, `task`, `lookback_steps`, `horizon_minutes`.
 - Métricas thesis en JSONB: precision, recall, f1, false_negative_rate, rmse, lead_time_*, gates `meets_*`.
-- Promoción: un `production` por `(scope, task)`.
+- Promoción: un `production` por `(scope, task)`; inferencia **prefiere** production `family=sequence` con task `both`/`regression`.
+- Retrain dirigido forecast: `scripts/retrain_promote_dl_forecast.py`.
 
-### 7.4 Predicciones y riesgo
+### 7.4 Predicciones, riesgo y forecast (Plan 13)
 
-- Modelo `production` desde `artifact_uri` (MLflow sklearn/xgboost o PyTorch según `params.framework`).
+- Modelo `production` desde `artifact_uri` (preferir PyTorch sequence si existe).
 - Features tabular rolling (~20) o secuencia 3D según familia.
-- Guarda `Prediction`: probability, predicted_label (≥0.5), `risk_level`.
-- Triggers: post-ETL (límite `PREDICTION_POST_ETL_LIMIT`) y job opcional `PREDICTION_JOB_*`.
+- Guarda `Prediction`:
+  - `probability` / `predicted_label` / `risk_level` (clasificación)
+  - `predicted_concentration` + `horizon_minutes` cuando el modelo tiene cabeza de regresión (desnormalizada con `reg_mean`/`reg_std` del `.pt`)
+- Triggers: post-ETL (`PREDICTION_POST_ETL_LIMIT`) y job opcional `PREDICTION_JOB_*`.
+- Dashboard: `GET /dashboard/api/forecast-by-gas` agrega histórico por gas canónico + trazo proyectado a t+h.
 
 | Nivel | Umbral default (env) |
 |-------|----------------------|
@@ -250,6 +257,17 @@ La navegación del sidebar se arma por **permisos**, no por rol hardcodeado.
 | PRECAUCION | ≥ 0.3 |
 | ALERTA | ≥ 0.6 |
 | CRITICO | ≥ 0.85 |
+
+### Umbrales thesis (Model Zoo + forecast)
+
+| Métrica | Umbral | Notas |
+|---------|--------|-------|
+| Recall | ≥ 0.95 | Clasificación |
+| Precisión | ≥ 0.90 | Clasificación |
+| F1 | ≥ 0.92 | Clasificación |
+| FN rate | ≤ 0.05 | Clasificación |
+| RMSE | ≤ 0.05 | Concentración a 5–10 min; en datos reales puede no alcanzarse — documentar al promover |
+| Lead time | 5–10 min | Alerta anticipada |
 
 ### 7.5 Alertas
 
@@ -273,17 +291,6 @@ Tipos: `alertas_periodo`, `desempeno_modelo`, `resumen_ejecutivo`, `comparativa_
 - API: `POST /api/reports/alertas|ejecutivo|modelo/{id}|comparativa`; `GET /api/reports/{id}/download`.
 - Interesado: restringido a alertas/suscripciones visibles.
 - Auditoría: `report.generate`.
-
-### Umbrales thesis (Model Zoo)
-
-| Métrica | Umbral |
-|---------|--------|
-| Recall | ≥ 0.95 |
-| Precisión | ≥ 0.90 |
-| F1 | ≥ 0.92 |
-| FN rate | ≤ 0.05 |
-| RMSE | ≤ 0.05 |
-| Lead time | 5–10 min |
 
 ---
 
@@ -319,7 +326,7 @@ Tipos: `alertas_periodo`, `desempeno_modelo`, `resumen_ejecutivo`, `comparativa_
 
 ### Dashboard API (polling)
 
-Prefijo `/dashboard/api`: `semaforo`, `series/{sensor_id}`, `alertas-activas`, `sites`, `executive`, `ingeniero`.
+Prefijo `/dashboard/api`: `semaforo`, `forecast-by-gas`, `series/{sensor_id}`, `alertas-activas`, `sites`, `executive`, `ingeniero`.
 
 ### APIs REST
 
@@ -380,7 +387,7 @@ page-header → (filters-bar opcional) → panel(s) con contenido
 | # | Pantalla | Ruta | Audiencia |
 |---|----------|------|-----------|
 | P1 | Login | `/login` | público |
-| P2 | Semáforo operativo | `/` | operador, admin |
+| P2 | Home predictivo (forecast + semáforo) | `/` | operador, admin |
 | P3 | Sitios / sensores | `/sites`, `/sensors/{id}` | predictions.view |
 | P4–P5 | Alertas list/detail | `/alerts` | alerts.view |
 | P6 | Ingesta ETL | `/ingestion` | sensors.manage |

@@ -26,6 +26,8 @@ class Prediction(Base):
     probability: Mapped[float] = mapped_column(Float, nullable=False)
     predicted_label: Mapped[int] = mapped_column(Integer, nullable=False)
     risk_level: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    predicted_concentration: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    horizon_minutes: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

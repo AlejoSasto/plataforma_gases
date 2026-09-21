@@ -107,13 +107,35 @@ def get_production_model(
         .order_by(ModelRegistry.id.desc())
         .all()
     )
+    if not rows:
+        return None
+
+    def _family(row: ModelRegistry) -> str:
+        return str((row.params or {}).get("family") or "").lower()
+
+    def _task(row: ModelRegistry) -> str:
+        return str((row.params or {}).get("task") or "classification").lower()
+
+    # Preferir DL sequence con task both/regression (forecast operativo thesis)
+    sequence = [
+        r
+        for r in rows
+        if _family(r) == "sequence"
+        or (r.algorithm or "").lower() in ("lstm", "gru", "transformer", "cnn1d")
+    ]
+    for preferred_task in ("both", "regression"):
+        for row in sequence:
+            if _task(row) == preferred_task:
+                return row
+    if sequence:
+        return sequence[0]
+
     if task is None:
-        return rows[0] if rows else None
+        return rows[0]
     for row in rows:
-        row_task = (row.params or {}).get("task") or "classification"
-        if row_task == task:
+        if _task(row) == (task or "").lower():
             return row
-    return rows[0] if rows else None
+    return rows[0]
 
 
 def archive_production(

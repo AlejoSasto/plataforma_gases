@@ -63,6 +63,10 @@
           <td>
             <a class="fw-semibold text-decoration-none" href="/ml/models/{{ m.id }}">{{ m.name }}</a>
             <div class="small text-secondary">{{ m.algorithm }} · v{{ m.version }}</div>
+            {% set fam_l = (fam or '')|lower %}
+            {% if m.status == 'production' and fam_l == 'sequence' %}
+            <span class="badge text-bg-success mt-1">Forecast activo</span>
+            {% endif %}
           </td>
           <td><span class="badge text-bg-light border">{{ fam }}</span></td>
           <td class="small">{{ task }}</td>
