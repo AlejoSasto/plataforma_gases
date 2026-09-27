@@ -1,6 +1,6 @@
 # Índice — Plataforma de Monitoreo y Predicción de Gases (Monolito FastAPI)
 
-> **Contexto canónico del sistema (todo en un solo lugar):** [`CONTEXTO_SISTEMA.md`](CONTEXTO_SISTEMA.md) — arquitectura, modelo de datos, flujos, rutas, roles, UX/UI y arranque local. Usar ese archivo como fuente de verdad para agentes y onboarding; este índice solo ordena los planes de ejecución.
+> **Contexto canónico del sistema (todo en un solo lugar):** [`CONTEXTO_SISTEMA.md`](CONTEXTO_SISTEMA.md) — arquitectura, datos de campo, **Model Zoo / métricas / inferencia (§8.3–8.4)**, modelo de datos, flujos, rutas, roles, UX/UI y arranque local (actualizado 2026-09-27). Usar ese archivo como fuente de verdad para agentes y onboarding; este índice solo ordena los planes de ejecución. Ante conflicto, priorizar el código.
 
 > Los planes numerados son la bitácora de implementación en **fases secuenciales**. Cada plan tiene: objetivo, prerrequisitos, pasos numerados, artefactos a crear/editar, y un checklist de validación ("Definition of Done") antes de pasar al siguiente.
 
