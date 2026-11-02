@@ -1,4 +1,4 @@
-"""Entrena el Model Zoo completo (tabular + DL) y promueve el mejor."""
+﻿"""Entrena el Model Zoo completo (tabular + DL) y promueve el mejor."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
 from app.core.database import SessionLocal
 from app.modules.ml_training import service as ml_service
 from app.modules.users.models import User
-from ml_core.models.registry import DEFAULT_ALL
+from legacy.ml_core_models.registry import DEFAULT_ALL
 
 
 def main() -> int:

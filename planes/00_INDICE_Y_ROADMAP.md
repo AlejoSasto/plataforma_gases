@@ -2,8 +2,9 @@
 
 > **Estado actual (código):** [`CONTEXTO_SISTEMA.md`](CONTEXTO_SISTEMA.md).  
 > **Destino (reformulación jurado):** [`14_REFORMULACION_INDICE.md`](14_REFORMULACION_INDICE.md) y planes **15–20**.  
+> **Auditoría científica / ajustes:** [`23_AUDITORIA_Y_AJUSTES_TESIS.md`](23_AUDITORIA_Y_AJUSTES_TESIS.md) — **prioridad** sobre 14–22 cuando haya conflicto.  
 > **Identidad visual:** [`21_SISTEMA_DE_DISENO_VIGIA.md`](21_SISTEMA_DE_DISENO_VIGIA.md) + [`22_MOCKUPS_Y_GUIA_DE_IMPLEMENTACION.md`](22_MOCKUPS_Y_GUIA_DE_IMPLEMENTACION.md) (kit en `mockups/vigia-design-kit/`).  
-> Ante conflicto: **paquete 14–22 > planes 04, 05, 07, 11, 12 y 13**; el **código** describe lo que hay hoy. Planes **01–03, 06 y 08** siguen como base.  
+> Ante conflicto: **Plan 23 > paquete 14–22 > planes 04, 05, 07, 11, 12 y 13**; el **código** describe lo que hay hoy. Planes **01–03, 06 y 08** siguen como base.  
 > Marca de trabajo en UI: **Vigía · Gases en la mina**. Alembic head: `c1d2e3f4a5b6`.
 
 Este archivo es el mapa de ejecución. Cada plan tiene objetivo, prerrequisitos, pasos, artefactos y definición de terminado. No se salta una **compuerta**.
@@ -158,6 +159,8 @@ Flujo actual: **Excel/CSV → E1–E6 → `gas_readings` / `reading_grid` → `f
 | 20 | `20_PRUEBAS_Y_BUCLE_DE_CALIDAD.md` | `scripts/verify.py`, cobertura, lint de lenguaje | Transversal |
 | 21 | `21_SISTEMA_DE_DISENO_VIGIA.md` | Tokens, tipografía Archivo, riel, ilustraciones SVG | OE4 · identidad |
 | 22 | `22_MOCKUPS_Y_GUIA_DE_IMPLEMENTACION.md` | Mockups → Jinja2, macros, CSP self-only | OE4 · implementación |
+| 23 | `23_AUDITORIA_Y_AJUSTES_TESIS.md` | Gráficas, umbrales decreto, experimento real, ver la IA, retirar legado | Núcleo científico + OE3 |
+| 24 | `24_OPERACION_CON_DATOS_REALES.md` | Cero demo; instrumentos; replay histórico; linaje | OE1–OE4 · operación |
 | 09 | `09_DESPLIEGUE_GCP_CICD.md` | Edge local + sync asíncrona (ajustar alcance) | 3A, 3B |
 | 10 | `10_SEGURIDAD_TESTING_HARDENING.md` | Hardening; tramo login/CSP ya en código | — |
 
@@ -231,19 +234,25 @@ destino: ingestion (E1–E6) → forecasting (Plan 17) → forecasts/decision �
 
 ## 7. Estado (actualizar a mano)
 
+Separar **código** (implementado), **experimento** (corrida real / datos) y **validación humana**. Un ✅ solo en código **no** autoriza citar métricas en la tesis.
+
 ### Paquete de reformulación (vigente)
 
-| Plan | Estado | Fecha |
-|------|--------|-------|
-| 14 Reformulación índice | ✅ Documento | 2026-11-01 |
-| 15 Datos reales y formulación | ✅ Código F0–F6; G0 6/12/18; falta visto del director | 2026-11-01 |
-| 16 Modelo de datos v2 | ✅ Código M1–M9 + `c1d2e3f4a5b6` | 2026-11-01 |
-| 17 Modelos transformer | ✅ Zoo + conformal + decisión | 2026-11-01 |
-| 18 UX/UI lenguaje natural | ✅ Pantallas ES, copy, contraste | 2026-11-01 |
-| 19 Usuarios, roles y acceso | ✅ Roles v2, CSRF, TOTP, kiosco | 2026-11-01 |
-| 20 Pruebas y bucle | ✅ DB test, verify 13 etapas, guardias, E2E | 2026-11-01 |
-| 21 Sistema de diseño Vigía | ✅ Documento + tokens en `app/static/css/tokens.css` | 2026-11-02 |
-| 22 Mockups e implementación | ✅ Kit aplicado (riel, login, SVG, sin CDN) | 2026-11-02 |
-| Login seguro (tramo Plan 10) | ✅ POST `/ingresar`, strip query, CSRF ASGI, Referrer no-referrer | 2026-11-02 |
-| 09 Despliegue (ajustar edge-first) | ⬜ | |
-| 10 Seguridad / hardening (resto) | ⬜ k6, pip-audit, HSTS prod, backups Cloud SQL | |
+| Plan | Código | Experimento | Validación humana | Fecha |
+|------|--------|-------------|-------------------|-------|
+| 14 Reformulación índice | ✅ Documento | — | — | 2026-11-01 |
+| 15 Datos reales y formulación | ✅ F0–F6; G0 6/12/18 | ⚠️ G0 desde CSV, no DB; falta longitud de segmentos (Plan 23 F1) | ⬜ visto del director | 2026-11-01 |
+| 16 Modelo de datos v2 | ✅ M1–M9 + `c1d2e3f4a5b6` | — | — | 2026-11-01 |
+| 17 Modelos transformer | ✅ Zoo + conformal + decisión | ⬜ **benchmark con modelos reales no corrido** | — | 2026-11-01 |
+| 18 UX/UI lenguaje natural | ✅ Pantallas ES, copy, contraste | — | ⬜ co-diseño / SUS | 2026-11-01 |
+| 19 Usuarios, roles y acceso | ✅ Roles v2, CSRF, TOTP, kiosco | — | — | 2026-11-01 |
+| 20 Pruebas y bucle | ✅ DB test, verify, E2E | — | ⬜ sesiones SUS en mina | 2026-11-01 |
+| 21 Sistema de diseño Vigía | ✅ Tokens + doc | — | — | 2026-11-02 |
+| 22 Mockups e implementación | ✅ Kit en `app/` | — | ⬜ revisión captura a captura | 2026-11-02 |
+| Login seguro (tramo Plan 10) | ✅ POST `/ingresar`, CSRF ASGI | — | — | 2026-11-02 |
+| **23** Auditoría y ajustes tesis | 🔄 F7+F5 código; faltan F1→F2→F3→F8→F4/F6 | ⬜ | ⬜ | 2026-11-02 |
+| **24** Operación con datos reales | 🔄 F1 limpia (audit/purge); faltan F2–F8 | ⬜ | ⬜ | 2026-11-02 |
+| 09 Despliegue (edge-first) | ⬜ | — | — | |
+| 10 Seguridad / hardening (resto) | ⬜ k6, pip-audit, HSTS prod, backups | — | — | |
+
+> Ningún resultado de `reports/thesis/` se cita en la tesis hasta cerrar Plan 23 F3.

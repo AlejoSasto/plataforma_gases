@@ -1,13 +1,29 @@
-"""Servicios de pronóstico. La inferencia ML llega en el Plan 17."""
+"""Servicios de pronóstico (Plan 17) y referencia temporal de series (Plan 23 F7)."""
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.modules.forecasting import repository as repo
+from app.modules.sensors_ingestion.models import GasReading
 from app.shared.formatting import format_datetime_short, format_reading_value
+
+
+def reference_time(db: Session, sensor_id: int | None = None) -> datetime:
+    """Hora de referencia para series: último dato del sensor (o global), no el reloj."""
+    q = db.query(func.max(GasReading.tiempo_inicio))
+    if sensor_id is not None:
+        q = q.filter(GasReading.sensor_id == sensor_id)
+    mx = q.scalar()
+    if mx is None:
+        return datetime.now(timezone.utc)
+    if mx.tzinfo is None:
+        return mx.replace(tzinfo=timezone.utc)
+    return mx
 
 
 def list_forecasts(

@@ -1,11 +1,11 @@
-"""Targets temporales: regresión a horizonte y alerta anticipada."""
+﻿"""Targets temporales: regresión a horizonte y alerta anticipada."""
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
-from ml_core.features.build_features import LABEL_COLUMN
+from legacy.ml_core_features.build_features import LABEL_COLUMN
 
 
 def median_delta_minutes(times: pd.Series) -> float:

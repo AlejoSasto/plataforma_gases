@@ -15,7 +15,7 @@
 | Runtime | Python 3.11+ |
 | Base de datos | `proyecto_gases` (Compose: host `5433`); tests: `proyecto_gases_test` |
 | Alembic head | `c1d2e3f4a5b6` |
-| Actualizado | 2026-11-02 (Vigía + login seguro + planes 15–20) |
+| Actualizado | 2026-11-02 (Plan 23 en curso: F7 gráficas; índice honesto) |
 
 ### Índice rápido
 
@@ -76,6 +76,7 @@ No es un microservicio; toda la lógica vive en un solo proceso FastAPI con mód
 | **21** Sistema de diseño Vigía | OE4 identidad | ✅ Tokens, tipografía, ilustraciones; doc en `planes/21_*.md` |
 | **22** Mockups → app | OE4 UI | ✅ Kit en `mockups/vigia-design-kit/`; cascarón aplicado en `app/` |
 | Login / CSP (tramo Plan 10) | seguridad UI | ✅ POST `/ingresar`, strip query, CSRF ASGI, recursos locales |
+| **23** Auditoría / ajustes tesis | científico + UI | 🔄 F7 parcialmente ✅ (`reference_time`, E2E charts); faltan F5→F1→F2→F3→F8→F4/F6 |
 | 09 Despliegue GCP | F8 | ⬜ edge-first pendiente |
 | 10 Hardening (resto) | F9 | ⬜ k6, pip-audit, HSTS prod, backups |
 
@@ -391,15 +392,18 @@ Migración: `ingeniero_datos` → `analista`, `operador_mina` → `operador`, `i
 
 Superadmin: `scripts/create_superadmin.py` + `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD` / `SUPERADMIN_FULL_NAME` (opcional, default `Super Admin`). El script **actualiza** el usuario si el email ya existe.
 
-### Credenciales locales
+### Credenciales locales (Plan 24 F1)
 
-**No hay usuarios semilla fijos embebidos en la imagen.** Se crean con scripts o fixtures.
+**En la base de desarrollo no hay usuarios `@example.com` ni datos demo.** Acceso DEV:
 
-| Origen | Email | Password | Rol | Cuándo existe |
-|--------|-------|----------|-----|----------------|
-| Superadmin (`.env` + script) | el de `SUPERADMIN_EMAIL` | `SUPERADMIN_PASSWORD` | `admin` | Tras `python scripts/create_superadmin.py` |
-| Pruebas / DEV habitual | `test.admin@example.com` | `AdminPass123!` | `admin` | Fixture pytest; **también en DEV** si se sembró a mano (Compose actual) |
-| Fixture operador | `test.operador@example.com` | `OperadorPass123!` | `operador` | Solo test DB salvo que exista en DEV |
+| Origen | Email | Password | Notas |
+|--------|-------|----------|-------|
+| Superadmin local | `admin@vigia.local` | `AdminPass123!` | Creado con `create_superadmin.py` / `SUPERADMIN_*` |
+| Fixtures pytest | `test.admin@example.com` etc. | — | **Solo** DB de pruebas; audit los rechaza en DEV |
+
+Recrear: `python scripts/create_superadmin.py` → http://localhost:8000/ingresar
+
+Auditoría / purga: `python scripts/audit_demo_data.py` · `python scripts/purge_demo_data.py --confirm`.
 
 Login UI: `http://localhost:8000/ingresar` (`/login` → 301).  
 - **Nativo (sin JS):** `POST /ingresar` (form + `csrf_token`) → cookies + 303 a `/` o `/mi-cuenta`.  
@@ -599,7 +603,7 @@ Puede haber más de un `production` si tienen **tasks distintas**. El runtime **
 
 ### 8.4 Inferencia, semáforo y forecast (producción)
 
-**Vigente (Plan 17):** `ml_core/forecasting/serve.py` + `app/modules/forecasting/cycle.py` escriben `forecasts` / `forecast_quantiles` (horizontes G0: 6/12/18 min). Semáforo y avisos en Hoy vía `dashboard`. API: `/api/forecasts`. Gráficos con `charts.js` (SVG) / ECharts local — **sin Chart.js ni CDN**.
+**Vigente (Plan 17 + 23 F5/F7):** `ml_core/forecasting/` (adaptadores + serve) y `forecasting/cycle.py` escriben `forecasts` / `forecast_quantiles` (horizontes G0: 6/12/18 min). El Laboratorio entrena solo este zoo (`task=forecast`). El zoo tabular/DL viejo está en `legacy/`. Series de gráficos ancladas a `reference_time` (último dato), no al reloj. API: `/api/forecasts`. Gráficos: `charts.js` + ECharts local.
 
 Ciclo actual (resumen):
 
@@ -901,7 +905,7 @@ docker compose up -d --build   # o uvicorn app.main:app --reload en el host
 
 Tests: `python scripts/verify.py` o `pytest` contra `proyecto_gases_test` (§15).
 
-Login local típico en Compose DEV: `test.admin@example.com` / `AdminPass123!` (§7).
+Login DEV: el de `SUPERADMIN_*` tras `create_superadmin.py` (§7). No usar `@example.com` en desarrollo.
 
 ---
 

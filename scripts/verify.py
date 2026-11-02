@@ -34,6 +34,7 @@ RUFF_PATHS = [
     "tests/guards/test_features_are_causal.py",
     "tests/guards/test_scalers_fit_on_train_only.py",
     "tests/guards/test_final_test_untouched.py",
+    "tests/guards/test_no_legacy_imports.py",
     "app/shared/access.py",
     "ml_core/validation/scaling.py",
 ]
@@ -155,8 +156,16 @@ def _plan_pytest_args(plan: int) -> list[str]:
         return ["-m", "plan19"]
     if plan == 20:
         return ["-m", "plan20 or plan"]
+    if plan == 23:
+        return ["-m", "plan23"]
+    if plan == 24:
+        return ["-m", "plan24"]
     if plan == 15:
-        return ["-m", "plan and not plan16 and not plan17 and not plan18 and not plan19 and not plan20"]
+        return [
+            "-m",
+            "plan and not plan16 and not plan17 and not plan18 and not plan19 "
+            "and not plan20 and not plan23 and not plan24",
+        ]
     return ["-m", f"plan{plan} or plan"]
 
 

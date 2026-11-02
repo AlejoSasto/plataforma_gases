@@ -1,4 +1,4 @@
-"""Orquestador del Model Zoo: selecciona algoritmos y dispara tabular / sequence."""
+﻿"""Orquestador del Model Zoo: selecciona algoritmos y dispara tabular / sequence."""
 
 from __future__ import annotations
 
@@ -9,9 +9,9 @@ import mlflow
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from ml_core.models.registry import DEFAULT_ALL, DEFAULT_SEQUENCE, DEFAULT_TABULAR, get_spec
-from ml_core.models.train_sequence import train_sequence_algorithms
-from ml_core.models.train_tabular import TrainingResult, train_tabular_algorithms
+from legacy.ml_core_models.registry import DEFAULT_ALL, DEFAULT_SEQUENCE, DEFAULT_TABULAR, get_spec
+from legacy.ml_core_models.train_sequence import train_sequence_algorithms
+from legacy.ml_core_models.train_tabular import TrainingResult, train_tabular_algorithms
 
 
 def train(

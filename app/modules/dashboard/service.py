@@ -124,12 +124,19 @@ def series_for_sensor(
     *,
     hours: int = 24,
 ) -> dict[str, Any]:
+    from app.modules.forecasting.service import reference_time
+
     sensor = get_sensor(db, sensor_id)
     site = db.query(Site).filter(Site.id == sensor.site_id).first()
-    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+    ref = reference_time(db, sensor_id)
+    since = ref - timedelta(hours=hours)
     readings = (
         db.query(GasReading)
-        .filter(GasReading.sensor_id == sensor_id, GasReading.tiempo_inicio >= since)
+        .filter(
+            GasReading.sensor_id == sensor_id,
+            GasReading.tiempo_inicio >= since,
+            GasReading.tiempo_inicio <= ref,
+        )
         .order_by(GasReading.tiempo_inicio.asc())
         .limit(2000)
         .all()
@@ -155,6 +162,8 @@ def series_for_sensor(
         "points": points,
         "stel_max": last.stel_max if last else None,
         "twa_max": last.twa_max if last else None,
+        "reference_time": ref.isoformat(),
+        "data_until": ref.isoformat(),
     }
 
 
@@ -166,7 +175,10 @@ def forecast_by_gas(
     horizon_minutes: float = 7.5,
 ) -> dict[str, Any]:
     """Series históricas + proyección de concentración agrupadas por gas canónico."""
-    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+    from app.modules.forecasting.service import reference_time
+
+    ref = reference_time(db, None)
+    since = ref - timedelta(hours=hours)
     priority = thesis_priority_gases()
     forecast_available = db.query(Forecast.id).first() is not None
 
@@ -175,6 +187,7 @@ def forecast_by_gas(
         .join(Sensor, Sensor.id == GasReading.sensor_id)
         .filter(
             GasReading.tiempo_inicio >= since,
+            GasReading.tiempo_inicio <= ref,
             GasReading.is_synthetic.is_(False),
         )
     )
@@ -307,7 +320,9 @@ def forecast_by_gas(
         "horizon_minutes": horizon_minutes,
         "site_id": site_id,
         "forecast_available": forecast_available,
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "reference_time": ref.isoformat(),
+        "data_until": ref.isoformat(),
+        "updated_at": ref.isoformat(),
         "gases": gases_payload,
     }
 

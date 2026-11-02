@@ -1,4 +1,4 @@
-"""Reentrena solo DL y unifica production del Model Zoo."""
+﻿"""Reentrena solo DL y unifica production del Model Zoo."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from app.modules.ml_training import repository as repo
 from app.modules.ml_training import service as ml_service
 from app.modules.ml_training.models import ModelRegistry
 from app.modules.users.models import User
-from ml_core.models.registry import DEFAULT_SEQUENCE
+from legacy.ml_core_models.registry import DEFAULT_SEQUENCE
 
 
 def main() -> int:

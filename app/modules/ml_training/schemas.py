@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 class TrainRequest(BaseModel):
     dataset_version: str = "gas_readings"
     scope: str = "global"
-    task: Literal["classification", "regression", "both"] = "classification"
+    task: Literal["forecast"] = "forecast"
     algorithms: Optional[Union[list[str], str]] = None
     lookback_steps: Optional[int] = None
     horizon_minutes: Optional[float] = None

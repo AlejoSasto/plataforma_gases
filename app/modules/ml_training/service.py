@@ -1,21 +1,28 @@
-"""Servicio de entrenamiento, promote y modelo activo."""
+"""Servicio de entrenamiento, promote y modelo activo (zoo de forecasting, Plan 23 F5)."""
 
 from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
-import mlflow
+import numpy as np
+import pandas as pd
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.modules.audit.service import record_audit
 from app.modules.ml_training import repository as repo
 from app.modules.ml_training.models import ModelRegistry, TrainingJob
+from app.modules.sensors_ingestion.models import GasReading, Sensor
 from app.shared.exceptions import NotFoundError, ValidationError
-from ml_core.models.registry import catalog_public
-from ml_core.models.train_model import best_result, result_to_dict, train
+from ml_core.forecasting.adapters import ADAPTERS, make_forecaster
+from ml_core.forecasting.base import ZOO_KEYS, assert_prediction_frame
+from ml_core.forecasting.problem import ProblemSpec
+from ml_core.validation.metrics import forecast_metrics
+
+SAFE_DEFAULT_ALGOS = ("persistencia", "ets")
 
 
 def _job_to_dict(job: TrainingJob) -> dict[str, Any]:
@@ -35,7 +42,6 @@ def _job_to_dict(job: TrainingJob) -> dict[str, Any]:
 def _model_to_dict(row: ModelRegistry) -> dict[str, Any]:
     params = row.params or {}
     metrics = row.metrics or {}
-    gates = metrics.get("gates") or {}
     return {
         "id": row.id,
         "name": row.name,
@@ -50,9 +56,68 @@ def _model_to_dict(row: ModelRegistry) -> dict[str, Any]:
         "trained_by": row.trained_by,
         "trained_at": row.trained_at.isoformat() if row.trained_at else None,
         "family": params.get("family"),
-        "task": params.get("task"),
-        "meets_thesis": gates.get("meets_thesis"),
+        "task": params.get("task") or "forecast",
+        "meets_thesis": None,
     }
+
+
+def model_catalog() -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for key in ZOO_KEYS:
+        cls = ADAPTERS[key]
+        sample = cls()
+        out.append(
+            {
+                "key": key,
+                "name": getattr(sample, "name", key),
+                "family": getattr(sample, "family", "baseline"),
+                "backend": getattr(sample, "backend", "native"),
+                "task": "forecast",
+            }
+        )
+    return out
+
+
+def _readings_frame(db: Session, *, max_rows: int = 5000) -> pd.DataFrame:
+    rows = (
+        db.query(GasReading, Sensor)
+        .join(Sensor, Sensor.id == GasReading.sensor_id)
+        .filter(GasReading.is_synthetic.is_(False))
+        .order_by(GasReading.tiempo_inicio.asc())
+        .limit(max_rows)
+        .all()
+    )
+    if len(rows) < 24:
+        raise ValidationError("Hacen falta al menos 24 lecturas reales para entrenar")
+    records = [
+        {
+            "unique_id": f"{sensor.code}|{sensor.gas_type}",
+            "ds": reading.tiempo_inicio,
+            "y": float(reading.leyendo) if reading.leyendo is not None else np.nan,
+        }
+        for reading, sensor in rows
+    ]
+    frame = pd.DataFrame.from_records(records).dropna(subset=["y"])
+    if frame.empty:
+        raise ValidationError("No hay lecturas numéricas para entrenar")
+    return frame.sort_values(["unique_id", "ds"]).reset_index(drop=True)
+
+
+def _normalize_algorithms(algorithms: list[str] | str | None) -> list[str]:
+    if algorithms is None:
+        return list(SAFE_DEFAULT_ALGOS)
+    if isinstance(algorithms, str):
+        algorithms = [a.strip() for a in algorithms.split(",") if a.strip()]
+    keys = [a.strip().lower() for a in algorithms if a and str(a).strip()]
+    unknown = [k for k in keys if k not in ADAPTERS]
+    if unknown:
+        raise ValidationError(
+            f"Algoritmos no válidos para el zoo de forecasting: {unknown}. "
+            f"Usa: {', '.join(ZOO_KEYS)}"
+        )
+    if not keys:
+        return list(SAFE_DEFAULT_ALGOS)
+    return keys
 
 
 def start_training(
@@ -62,17 +127,24 @@ def start_training(
     dataset_version: str = "gas_readings",
     params: dict[str, Any] | None = None,
     scope: str = "global",
-    task: str = "classification",
+    task: str = "forecast",
     algorithms: list[str] | str | None = None,
     lookback_steps: int | None = None,
     horizon_minutes: float | None = None,
 ) -> dict[str, Any]:
+    """Entrena adaptadores de `ml_core.forecasting` (ya no el zoo tabular)."""
+    if task in {"classification", "regression", "both"}:
+        raise ValidationError(
+            "El Laboratorio solo entrena pronóstico probabilístico (task=forecast). "
+            "El zoo de clasificación/regresión se retiró (Plan 23 F5)."
+        )
+    task = "forecast"
     params = dict(params or {})
     params["task"] = task
-    if algorithms is not None:
-        params["algorithms"] = algorithms
-    if lookback_steps is not None:
-        params["lookback_steps"] = lookback_steps
+    keys = _normalize_algorithms(algorithms)
+    params["algorithms"] = keys
+    lookback = int(lookback_steps or 60)
+    params["lookback_steps"] = lookback
     if horizon_minutes is not None:
         params["horizon_minutes"] = horizon_minutes
 
@@ -86,36 +158,82 @@ def start_training(
     db.commit()
 
     try:
-        results = train(
-            db,
-            dataset_version=dataset_version,
-            params=params,
-            triggered_by_user_id=triggered_by,
-        )
-        best = best_result(results)
+        frame = _readings_frame(db, max_rows=int(params.get("max_rows") or 5000))
+        spec = ProblemSpec(lookback=lookback, horizons=(6, 12, 18), grid_step_minutes=6)
+        split = max(16, int(len(frame) * 0.7))
+        train = frame.iloc[:split]
+        val = frame.iloc[split:]
+        if val.empty:
+            val = train.tail(8)
+            train = train.iloc[:-8]
+
         version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
         created_ids: list[int] = []
+        results_log: list[dict[str, Any]] = []
         best_id: int | None = None
+        best_mase = float("inf")
+        art_root = Path("storage/models") / version
+        art_root.mkdir(parents=True, exist_ok=True)
 
-        job = db.query(TrainingJob).filter(TrainingJob.id == job_id).one()
-        for result in results:
+        for key in keys:
+            model = make_forecaster(key)
+            model.fit(train, spec)
+            ctx = train.groupby("unique_id", group_keys=False).tail(max(spec.lookback, 2))
+            pred = model.predict_quantiles(ctx, spec)
+            assert_prediction_frame(pred)
+            # Métricas groseras: comparar q50 del primer horizonte con último y de validación
+            h0 = int(spec.horizons[0])
+            sub = pred[pred["horizon_min"] == h0]
+            y_true = val.groupby("unique_id")["y"].last().reindex(sub["unique_id"]).to_numpy(dtype=float)
+            q50 = sub["q50"].to_numpy(dtype=float)
+            q10 = sub["q10"].to_numpy(dtype=float)
+            q90 = sub["q90"].to_numpy(dtype=float)
+            persist = (
+                train.groupby("unique_id")["y"].last().reindex(sub["unique_id"]).to_numpy(dtype=float)
+            )
+            mask = np.isfinite(y_true) & np.isfinite(q50) & np.isfinite(persist)
+            metrics: dict[str, Any] = {"n": int(mask.sum()), "family": getattr(model, "family", None)}
+            if mask.any():
+                metrics.update(
+                    forecast_metrics(
+                        y_true[mask],
+                        q10[mask],
+                        q50[mask],
+                        q90[mask],
+                        y_persist=persist[mask],
+                    )
+                )
+            path = art_root / key
+            path.mkdir(parents=True, exist_ok=True)
+            model.save(path)
             entry = repo.create_registry_entry(
                 db,
-                name=f"{result.algorithm}-{version}",
+                name=f"{key}-{version}",
                 version=version,
-                algorithm=result.algorithm,
-                params=result.params,
-                metrics=result.metrics,
-                mlflow_run_id=result.mlflow_run_id,
-                artifact_uri=result.artifact_uri,
+                algorithm=key,
+                params={
+                    "family": getattr(model, "family", None),
+                    "task": "forecast",
+                    "backend": getattr(model, "backend", None),
+                    "lookback": lookback,
+                    "horizons": list(spec.horizons),
+                    "library": getattr(model, "backend", "native"),
+                },
+                metrics=metrics,
+                mlflow_run_id=None,
+                artifact_uri=str(path),
                 trained_by=triggered_by,
                 status="staging",
                 scope=scope,
             )
             created_ids.append(entry.id)
-            if result.algorithm == best.algorithm:
+            results_log.append({"algorithm": key, "metrics": metrics, "id": entry.id})
+            mase = float(metrics.get("mase") or 999)
+            if mase < best_mase:
+                best_mase = mase
                 best_id = entry.id
 
+        job = db.query(TrainingJob).filter(TrainingJob.id == job_id).one()
         repo.finish_job(
             db,
             job,
@@ -123,9 +241,9 @@ def start_training(
             model_registry_id=best_id,
             log=json.dumps(
                 {
-                    "results": [result_to_dict(r) for r in results],
-                    "best_algorithm": best.algorithm,
-                    "registry_ids": created_ids,
+                    "results": results_log,
+                    "best_model_id": best_id,
+                    "zoo": "forecasting",
                     "task": task,
                 },
                 default=str,
@@ -137,7 +255,7 @@ def start_training(
             user_id=triggered_by,
             resource_type="training_job",
             resource_id=job.id,
-            metadata={"best_algorithm": best.algorithm, "model_ids": created_ids},
+            metadata={"best_model_id": best_id, "model_ids": created_ids, "zoo": "forecasting"},
         )
         db.commit()
         db.refresh(job)
@@ -151,6 +269,8 @@ def start_training(
         job = db.query(TrainingJob).filter(TrainingJob.id == job_id).one()
         repo.finish_job(db, job, status="failed", log=str(exc))
         db.commit()
+        if isinstance(exc, ValidationError):
+            raise
         raise ValidationError(f"Entrenamiento falló: {exc}") from exc
 
 
@@ -174,7 +294,6 @@ def compare_models(db: Session) -> list[dict[str, Any]]:
 
 
 def propose_production(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
-    """Propone ganador. La promoción sigue siendo explícita (`models.promote`)."""
     from ml_core.experiments.select import select_production_model
 
     result = select_production_model(evaluations)
@@ -185,10 +304,6 @@ def propose_production(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
         "reason": result.reason,
         "ranking": result.ranking,
     }
-
-
-def model_catalog() -> list[dict[str, Any]]:
-    return catalog_public()
 
 
 def promote_model(
@@ -202,7 +317,7 @@ def promote_model(
     if model is None:
         raise NotFoundError("Modelo no encontrado")
     target_scope = scope or model.scope or "global"
-    task = (model.params or {}).get("task") or "classification"
+    task = (model.params or {}).get("task") or "forecast"
     repo.archive_production(db, scope=target_scope, task=task)
     model.status = "production"
     model.scope = target_scope
@@ -220,8 +335,8 @@ def promote_model(
     return _model_to_dict(model)
 
 
-def get_active_model(db: Session, scope: str = "global", task: str = "classification") -> Any:
-    """Carga el modelo production (sklearn/xgb via mlflow pyfunc)."""
+def get_active_model(db: Session, scope: str = "global", task: str = "forecast") -> Any:
+    """Devuelve la fila production (artefacto en disco del zoo de forecasting)."""
     row = repo.get_production_model(db, scope=scope, task=task)
     if row is None:
         row = repo.get_production_model(db, scope=scope, task=None)
@@ -229,5 +344,7 @@ def get_active_model(db: Session, scope: str = "global", task: str = "classifica
         raise NotFoundError(f"No hay modelo production para scope={scope}")
     if not row.artifact_uri:
         raise ValidationError("El modelo production no tiene artifact_uri")
-    mlflow.set_tracking_uri(settings.mlflow_tracking_uri)
-    return mlflow.pyfunc.load_model(row.artifact_uri)
+    key = row.algorithm
+    if key not in ADAPTERS:
+        raise ValidationError(f"Algoritmo production no está en el zoo vigente: {key}")
+    return make_forecaster(key).load(Path(row.artifact_uri))

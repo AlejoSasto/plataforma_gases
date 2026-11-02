@@ -1,4 +1,4 @@
-"""Construcción de secuencias 3D [N, T, F] para modelos DL."""
+﻿"""Construcción de secuencias 3D [N, T, F] para modelos DL."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from ml_core.features.build_features import (
+from legacy.ml_core_features.build_features import (
     FEATURE_COLUMNS,
     LABEL_COLUMN,
     TEST_MONTHS,
@@ -18,7 +18,7 @@ from ml_core.features.build_features import (
     load_readings_df,
     temporal_split,
 )
-from ml_core.features.targets import add_future_targets
+from legacy.ml_core_features.targets import add_future_targets
 
 
 @dataclass

@@ -140,17 +140,21 @@ def chart_now_and_next(
     hours: float = 1.0,
 ) -> dict[str, Any]:
     from app.modules.dashboard import service as dash_service
+    from app.modules.forecasting.service import reference_time
     from app.modules.sensors_ingestion.models import Sensor
 
-    series = dash_service.series_for_sensor(db, sensor_id, hours=max(1, int(hours)))
+    window_h = max(1, int(hours))
+    series = dash_service.series_for_sensor(db, sensor_id, hours=window_h)
     points = series.get("points") or []
-    cutoff = datetime.now(timezone.utc) - timedelta(minutes=60)
+    ref = reference_time(db, sensor_id)
+    # Para la vista "ahora": última hora relativa al último dato, no al reloj.
+    cutoff = ref - timedelta(minutes=60) if window_h <= 1 else ref - timedelta(hours=window_h)
     measured: list[dict[str, Any]] = []
     for p in points:
         ts = _parse_ts(p.get("t"))
         if ts is None:
             continue
-        if ts < cutoff and hours <= 1:
+        if ts < cutoff:
             continue
         measured.append({"t": ts.isoformat(), "v": p.get("leyendo")})
     fc = forecast_repo.latest_for_sensor(db, sensor_id)
@@ -182,13 +186,18 @@ def chart_now_and_next(
                     "level": copy.status_key(row.level),
                 }
             )
-    now = datetime.now(timezone.utc).isoformat()
+    data_until = series.get("data_until") or ref.isoformat()
     return {
         "measured": measured,
         "expected": expected,
         "band": band,
         "thresholds": thresholds,
-        "now": now,
+        "now": ref.isoformat(),
+        "reference_time": ref.isoformat(),
+        "data_until": data_until,
+        "data_until_label": format_datetime_short(_parse_ts(data_until) or ref),
+        "empty_message": copy.CHART_EMPTY if not measured else None,
+        "no_forecast_message": copy.NO_MODEL if not expected else None,
         "unit": series.get("unit") or "%",
         "gas": series.get("gas_type"),
         "has_forecast": bool(expected),

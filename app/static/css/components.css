@@ -135,6 +135,9 @@
 /* ---------- Gráfico ---------- */
 .chart { width: 100%; height: 320px; }
 .chart--sm { height: 220px; }
+.chart--empty { display: flex; align-items: center; justify-content: center; }
+.chart-empty { text-align: center; color: var(--text-2); padding: var(--sp-5); max-width: 28rem; }
+.chart-empty p { margin: 0 0 var(--sp-3); }
 .chart-note { display: flex; gap: var(--sp-5); flex-wrap: wrap; font-size: var(--fs-small); color: var(--text-2); padding: 0 var(--sp-5) var(--sp-4); }
 .chart-note span { display: inline-flex; align-items: center; gap: 8px; }
 .key-line { width: 22px; height: 0; border-top: 2px solid var(--chart-measured); }

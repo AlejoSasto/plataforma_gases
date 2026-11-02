@@ -1,4 +1,4 @@
-"""Entrenamiento de modelos secuenciales (PyTorch)."""
+﻿"""Entrenamiento de modelos secuenciales (PyTorch)."""
 
 from __future__ import annotations
 
@@ -14,16 +14,16 @@ import torch.nn as nn
 from sqlalchemy.orm import Session
 from torch.utils.data import DataLoader, TensorDataset
 
-from ml_core.features.sequences import build_sequences
-from ml_core.models.architectures import build_sequence_model
-from ml_core.models.metrics import (
+from legacy.ml_core_features.sequences import build_sequences
+from legacy.ml_core_models.architectures import build_sequence_model
+from legacy.ml_core_models.metrics import (
     classification_metrics,
     lead_time_metrics,
     merge_metric_blocks,
     regression_metrics,
 )
-from ml_core.models.registry import applicability_for, get_spec
-from ml_core.models.train_tabular import TrainingResult
+from legacy.ml_core_models.registry import applicability_for, get_spec
+from legacy.ml_core_models.train_tabular import TrainingResult
 
 
 def _train_one(

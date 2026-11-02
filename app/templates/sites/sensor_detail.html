@@ -10,6 +10,9 @@
   <a class="btn btn-ghost" href="?hours=720">30 días</a>
 </div>
 <h2>Ahora y lo que viene</h2>
+{% if chart_payload and chart_payload.get('data_until_label') %}
+<p class="help">Datos hasta el {{ chart_payload.data_until_label }}</p>
+{% endif %}
 {{ chart("now", data_json=chart_payload) }}
 <div class="layout-2" style="margin-top: var(--space-5)">
   <div class="card">

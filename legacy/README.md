@@ -1,8 +1,11 @@
-# Legado retirado (Plan 15 F1)
+﻿# Legado retirado
 
-El dataset aumentado a 24 meses y el clonado de meses **no se usan** en entrenamiento ni evaluación.
+## Plan 15 F1
+- `ml_core_augmentation.py` — clonado 24m
 
-- `ml_core_augmentation.py` — código original de `ml_core/augmentation.py`
-- `augmentation_manifest.json` y `Procesamiento_de_Datos_24m.csv` — si están aquí, no cargarlos
+## Plan 23 F5
+- `ml_core_models/` — zoo sklearn/XGBoost/LSTM/GRU/Transformer vanilla
+- `ml_core_features/` — `build_features`, `targets`, `sequences` (etiqueta `evento_final`, p95 global)
+- `scripts/` — `train_full_model_zoo.py`, `retrain_*`
 
-Fuente de verdad: `data/processed/Procesamiento_de_Datos.csv` (solo reales).
+**No importar** desde `app/` ni `ml_core/forecasting`. El Laboratorio usa solo `ml_core.forecasting.adapters`.

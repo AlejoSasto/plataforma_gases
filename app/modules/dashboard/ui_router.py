@@ -716,46 +716,32 @@ def sala_page(request: Request, db: DbSession) -> HTMLResponse:
 
 
 @router.get("/_componentes", response_class=HTMLResponse)
-def componentes_page(request: Request, user: CurrentUser) -> HTMLResponse:
+def componentes_page(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+) -> HTMLResponse:
     if settings.environment != "local":
         raise NotFoundError("No encontrado")
-    sample = copy.alert_card(
-        level="actuar",
-        gas="Metano",
-        zone="Frente 3",
-        minutes=7,
-        now_value="0,72 %",
-        expected="1,05 %",
-        limit="1,0 %",
-        why="viene subiendo sin pausa desde hace 20 minutos",
-        action="revisar la ventilación y preparar la salida del personal",
-    )
-    sample.update(
-        {
-            "status_key": "actuar",
-            "status": "abierta",
-            "created_at": "hoy",
-            "id": 0,
-            "href": "#",
-        }
-    )
-    sample_chart = {
-        "measured": [["2026-01-01T10:00:00Z", 0.4], ["2026-01-01T10:06:00Z", 0.7]],
-        "expected": [["2026-01-01T10:06:00Z", 0.7], ["2026-01-01T10:12:00Z", 1.05]],
-        "band": [
-            ["2026-01-01T10:06:00Z", 0.6, 0.8],
-            ["2026-01-01T10:12:00Z", 0.9, 1.2],
-        ],
-        "now": "2026-01-01T10:06:00Z",
-        "thresholds": [{"label": "Actuar ya · 1,0 %", "value": 1.0}],
-    }
+    # Solo datos reales del último periodo (o vacío). Sin cifras inventadas del kit.
+    sample_alert = None
+    active = dash_service.alertas_activas(db, user_id=user.id, limit=1)
+    if active:
+        sample_alert = present.present_alert(active[0])
+    sample_chart = None
+    cards = dash_service.semaforo(db, user=user)
+    if cards:
+        try:
+            sample_chart = present.chart_now_and_next(db, int(cards[0]["sensor_id"]))
+        except Exception:  # noqa: BLE001
+            sample_chart = None
     return _render(
         request,
         "_componentes.html",
         user,
         title="Componentes",
         active_nav="",
-        sample_alert=sample,
+        sample_alert=sample_alert,
         sample_chart=sample_chart,
     )
 

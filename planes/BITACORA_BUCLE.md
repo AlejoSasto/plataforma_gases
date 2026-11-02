@@ -80,6 +80,52 @@
 - Ensayo técnico de las 5 tareas de `docs/ux/aceptacion.md` (no SUS). Plantilla de firma G0: `docs/g0_visto_director.md` (vacía a propósito).
 - Pendiente humano (no se puede firmar aquí): 3–5 sesiones reales en mina + visto del director en G0.
 
+## 2026-11-02 · Plan 24 · F1 limpieza demo
+
+- Scripts: `audit_demo_data.py`, `purge_demo_data.py --confirm` (auditoría `data.purge_demo`).
+- Purgado DEV: 21 users `@example.com`, 6 sensores demo (`TEST#`/`LIFE#`/`PRED#`/`SN#MINA`/`P19*`), 3 sitios ficticios, 26 avisos sin forecast, 26 lecturas demo.
+- Quedan: **50 sensores**, **13 894 lecturas** reales, sitio «Sin sitio asignado», **0 avisos**, **0 users** hasta `create_superadmin.py`.
+- Código: sin «Frente 3» / «0,72» / «Mina caso de estudio» en templates/copy; `/_componentes` usa datos reales o vacío.
+- Guardias: `tests/guards/test_no_demo_strings.py`. `verify --plan 24` ✅.
+- **Acción humana:** definir `SUPERADMIN_*` (no `@example.com`) en `.env` y correr `python scripts/create_superadmin.py`.
+- Prerrequisitos aún abiertos para el resto del Plan 24: **23 F2** (umbrales decreto) y **23 F3** (benchmark real).
+
+## 2026-11-02 · Plan 23 · §0 Índice honesto + F7 diagnóstico (sin cambios de código aún)
+
+- Índice: tres columnas Código / Experimento / Validación humana; Plan 23 priorizado sobre 14–22.
+- App Compose healthy `:8000`. DB: `gas_readings` 13 920; `max(tiempo_inicio)=2026-09-21` (sensores de prueba); datos de campo reales hasta **2025-12-11**. `forecasts` **0** filas. Hay `model_registry` production (transformer legado) sin ciclo de pronóstico v2.
+- Evidencia `present.chart_now_and_next(sensor=1)`: `measured=0`, `expected=0`, `now=2026-11-02T…`. `series_for_sensor(..., hours=24)` y hasta 90 d → 0 puntos (filtra con `datetime.now()`).
+- Navegador Hoy `/`: ECharts y `charts.js` **200**; `[data-chart]` **622×260** px con SVG (11 paths de ejes); payload embebido `measured:0` / `expected:0` / umbrales 3. Texto UI: «Por ahora mostramos solo lo que marcan los sensores».
+- `/sensores/1`: mismo patrón (caja con altura, sin serie).
+
+| Pantalla | Causa dominante (de las 7) | Notas |
+|----------|----------------------------|-------|
+| `/` Hoy | **#1** reloj de pared + **#2** sin forecasts | No #3/#5/#6 |
+| `/sensores/{id}` | **#1** + **#2** | Ventanas 24h/7d/30d vs now() |
+| `/avisos/{id}`, `/historial`, `/confiabilidad`, `/laboratorio/comparar`, `/sala` | pendiente al arreglar #1; mismo servicio de series | — |
+| charts.js | #4 parcialmente: no hay `htmx:afterSwap`; fetch vacío silencioso; sin estado vacío explicativo | #7 no aplica (tokens cargan) |
+
+- Siguiente: implementar `reference_time`, estados vacíos, pruebas; **no** marcar F7 cerrado sin E2E `test_charts_render.py`.
+
+## 2026-11-02 · Plan 23 · F7 arreglo (reference_time + charts.js)
+
+- `forecasting.service.reference_time(sensor_id)`: ancla series al `max(tiempo_inicio)`.
+- `series_for_sensor` / `chart_now_and_next` / `forecast_by_gas` usan esa referencia; JSON incluye `reference_time`, `data_until`, `data_until_label`.
+- UI: «Datos hasta el …» en Hoy y detalle de sensor. `charts.js`: `initCharts`, dispose, `htmx:afterSwap`, estado vacío/error con reintento. CSS `.chart--empty`.
+- Pruebas: `tests/integration/test_chart_endpoints.py`, `tests/e2e/test_charts_render.py`. `verify --plan 23` ✅ (4). E2E charts ✅.
+- Smoke DEV: sensor 54 → `measured=10`, label `21/09/2026 01:40` (antes 0 por reloj de pared).
+- F7 restante: recorrer `/avisos/{id}`, `/laboratorio/comparar`, `/sala` en bitácora; backfill de forecasts queda en F3/F8 (causa #2).
+- Siguiente fase del orden: **F5** retirar camino viejo.
+
+## 2026-11-02 · Plan 23 · F5 retirar camino viejo
+
+- Movido a `legacy/`: `ml_core_models/`, `ml_core_features/` (`build_features`, `targets`, `sequences`), scripts `train_full_model_zoo` / `retrain_*`.
+- `ml_training.service` usa `ml_core.forecasting.adapters` (`task=forecast`); rechaza classification/regression.
+- `/laboratorio/entrenar` sin selector de tarea; algoritmos del zoo 17.
+- Eliminados `RISK_THRESHOLD_*`, `THESIS_*`, `ML_LEAD_*` de `.env.example` y `config.py`; `probability_to_risk_level` retirada.
+- Guardias: `tests/guards/test_no_legacy_imports.py`. Tests viejos de features/metrics → `tests/legacy/` (fuera de la suite por defecto).
+- Siguiente: F1 (diagnóstico DB / G1).
+
 ## 2026-11-02 · Login seguro + identidad Vigía (Planes 10 tramo auth, 18, 21–22)
 
 - **Causa del fallo de login:** CSP `script-src 'self'` bloqueaba el JS inline; el form hacía GET y dejaba `password=` en la URL. `POST /ingresar` solo re-pintaba.

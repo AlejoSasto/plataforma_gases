@@ -33,14 +33,16 @@ curl http://localhost:8000/health
 
 Tras cambiar código Python montado: `docker compose restart app` (Gunicorn no recarga solo).
 
-### Credenciales de prueba (DEV)
+### Acceso en desarrollo
 
-Si existe el admin de prueba:
+Credenciales locales (solo DEV):
 
-- Correo: `test.admin@example.com`
+- Correo: `admin@vigia.local`
 - Contraseña: `AdminPass123!`
+- Entrada: http://localhost:8000/ingresar
 
-O crea uno con `SUPERADMIN_*` en `.env` y `python scripts/create_superadmin.py`.
+Si no existen: `python scripts/create_superadmin.py` (usa `SUPERADMIN_*` de `.env`).  
+`python scripts/audit_demo_data.py` debe salir limpio (sin `@example.com`).
 
 ## Arranque local (app en el host)
 

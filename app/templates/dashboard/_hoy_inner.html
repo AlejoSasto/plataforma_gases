@@ -15,6 +15,9 @@
     {% endif %}
     <div style="margin-top: var(--space-5)">
       <h2>Ahora y lo que viene</h2>
+      {% if chart_payload and chart_payload.get('data_until_label') %}
+      <p class="help">Datos hasta el {{ chart_payload.data_until_label }}</p>
+      {% endif %}
       {% if chart_payload %}
         {{ chart("now", data_json=chart_payload) }}
       {% else %}

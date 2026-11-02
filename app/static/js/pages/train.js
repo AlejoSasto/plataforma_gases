@@ -12,7 +12,7 @@
         body: {
           dataset_version: document.getElementById("dataset_version").value,
           scope: document.getElementById("scope").value,
-          task: document.getElementById("task").value,
+          task: "forecast",
           algorithms: algos,
         },
       });

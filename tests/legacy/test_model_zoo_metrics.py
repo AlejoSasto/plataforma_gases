@@ -1,22 +1,22 @@
-"""Tests unitarios de métricas thesis y targets temporales."""
+﻿"""Tests unitarios de métricas thesis y targets temporales."""
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
-from ml_core.features.targets import (
+from legacy.ml_core_features.targets import (
     add_future_targets,
     horizon_steps_from_minutes,
     median_delta_minutes,
 )
-from ml_core.models.metrics import (
+from legacy.ml_core_models.metrics import (
     apply_thesis_gates,
     classification_metrics,
     merge_metric_blocks,
     regression_metrics,
 )
-from ml_core.models.registry import MODEL_CATALOG, applicability_for
+from legacy.ml_core_models.registry import MODEL_CATALOG, applicability_for
 
 
 def test_classification_and_fn_rate():

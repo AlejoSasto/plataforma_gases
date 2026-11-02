@@ -2,7 +2,7 @@
 {% from "components/macros.html" import status_badge, status_banner, gas_tile, alert_card, metric_big, empty_state, chart, toast, page_header %}
 {% block page_title %}Componentes{% endblock %}
 {% block content %}
-{{ page_header("Catálogo de componentes", "Solo visible en entorno local.") }}
+{{ page_header("Catálogo de componentes", "Solo visible en entorno local. Las cifras salen de datos reales o quedan vacías.") }}
 <h2>Estados</h2>
 <div class="row-flex">
   {{ status_badge("normal") }}
@@ -17,13 +17,18 @@
 <div style="margin-top: var(--space-3)">
   {{ status_banner("2 zonas requieren atención", "actuar") }}
 </div>
-<h2>Cifra y gas</h2>
-{{ gas_tile("Metano", "0,72 %", "Se espera alrededor de 0,8 %") }}
-{{ metric_big("9", "Avisó a tiempo", "De cada 10 situaciones peligrosas") }}
 <h2>Aviso</h2>
+{% if sample_alert %}
 {{ alert_card(sample_alert) }}
+{% else %}
+{{ empty_state("bell", copy.EMPTY_ALERTS_TITLE, "Cuando haya avisos reales, el componente se muestra aquí.") }}
+{% endif %}
 <h2>Vacío</h2>
 {{ empty_state("circle-dashed", copy.EMPTY_SENSORS_TITLE, copy.EMPTY_SENSORS_TEXT) }}
 <h2>Gráfico</h2>
+{% if sample_chart %}
 {{ chart("now", data_json=sample_chart) }}
+{% else %}
+{{ empty_state("circle-dashed", "Sin serie", "No hay lecturas reales para dibujar el gráfico de muestra.") }}
+{% endif %}
 {% endblock %}

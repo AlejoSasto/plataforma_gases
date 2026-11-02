@@ -1,4 +1,4 @@
-"""Tests unitarios de feature engineering."""
+﻿"""Tests unitarios de feature engineering."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
-from ml_core.features.build_features import FEATURE_COLUMNS, LABEL_COLUMN, build_features
+from legacy.ml_core_features.build_features import FEATURE_COLUMNS, LABEL_COLUMN, build_features
 from tests.factories import readings_series, sensor, site
 
 

@@ -1,8 +1,6 @@
-"""Mapeo probabilidad → risk_level y recomendaciones por gas."""
+"""Recomendaciones por gas. La decisión operativa usa normative_thresholds (Plan 17/23)."""
 
 from __future__ import annotations
-
-from app.core.config import settings
 
 # Recomendaciones editables por código de gas / tipo
 GAS_RECOMMENDATIONS: dict[str, str] = {
@@ -15,17 +13,6 @@ GAS_RECOMMENDATIONS: dict[str, str] = {
     "O2": "Evacuar zona, revisar suministro de aire y posible desplazamiento de oxígeno.",
     "DEFAULT": "Monitorear la zona, confirmar lectura con instrumento calibrado y aplicar protocolo del sitio.",
 }
-
-
-def probability_to_risk_level(probability: float) -> str:
-    p = float(probability)
-    if p >= settings.risk_threshold_critical:
-        return "CRITICO"
-    if p >= settings.risk_threshold_alert:
-        return "ALERTA"
-    if p >= settings.risk_threshold_precaution:
-        return "PRECAUCION"
-    return "NORMAL"
 
 
 def recommendation_for_gas(gas_type: str | None) -> str:

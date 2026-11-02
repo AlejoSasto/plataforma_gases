@@ -1,4 +1,4 @@
-"""Entrenamiento de modelos tabulares (sklearn / XGBoost)."""
+﻿"""Entrenamiento de modelos tabulares (sklearn / XGBoost)."""
 
 from __future__ import annotations
 
@@ -17,15 +17,15 @@ from sklearn.tree import DecisionTreeClassifier
 from sqlalchemy.orm import Session
 from xgboost import XGBClassifier, XGBRegressor
 
-from ml_core.features.build_features import FEATURE_COLUMNS, LABEL_COLUMN, build_features
-from ml_core.features.targets import add_future_targets
-from ml_core.models.metrics import (
+from legacy.ml_core_features.build_features import FEATURE_COLUMNS, LABEL_COLUMN, build_features
+from legacy.ml_core_features.targets import add_future_targets
+from legacy.ml_core_models.metrics import (
     classification_metrics,
     lead_time_metrics,
     merge_metric_blocks,
     regression_metrics,
 )
-from ml_core.models.registry import applicability_for, get_spec
+from legacy.ml_core_models.registry import applicability_for, get_spec
 
 
 @dataclass
