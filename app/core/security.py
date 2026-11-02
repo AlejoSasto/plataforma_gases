@@ -52,14 +52,12 @@ def create_access_token(
 
 def create_refresh_token(user_id: int | str) -> tuple[str, datetime]:
     """
-    Genera un refresh token opaco y su fecha de expiración.
+    Genera un refresh token opaco y su fecha de expiración (turno de 8 h).
     El caller debe persistir hash_token(raw) en refresh_tokens.
     """
     raw = secrets.token_urlsafe(48)
-    expires_at = datetime.now(timezone.utc) + timedelta(
-        days=settings.refresh_token_expire_days
-    )
-    # Incluir user_id firmado no es necesario (token opaco); se valida vía DB.
+    hours = getattr(settings, "refresh_token_expire_hours", None) or 8
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=int(hours))
     _ = user_id
     return raw, expires_at
 

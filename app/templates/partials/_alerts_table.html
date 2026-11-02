@@ -1,41 +1,8 @@
-<div class="panel panel-flush">
-  <div class="table-responsive-wrap">
-    <table class="table table-hover align-middle mb-0" id="{{ table_id or 'alerts-table' }}">
-      <thead class="table-light">
-        <tr>
-          <th>Nivel</th>
-          <th>Sitio / Sensor</th>
-          <th>Mensaje</th>
-          <th>Estado</th>
-          <th>Fecha</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if alerts %}
-          {% for a in alerts %}
-          <tr>
-            <td>{% with level=a.level %}{% include "partials/_risk_badge.html" %}{% endwith %}</td>
-            <td>
-              <div class="fw-semibold">{{ a.site_name or '—' }}</div>
-              <div class="small text-secondary">{{ a.sensor_code or a.sensor_id }}{% if a.gas_type %} · {{ a.gas_type }}{% endif %}</div>
-            </td>
-            <td>
-              <div class="text-truncate" style="max-width: 280px;" title="{{ a.message }}">{{ a.message }}</div>
-            </td>
-            <td><span class="badge text-bg-light border fw-normal">{{ a.status }}</span></td>
-            <td class="small text-secondary text-nowrap">{{ a.created_at }}</td>
-            <td><a class="btn btn-sm btn-outline-primary" href="/alerts/{{ a.id }}">Ver</a></td>
-          </tr>
-          {% endfor %}
-        {% else %}
-          <tr>
-            <td colspan="6" class="text-center text-secondary py-5">
-              {{ empty_message or "No hay alertas con estos filtros" }}
-            </td>
-          </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
+{% from "components/macros.html" import alert_card, empty_state %}
+{% if alerts %}
+<div class="stack">
+  {% for a in alerts %}{{ alert_card(a) }}{% endfor %}
 </div>
+{% else %}
+{{ empty_state("bell-off", "No hay avisos abiertos", empty_message or "") }}
+{% endif %}

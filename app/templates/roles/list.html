@@ -1,32 +1,27 @@
 {% extends "base.html" %}
-{% block page_title %}Roles y permisos{% endblock %}
+{% from "components/macros.html" import page_header %}
+{% block page_title %}Roles{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Matriz de roles × permisos (solo lectura en UI).</p>
-  </div>
+<div class="lab-banner">{{ copy.LAB_BADGE }}</div>
+{{ page_header("Roles y permisos", "Matriz de lectura. Los cambios van por la consola de administración.") }}
+<div class="card" style="overflow:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Rol</th>
+        {% for p in perm_catalog %}<th class="help">{{ p.code }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in roles %}
+      <tr>
+        <td>{{ r.name }}<div class="help">{{ r.description }}</div></td>
+        {% for p in perm_catalog %}
+          <td>{{ "sí" if p.code in r.permissions else "·" }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 </div>
-<div class="panel panel-flush">
-  <div class="table-responsive-wrap">
-    <table class="table align-middle mb-0">
-      <thead class="table-light">
-        <tr>
-          <th>Rol</th>
-          {% for p in permissions %}<th class="small">{{ p.code }}</th>{% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-      {% for r in roles %}
-        <tr>
-          <td class="fw-medium">{{ r.name }}<div class="small text-secondary">{{ r.description }}</div></td>
-          {% for p in permissions %}
-            <td class="text-center">{% if p.code in r.permissions %}✓{% else %}·{% endif %}</td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-<p class="small text-secondary mt-3 mb-0">Para editar usa la API <code>/api/roles</code> o el seed.</p>
 {% endblock %}

@@ -18,14 +18,21 @@ from app.shared.exceptions import NotFoundError, ValidationError
 
 LEVEL_RANK = {
     "NORMAL": 0,
+    "normal": 0,
     "PRECAUCION": 1,
+    "vigilar": 1,
     "ALERTA": 2,
+    "actuar": 2,
     "CRITICO": 3,
+    "evacuar": 3,
 }
 
 
 def _rank(level: str) -> int:
-    return LEVEL_RANK.get((level or "").upper(), 0)
+    key = (level or "").strip()
+    if key in LEVEL_RANK:
+        return LEVEL_RANK[key]
+    return LEVEL_RANK.get(key.lower(), LEVEL_RANK.get(key.upper(), 0))
 
 
 def create_stakeholder(db: Session, data: dict[str, Any]) -> Stakeholder:
@@ -170,11 +177,12 @@ def alert_ids_visible_to_user(db: Session, user_id: int) -> Optional[set[int]]:
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         return set()
-    roles = set(user.role_names)
-    if "interesado" not in roles:
+    from app.shared.access import canonical_role
+
+    roles = {canonical_role(r) for r in user.role_names}
+    if "interesado" not in user.role_names:
         return None
-    # Roles operativos / admin ven todo
-    if roles & {"admin", "operador_mina", "ingeniero_datos", "auditor"}:
+    if roles & {"admin", "operador", "analista", "auditor", "supervisor_seguridad", "gerencia"}:
         return None
 
     s_ids = stakeholder_ids_for_user(db, user_id)

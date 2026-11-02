@@ -1,0 +1,1182 @@
+{
+  "generated_at": "2026-11-01T23:21:16.812873+00:00",
+  "source": "csv:Procesamiento_de_Datos.csv",
+  "n_rows": 13894,
+  "n_sensors": 50,
+  "gases": [
+    "CH4",
+    "CO",
+    "CO2",
+    "H2S",
+    "O2",
+    "UNKNOWN"
+  ],
+  "t_min": "2023-03-31T14:37:09+00:00",
+  "t_max": "2025-12-11T14:17:44+00:00",
+  "sensors": [
+    {
+      "n": 2484,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 0.6667,
+      "gap_gt_3median_pct": 11.92,
+      "sensor_code": "160541U005#S0001",
+      "gas": "CO",
+      "t_min": "2024-11-13T04:00:39+00:00",
+      "t_max": "2024-12-11T15:15:52+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 1527,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 0.8333,
+      "gap_gt_3median_pct": 12.78,
+      "sensor_code": "160541U005#S0002",
+      "gas": "H2S",
+      "t_min": "2024-11-13T04:00:39+00:00",
+      "t_max": "2024-12-11T15:15:52+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 9,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 2.0,
+      "dt_p90_min": 6.66,
+      "gap_gt_3median_pct": 12.5,
+      "sensor_code": "161107V011#S0011",
+      "gas": "CO2",
+      "t_min": "2025-10-27T14:46:47+00:00",
+      "t_max": "2025-10-27T15:14:31+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 2953,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 1.1667,
+      "gap_gt_3median_pct": 20.8,
+      "sensor_code": "17020PE013#S0011",
+      "gas": "CO2",
+      "t_min": "2024-11-13T04:00:39+00:00",
+      "t_max": "2024-12-11T15:15:52+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 6,
+      "dt_p10_min": 1.1667,
+      "dt_p50_min": 1.5333,
+      "dt_p90_min": 6255.6633,
+      "gap_gt_3median_pct": 20.0,
+      "sensor_code": "17030B6004#S0011",
+      "gas": "CO2",
+      "t_min": "2025-10-10T09:21:45+00:00",
+      "t_max": "2025-10-17T15:12:47+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 8,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 1.5533,
+      "gap_gt_3median_pct": 42.86,
+      "sensor_code": "1807482030#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2023-03-31T14:37:09+00:00",
+      "t_max": "2023-03-31T14:41:57+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 3,
+      "dt_p10_min": 5.6667,
+      "dt_p50_min": 8.8667,
+      "dt_p90_min": 12.0667,
+      "gap_gt_3median_pct": 0.0,
+      "sensor_code": "19052Q1004#S0001",
+      "gas": "CO",
+      "t_min": "2025-10-27T14:46:47+00:00",
+      "t_max": "2025-10-27T15:04:31+00:00",
+      "kind": "desconocido",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 8,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 3.8667,
+      "dt_p90_min": 8.7467,
+      "gap_gt_3median_pct": 14.29,
+      "sensor_code": "19052Q1004#S0002",
+      "gas": "H2S",
+      "t_min": "2025-10-27T14:46:47+00:00",
+      "t_max": "2025-10-27T15:16:31+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 14,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 0.6067,
+      "gap_gt_3median_pct": 15.38,
+      "sensor_code": "1908138189#S0021",
+      "gas": "CH4",
+      "t_min": "2023-03-31T14:37:09+00:00",
+      "t_max": "2023-03-31T14:41:57+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 13,
+      "dt_p10_min": 1.1,
+      "dt_p50_min": 31.5,
+      "dt_p90_min": 11539.785,
+      "gap_gt_3median_pct": 16.67,
+      "sensor_code": "20091E1013#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2025-08-25T09:28:51+00:00",
+      "t_max": "2025-09-16T08:59:01+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 67,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.0,
+      "dt_p90_min": 18.0,
+      "gap_gt_3median_pct": 31.82,
+      "sensor_code": "20100B2010#S0001",
+      "gas": "CO",
+      "t_min": "2025-08-25T09:28:51+00:00",
+      "t_max": "2025-09-16T08:37:01+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 260,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.0,
+      "dt_p90_min": 4.0,
+      "gap_gt_3median_pct": 12.74,
+      "sensor_code": "20100B2010#S0002",
+      "gas": "H2S",
+      "t_min": "2025-08-25T09:28:51+00:00",
+      "t_max": "2025-09-16T09:30:01+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 108,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.0,
+      "dt_p90_min": 12.8933,
+      "gap_gt_3median_pct": 20.56,
+      "sensor_code": "20100MY003#S0011",
+      "gas": "CO2",
+      "t_min": "2025-08-25T09:28:51+00:00",
+      "t_max": "2025-09-16T09:09:01+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 15,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 0.7833,
+      "gap_gt_3median_pct": 21.43,
+      "sensor_code": "21071TQ142#S0020",
+      "gas": "O2",
+      "t_min": "2023-03-31T14:37:09+00:00",
+      "t_max": "2023-03-31T14:42:17+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 5,
+      "dt_p10_min": 1.7983,
+      "dt_p50_min": 2.675,
+      "dt_p90_min": 7297.785,
+      "gap_gt_3median_pct": 25.0,
+      "sensor_code": "210802X034#S0001",
+      "gas": "CO",
+      "t_min": "2025-10-10T09:21:45+00:00",
+      "t_max": "2025-10-17T15:12:47+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 5,
+      "dt_p10_min": 1.7983,
+      "dt_p50_min": 2.675,
+      "dt_p90_min": 7297.785,
+      "gap_gt_3median_pct": 25.0,
+      "sensor_code": "210802X034#S0002",
+      "gas": "H2S",
+      "t_min": "2025-10-10T09:21:45+00:00",
+      "t_max": "2025-10-17T15:12:47+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 5,
+      "dt_p10_min": 1.7983,
+      "dt_p50_min": 2.675,
+      "dt_p90_min": 7297.785,
+      "gap_gt_3median_pct": 25.0,
+      "sensor_code": "21080LJ005#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2025-10-10T09:21:45+00:00",
+      "t_max": "2025-10-17T15:12:47+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 18,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.6667,
+      "dt_p90_min": 13.2267,
+      "gap_gt_3median_pct": 29.41,
+      "sensor_code": "22061PG059#S0001",
+      "gas": "CO",
+      "t_min": "2025-10-27T10:07:52+00:00",
+      "t_max": "2025-10-27T11:12:51+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 32,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 5.15,
+      "gap_gt_3median_pct": 25.81,
+      "sensor_code": "22061PG059#S0002",
+      "gas": "H2S",
+      "t_min": "2025-10-27T10:07:52+00:00",
+      "t_max": "2025-10-27T11:12:51+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 3,
+      "dt_p10_min": 2.08,
+      "dt_p50_min": 2.4,
+      "dt_p90_min": 2.72,
+      "gap_gt_3median_pct": 0.0,
+      "sensor_code": "2206309128#S0001",
+      "gas": "CO",
+      "t_min": "2023-03-31T14:37:09+00:00",
+      "t_max": "2023-03-31T14:41:57+00:00",
+      "kind": "desconocido",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 16,
+      "dt_p10_min": 0.2333,
+      "dt_p50_min": 1.2167,
+      "dt_p90_min": 13.3067,
+      "gap_gt_3median_pct": 26.67,
+      "sensor_code": "22081FT036#S0022",
+      "gas": "CH4",
+      "t_min": "2025-10-27T10:07:52+00:00",
+      "t_max": "2025-10-27T11:12:51+00:00",
+      "kind": "portatil",
+      "units": [
+        "%lel"
+      ]
+    },
+    {
+      "n": 12,
+      "dt_p10_min": 0.9,
+      "dt_p50_min": 1.7667,
+      "dt_p90_min": 13.4667,
+      "gap_gt_3median_pct": 27.27,
+      "sensor_code": "22081JU008#S0020",
+      "gas": "O2",
+      "t_min": "2025-10-27T10:07:52+00:00",
+      "t_max": "2025-10-27T11:12:51+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 383,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 2.0,
+      "dt_p90_min": 19.0,
+      "gap_gt_3median_pct": 20.16,
+      "sensor_code": "22082AR052#S0021",
+      "gas": "CH4",
+      "t_min": "2025-11-11T09:42:40+00:00",
+      "t_max": "2025-12-11T12:25:44+00:00",
+      "kind": "fijo",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 9,
+      "dt_p10_min": 18.2483,
+      "dt_p50_min": 40.0,
+      "dt_p90_min": 14560.0217,
+      "gap_gt_3median_pct": 25.0,
+      "sensor_code": "22082AR056#S0021",
+      "gas": "CH4",
+      "t_min": "2025-08-25T09:28:51+00:00",
+      "t_max": "2025-09-16T08:59:01+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 83,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.3333,
+      "dt_p90_min": 6.905,
+      "gap_gt_3median_pct": 37.8,
+      "sensor_code": "22083AF012#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2024-09-06T12:42:34+00:00",
+      "t_max": "2024-09-13T16:03:08+00:00",
+      "kind": "fijo",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 36,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.3333,
+      "dt_p90_min": 6.66,
+      "gap_gt_3median_pct": 22.86,
+      "sensor_code": "220929G001#S0011",
+      "gas": "CO2",
+      "t_min": "2025-10-27T10:07:52+00:00",
+      "t_max": "2025-10-27T11:12:51+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 84,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 10.3833,
+      "gap_gt_3median_pct": 38.55,
+      "sensor_code": "2209364013#S0011",
+      "gas": "CO2",
+      "t_min": "2024-09-06T12:42:34+00:00",
+      "t_max": "2024-09-13T16:03:08+00:00",
+      "kind": "fijo",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 1501,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.0,
+      "dt_p90_min": 2.0,
+      "gap_gt_3median_pct": 6.0,
+      "sensor_code": "2209364017#S0011",
+      "gas": "CO2",
+      "t_min": "2025-11-11T09:42:40+00:00",
+      "t_max": "2025-12-11T14:11:44+00:00",
+      "kind": "fijo",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 18,
+      "dt_p10_min": 1.2233,
+      "dt_p50_min": 9.9167,
+      "dt_p90_min": 1845.1333,
+      "gap_gt_3median_pct": 35.29,
+      "sensor_code": "2209366013#S0001",
+      "gas": "CO",
+      "t_min": "2024-09-06T12:42:34+00:00",
+      "t_max": "2024-09-13T16:03:08+00:00",
+      "kind": "fijo",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 247,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 0.8333,
+      "gap_gt_3median_pct": 11.38,
+      "sensor_code": "2209366013#S0002",
+      "gas": "H2S",
+      "t_min": "2024-09-06T12:42:34+00:00",
+      "t_max": "2024-09-13T16:03:08+00:00",
+      "kind": "fijo",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 117,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 3.0,
+      "dt_p90_min": 1224.775,
+      "gap_gt_3median_pct": 37.07,
+      "sensor_code": "2209366026#S0001",
+      "gas": "CO",
+      "t_min": "2025-11-11T09:42:40+00:00",
+      "t_max": "2025-12-11T12:25:44+00:00",
+      "kind": "fijo",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 467,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.0,
+      "dt_p90_min": 10.5,
+      "gap_gt_3median_pct": 19.31,
+      "sensor_code": "2209366026#S0002",
+      "gas": "H2S",
+      "t_min": "2025-11-11T09:42:40+00:00",
+      "t_max": "2025-12-11T14:17:44+00:00",
+      "kind": "fijo",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 476,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.1667,
+      "dt_p90_min": 2.5,
+      "gap_gt_3median_pct": 23.37,
+      "sensor_code": "2210031012#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2024-11-13T04:00:39+00:00",
+      "t_max": "2024-12-11T15:15:52+00:00",
+      "kind": "portatil",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 18,
+      "dt_p10_min": 1.2233,
+      "dt_p50_min": 9.9167,
+      "dt_p90_min": 1845.1333,
+      "gap_gt_3median_pct": 35.29,
+      "sensor_code": "22101J7044#S0021",
+      "gas": "CH4",
+      "t_min": "2024-09-06T12:42:34+00:00",
+      "t_max": "2024-09-13T16:03:08+00:00",
+      "kind": "fijo",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 63,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.8333,
+      "dt_p90_min": 20.4283,
+      "gap_gt_3median_pct": 32.26,
+      "sensor_code": "22101YV009#S0020",
+      "gas": "O2",
+      "t_min": "2024-09-06T12:42:34+00:00",
+      "t_max": "2024-09-13T16:03:08+00:00",
+      "kind": "fijo",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 1473,
+      "dt_p10_min": 0.1667,
+      "dt_p50_min": 0.3333,
+      "dt_p90_min": 2.3333,
+      "gap_gt_3median_pct": 21.54,
+      "sensor_code": "23050W8028#S0020",
+      "gas": "O2",
+      "t_min": "2024-11-13T04:00:39+00:00",
+      "t_max": "2024-12-11T15:15:52+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 162,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 2.0,
+      "dt_p90_min": 118.9667,
+      "gap_gt_3median_pct": 36.02,
+      "sensor_code": "23081F0018#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2025-11-11T09:42:40+00:00",
+      "t_max": "2025-12-11T12:25:44+00:00",
+      "kind": "fijo",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 1,
+      "dt_p10_min": null,
+      "dt_p50_min": null,
+      "dt_p90_min": null,
+      "gap_gt_3median_pct": null,
+      "sensor_code": "231025H023#S0001",
+      "gas": "CO",
+      "t_min": "2025-10-24T14:59:55+00:00",
+      "t_max": "2025-10-24T14:59:55+00:00",
+      "kind": "desconocido",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 1,
+      "dt_p10_min": null,
+      "dt_p50_min": null,
+      "dt_p90_min": null,
+      "gap_gt_3median_pct": null,
+      "sensor_code": "231025H023#S0002",
+      "gas": "H2S",
+      "t_min": "2025-10-24T14:59:55+00:00",
+      "t_max": "2025-10-24T14:59:55+00:00",
+      "kind": "desconocido",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 1,
+      "dt_p10_min": null,
+      "dt_p50_min": null,
+      "dt_p90_min": null,
+      "gap_gt_3median_pct": null,
+      "sensor_code": "23110AS018#S0021",
+      "gas": "CH4",
+      "t_min": "2025-10-24T14:59:55+00:00",
+      "t_max": "2025-10-24T14:59:55+00:00",
+      "kind": "desconocido",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 1,
+      "dt_p10_min": null,
+      "dt_p50_min": null,
+      "dt_p90_min": null,
+      "gap_gt_3median_pct": null,
+      "sensor_code": "23110Z4010#S0004",
+      "gas": "UNKNOWN",
+      "t_min": "2025-10-24T14:59:55+00:00",
+      "t_max": "2025-10-24T14:59:55+00:00",
+      "kind": "desconocido",
+      "units": [
+        "ppm"
+      ]
+    },
+    {
+      "n": 5,
+      "dt_p10_min": 1.7983,
+      "dt_p50_min": 2.675,
+      "dt_p90_min": 7297.785,
+      "gap_gt_3median_pct": 25.0,
+      "sensor_code": "231215G022#S0021",
+      "gas": "CH4",
+      "t_min": "2025-10-10T09:21:45+00:00",
+      "t_max": "2025-10-17T15:12:47+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 1,
+      "dt_p10_min": null,
+      "dt_p50_min": null,
+      "dt_p90_min": null,
+      "gap_gt_3median_pct": null,
+      "sensor_code": "24011Y1009#S0011",
+      "gas": "CO2",
+      "t_min": "2025-10-24T14:59:55+00:00",
+      "t_max": "2025-10-24T14:59:55+00:00",
+      "kind": "desconocido",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 42,
+      "dt_p10_min": 0.3333,
+      "dt_p50_min": 30.65,
+      "dt_p90_min": 2851.6,
+      "gap_gt_3median_pct": 36.59,
+      "sensor_code": "24062BR010#S0021",
+      "gas": "CH4",
+      "t_min": "2024-11-13T04:00:39+00:00",
+      "t_max": "2024-12-11T15:15:52+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 1014,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.0,
+      "dt_p90_min": 5.0,
+      "gap_gt_3median_pct": 15.5,
+      "sensor_code": "241033Q134#S0020",
+      "gas": "O2",
+      "t_min": "2025-11-11T09:42:40+00:00",
+      "t_max": "2025-12-11T14:11:44+00:00",
+      "kind": "fijo",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 7,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 1.475,
+      "dt_p90_min": 5213.0417,
+      "gap_gt_3median_pct": 16.67,
+      "sensor_code": "2412083053#S0020",
+      "gas": "O2",
+      "t_min": "2025-10-10T09:21:45+00:00",
+      "t_max": "2025-10-17T15:12:47+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 8,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 2.0,
+      "dt_p90_min": 10.5467,
+      "gap_gt_3median_pct": 28.57,
+      "sensor_code": "25031AY140#S0020",
+      "gas": "O2",
+      "t_min": "2025-10-27T14:46:47+00:00",
+      "t_max": "2025-10-27T15:17:31+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 101,
+      "dt_p10_min": 1.0,
+      "dt_p50_min": 2.5,
+      "dt_p90_min": 16.3,
+      "gap_gt_3median_pct": 23.0,
+      "sensor_code": "25040J7141#S0020",
+      "gas": "O2",
+      "t_min": "2025-08-25T09:28:51+00:00",
+      "t_max": "2025-09-16T09:18:01+00:00",
+      "kind": "portatil",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 3,
+      "dt_p10_min": 5.6667,
+      "dt_p50_min": 8.8667,
+      "dt_p90_min": 12.0667,
+      "gap_gt_3median_pct": 0.0,
+      "sensor_code": "25042V7005#S0021",
+      "gas": "CH4",
+      "t_min": "2025-10-27T14:46:47+00:00",
+      "t_max": "2025-10-27T15:04:31+00:00",
+      "kind": "desconocido",
+      "units": [
+        "%vol"
+      ]
+    },
+    {
+      "n": 1,
+      "dt_p10_min": null,
+      "dt_p50_min": null,
+      "dt_p90_min": null,
+      "gap_gt_3median_pct": null,
+      "sensor_code": "2510140176#S0020",
+      "gas": "O2",
+      "t_min": "2025-10-24T14:59:55+00:00",
+      "t_max": "2025-10-24T14:59:55+00:00",
+      "kind": "desconocido",
+      "units": [
+        "%vol"
+      ]
+    }
+  ],
+  "density_month_gas": [
+    {
+      "month": "2023-03",
+      "gas": "CH4",
+      "n": 14
+    },
+    {
+      "month": "2023-03",
+      "gas": "CO",
+      "n": 3
+    },
+    {
+      "month": "2023-03",
+      "gas": "O2",
+      "n": 15
+    },
+    {
+      "month": "2023-03",
+      "gas": "UNKNOWN",
+      "n": 8
+    },
+    {
+      "month": "2024-09",
+      "gas": "CH4",
+      "n": 18
+    },
+    {
+      "month": "2024-09",
+      "gas": "CO",
+      "n": 18
+    },
+    {
+      "month": "2024-09",
+      "gas": "CO2",
+      "n": 84
+    },
+    {
+      "month": "2024-09",
+      "gas": "H2S",
+      "n": 247
+    },
+    {
+      "month": "2024-09",
+      "gas": "O2",
+      "n": 63
+    },
+    {
+      "month": "2024-09",
+      "gas": "UNKNOWN",
+      "n": 83
+    },
+    {
+      "month": "2024-11",
+      "gas": "CH4",
+      "n": 39
+    },
+    {
+      "month": "2024-11",
+      "gas": "CO",
+      "n": 2481
+    },
+    {
+      "month": "2024-11",
+      "gas": "CO2",
+      "n": 2950
+    },
+    {
+      "month": "2024-11",
+      "gas": "H2S",
+      "n": 1524
+    },
+    {
+      "month": "2024-11",
+      "gas": "O2",
+      "n": 1470
+    },
+    {
+      "month": "2024-11",
+      "gas": "UNKNOWN",
+      "n": 473
+    },
+    {
+      "month": "2024-12",
+      "gas": "CH4",
+      "n": 3
+    },
+    {
+      "month": "2024-12",
+      "gas": "CO",
+      "n": 3
+    },
+    {
+      "month": "2024-12",
+      "gas": "CO2",
+      "n": 3
+    },
+    {
+      "month": "2024-12",
+      "gas": "H2S",
+      "n": 3
+    },
+    {
+      "month": "2024-12",
+      "gas": "O2",
+      "n": 3
+    },
+    {
+      "month": "2024-12",
+      "gas": "UNKNOWN",
+      "n": 3
+    },
+    {
+      "month": "2025-08",
+      "gas": "CH4",
+      "n": 3
+    },
+    {
+      "month": "2025-08",
+      "gas": "CO",
+      "n": 37
+    },
+    {
+      "month": "2025-08",
+      "gas": "CO2",
+      "n": 46
+    },
+    {
+      "month": "2025-08",
+      "gas": "H2S",
+      "n": 105
+    },
+    {
+      "month": "2025-08",
+      "gas": "O2",
+      "n": 42
+    },
+    {
+      "month": "2025-08",
+      "gas": "UNKNOWN",
+      "n": 3
+    },
+    {
+      "month": "2025-09",
+      "gas": "CH4",
+      "n": 6
+    },
+    {
+      "month": "2025-09",
+      "gas": "CO",
+      "n": 30
+    },
+    {
+      "month": "2025-09",
+      "gas": "CO2",
+      "n": 62
+    },
+    {
+      "month": "2025-09",
+      "gas": "H2S",
+      "n": 155
+    },
+    {
+      "month": "2025-09",
+      "gas": "O2",
+      "n": 59
+    },
+    {
+      "month": "2025-09",
+      "gas": "UNKNOWN",
+      "n": 10
+    },
+    {
+      "month": "2025-10",
+      "gas": "CH4",
+      "n": 25
+    },
+    {
+      "month": "2025-10",
+      "gas": "CO",
+      "n": 27
+    },
+    {
+      "month": "2025-10",
+      "gas": "CO2",
+      "n": 52
+    },
+    {
+      "month": "2025-10",
+      "gas": "H2S",
+      "n": 46
+    },
+    {
+      "month": "2025-10",
+      "gas": "O2",
+      "n": 28
+    },
+    {
+      "month": "2025-10",
+      "gas": "UNKNOWN",
+      "n": 6
+    },
+    {
+      "month": "2025-11",
+      "gas": "CH4",
+      "n": 255
+    },
+    {
+      "month": "2025-11",
+      "gas": "CO",
+      "n": 52
+    },
+    {
+      "month": "2025-11",
+      "gas": "CO2",
+      "n": 1010
+    },
+    {
+      "month": "2025-11",
+      "gas": "H2S",
+      "n": 276
+    },
+    {
+      "month": "2025-11",
+      "gas": "O2",
+      "n": 635
+    },
+    {
+      "month": "2025-11",
+      "gas": "UNKNOWN",
+      "n": 116
+    },
+    {
+      "month": "2025-12",
+      "gas": "CH4",
+      "n": 128
+    },
+    {
+      "month": "2025-12",
+      "gas": "CO",
+      "n": 65
+    },
+    {
+      "month": "2025-12",
+      "gas": "CO2",
+      "n": 491
+    },
+    {
+      "month": "2025-12",
+      "gas": "H2S",
+      "n": 191
+    },
+    {
+      "month": "2025-12",
+      "gas": "O2",
+      "n": 379
+    },
+    {
+      "month": "2025-12",
+      "gas": "UNKNOWN",
+      "n": 46
+    }
+  ],
+  "units_by_gas": {
+    "CH4": [
+      "%lel",
+      "%vol"
+    ],
+    "CO": [
+      "ppm"
+    ],
+    "CO2": [
+      "%vol"
+    ],
+    "H2S": [
+      "ppm"
+    ],
+    "O2": [
+      "%vol"
+    ],
+    "UNKNOWN": [
+      "ppm"
+    ]
+  },
+  "duplicates": {
+    "exact": 0,
+    "near_same_value_within_60s": 10
+  },
+  "episodes": [
+    {
+      "gas": "CH4",
+      "level": "vigilar",
+      "direction": "above",
+      "threshold": 0.5,
+      "onsets": 1,
+      "sensors_with_onsets": 1,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "CH4",
+      "level": "actuar",
+      "direction": "above",
+      "threshold": 1.0,
+      "onsets": 1,
+      "sensors_with_onsets": 1,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "CH4",
+      "level": "evacuar",
+      "direction": "above",
+      "threshold": 1.5,
+      "onsets": 1,
+      "sensors_with_onsets": 1,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "CO",
+      "level": "vigilar",
+      "direction": "above",
+      "threshold": 25.0,
+      "onsets": 7,
+      "sensors_with_onsets": 2,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "CO",
+      "level": "actuar",
+      "direction": "above",
+      "threshold": 50.0,
+      "onsets": 4,
+      "sensors_with_onsets": 2,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "CO",
+      "level": "evacuar",
+      "direction": "above",
+      "threshold": 100.0,
+      "onsets": 3,
+      "sensors_with_onsets": 2,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "H2S",
+      "level": "vigilar",
+      "direction": "above",
+      "threshold": 1.0,
+      "onsets": 59,
+      "sensors_with_onsets": 5,
+      "policy": "bootstrap_ic"
+    },
+    {
+      "gas": "H2S",
+      "level": "actuar",
+      "direction": "above",
+      "threshold": 5.0,
+      "onsets": 7,
+      "sensors_with_onsets": 2,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "H2S",
+      "level": "evacuar",
+      "direction": "above",
+      "threshold": 10.0,
+      "onsets": 5,
+      "sensors_with_onsets": 2,
+      "policy": "no_event_metrics"
+    },
+    {
+      "gas": "O2",
+      "level": "vigilar",
+      "direction": "below",
+      "threshold": 19.5,
+      "onsets": 53,
+      "sensors_with_onsets": 6,
+      "policy": "bootstrap_ic"
+    },
+    {
+      "gas": "O2",
+      "level": "actuar",
+      "direction": "below",
+      "threshold": 19.0,
+      "onsets": 24,
+      "sensors_with_onsets": 4,
+      "policy": "wide_ic_warning"
+    },
+    {
+      "gas": "O2",
+      "level": "evacuar",
+      "direction": "below",
+      "threshold": 17.0,
+      "onsets": 14,
+      "sensors_with_onsets": 3,
+      "policy": "wide_ic_warning"
+    }
+  ],
+  "g0": {
+    "dt_p50_min_priority_max": 5.7708,
+    "dt_p50_min_by_gas": {
+      "CH4": 5.7708,
+      "CO": 2.5375,
+      "H2S": 1.0
+    },
+    "band": "medium",
+    "horizons_min": [
+      6,
+      12,
+      18
+    ],
+    "note": "2 < Δt ≤ 10 min (Δt=5.77). Horizontes = 1, 2 y 3 pasos. Solicitar al proveedor el export de datalog por intervalo."
+  },
+  "thresholds_verified": false,
+  "lel_ch4_percent_vol": 5.0
+}

@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from app.modules.users import service as users_service
-from app.modules.users.schemas import UserCreate, UserResponse, UserRolesUpdate, UserUpdate
+from app.modules.users.schemas import UserCreate, UserResponse, UserRolesUpdate, UserSitesUpdate, UserUpdate
 from app.shared.dependencies import CurrentUser, DbSession, require_permission
 from app.shared.pagination import Page, PageParams
 
@@ -77,3 +77,24 @@ def set_user_roles(
     _: ManageUsers,
 ) -> UserResponse:
     return UserResponse(**users_service.set_roles(db, user_id, body, actor.id))
+
+
+@router.post("/{user_id}/zonas", response_model=UserResponse)
+def set_user_sites(
+    user_id: int,
+    body: UserSitesUpdate,
+    db: DbSession,
+    actor: CurrentUser,
+    _: ManageUsers,
+) -> UserResponse:
+    return UserResponse(**users_service.set_sites(db, user_id, body, actor.id))
+
+
+@router.post("/{user_id}/desbloquear", response_model=UserResponse)
+def unlock_user(user_id: int, db: DbSession, actor: CurrentUser, _: ManageUsers) -> UserResponse:
+    return UserResponse(**users_service.unlock_user(db, user_id, actor.id))
+
+
+@router.post("/{user_id}/forzar-contrasena", response_model=UserResponse)
+def force_password(user_id: int, db: DbSession, actor: CurrentUser, _: ManageUsers) -> UserResponse:
+    return UserResponse(**users_service.force_password_change(db, user_id, actor.id))

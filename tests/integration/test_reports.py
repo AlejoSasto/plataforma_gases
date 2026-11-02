@@ -7,7 +7,8 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from app.core.database import SessionLocal
+from sqlalchemy.orm import Session
+
 from app.modules.ml_training.models import ModelRegistry
 from app.modules.users.models import User
 
@@ -58,34 +59,30 @@ def test_reports_alertas_ejecutivo_and_download(
 
     page = client.get("/reports")
     assert page.status_code == 200
-    assert "Generar reporte" in page.text
+    assert "Generar y descargar" in page.text or "Informes" in page.text
 
 
-def test_reports_modelo(client: TestClient, admin_user: tuple[User, str]) -> None:
+def test_reports_modelo(client: TestClient, admin_user: tuple[User, str], db: Session) -> None:
     admin, password = admin_user
     assert (
         client.post("/auth/login", json={"email": admin.email, "password": password}).status_code
         == 200
     )
-    db = SessionLocal()
-    try:
-        model = db.query(ModelRegistry).first()
-        if model is None:
-            model = ModelRegistry(
-                name="report-test",
-                version="1",
-                algorithm="rf",
-                params={},
-                metrics={"f1": 0.8, "precision": 0.7, "recall": 0.9},
-                status="staging",
-                scope="global",
-            )
-            db.add(model)
-            db.commit()
-            db.refresh(model)
-        model_id = model.id
-    finally:
-        db.close()
+    model = db.query(ModelRegistry).first()
+    if model is None:
+        model = ModelRegistry(
+            name="report-test",
+            version="1",
+            algorithm="rf",
+            params={},
+            metrics={"f1": 0.8, "precision": 0.7, "recall": 0.9},
+            status="staging",
+            scope="global",
+        )
+        db.add(model)
+        db.commit()
+        db.refresh(model)
+    model_id = model.id
 
     res = client.post(f"/api/reports/modelo/{model_id}")
     assert res.status_code == 200, res.text

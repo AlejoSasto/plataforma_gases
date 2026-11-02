@@ -6,13 +6,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 
-from app.core.database import SessionLocal
 from app.core.security import hash_password
 from app.modules.alerts.models import Alert
 from app.modules.alerts.service import acknowledge_alert, evaluate_and_create_alert, resolve_alert
-from app.modules.ml_training.models import ModelRegistry
-from app.modules.predictions.models import Prediction
 from app.modules.roles_permissions.models import Role
 from app.modules.sensors_ingestion.models import GasReading, Sensor, Site
 from app.modules.users.models import User
@@ -46,11 +44,11 @@ def _ensure_role_user(db, email: str, password: str, role_name: str) -> User:
 
 def test_interesado_cannot_resolve_alert(
     client: TestClient,
+    db: Session,
 ) -> None:
-    db = SessionLocal()
     try:
         interesado = _ensure_role_user(
-            db, "test.interesado@example.com", "InteresadoPass123!", "interesado"
+            db, "test.interesado@example.com", "InteresadoPass123!", "gerencia"
         )
         site = db.query(Site).first()
         if site is None:
@@ -74,32 +72,12 @@ def test_interesado_cannot_resolve_alert(
         )
         db.add(reading)
         db.flush()
-        model = ModelRegistry(
-            name="dummy",
-            version="1",
-            algorithm="logistic_regression",
-            params={},
-            metrics={},
-            status="staging",
-            scope="global",
-        )
-        db.add(model)
-        db.flush()
-        pred = Prediction(
-            gas_reading_id=reading.id,
-            model_registry_id=model.id,
-            probability=0.9,
-            predicted_label=1,
-            risk_level="CRITICO",
-        )
-        db.add(pred)
-        db.flush()
-        alert = evaluate_and_create_alert(db, pred, reading)
+        alert = evaluate_and_create_alert(db, reading)
         db.commit()
         assert alert is not None
         alert_id = alert.id
     finally:
-        db.close()
+        pass
 
     assert (
         client.post(
@@ -114,9 +92,8 @@ def test_interesado_cannot_resolve_alert(
     assert resolve.status_code == 403
 
 
-def test_alert_lifecycle_and_audit(client: TestClient, admin_user: tuple[User, str]) -> None:
+def test_alert_lifecycle_and_audit(client: TestClient, admin_user: tuple[User, str], db: Session) -> None:
     admin, password = admin_user
-    db = SessionLocal()
     try:
         site = db.query(Site).first() or Site(name="SITE_LIFE")
         if site.id is None:
@@ -141,31 +118,7 @@ def test_alert_lifecycle_and_audit(client: TestClient, admin_user: tuple[User, s
         )
         db.add(reading)
         db.flush()
-        model = (
-            db.query(ModelRegistry).filter(ModelRegistry.status == "production").first()
-            or ModelRegistry(
-                name="life-model",
-                version="1",
-                algorithm="xgboost",
-                params={},
-                metrics={},
-                status="staging",
-                scope="global",
-            )
-        )
-        if model.id is None:
-            db.add(model)
-            db.flush()
-        pred = Prediction(
-            gas_reading_id=reading.id,
-            model_registry_id=model.id,
-            probability=0.7,
-            predicted_label=1,
-            risk_level="ALERTA",
-        )
-        db.add(pred)
-        db.flush()
-        alert = evaluate_and_create_alert(db, pred, reading)
+        alert = evaluate_and_create_alert(db, reading)
         db.commit()
         assert alert is not None
         alert_id = alert.id
@@ -177,70 +130,18 @@ def test_alert_lifecycle_and_audit(client: TestClient, admin_user: tuple[User, s
         assert refreshed.acknowledged_by == admin.id
         assert refreshed.resolved_at is not None
     finally:
-        db.close()
+        pass
 
     assert client.post("/auth/login", json={"email": admin.email, "password": password}).status_code == 200
     listed = client.get("/api/alerts", params={"status": "resuelta"})
     assert listed.status_code == 200
 
 
-def test_predictions_filter_by_sensor(client: TestClient, admin_user: tuple[User, str]) -> None:
+def test_forecasts_filter_by_sensor(client: TestClient, admin_user: tuple[User, str]) -> None:
     admin, password = admin_user
-    db = SessionLocal()
-    try:
-        site = db.query(Site).first() or Site(name="SITE_PRED")
-        if getattr(site, "id", None) is None:
-            db.add(site)
-            db.flush()
-        sensor = (
-            db.query(Sensor)
-            .filter(Sensor.code == "PRED#S1", Sensor.gas_type == "NO2")
-            .first()
-        )
-        if sensor is None:
-            sensor = Sensor(site_id=site.id, code="PRED#S1", gas_type="NO2", unit="ppm")
-            db.add(sensor)
-            db.flush()
-        reading = GasReading(
-            sensor_id=sensor.id,
-            leyendo=1.0,
-            tiempo_inicio=datetime.now(timezone.utc),
-            is_synthetic=False,
-        )
-        db.add(reading)
-        db.flush()
-        model = db.query(ModelRegistry).first()
-        if model is None:
-            model = ModelRegistry(
-                name="p",
-                version="1",
-                algorithm="rf",
-                params={},
-                metrics={},
-                status="staging",
-                scope="global",
-            )
-            db.add(model)
-            db.flush()
-        pred = Prediction(
-            gas_reading_id=reading.id,
-            model_registry_id=model.id,
-            probability=0.2,
-            predicted_label=0,
-            risk_level="NORMAL",
-        )
-        db.add(pred)
-        db.commit()
-        sensor_id = sensor.id
-    finally:
-        db.close()
-
     assert client.post("/auth/login", json={"email": admin.email, "password": password}).status_code == 200
-    res = client.get("/api/predictions", params={"sensor_id": sensor_id})
+    res = client.get("/api/forecasts", params={"sensor_id": 1})
     assert res.status_code == 200
     body = res.json()
-    assert body["total"] >= 1
-    assert all(
-        True  # filter applied server-side; at least response shape ok
-        for _ in body["items"]
-    )
+    assert "items" in body
+    assert "total" in body

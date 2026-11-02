@@ -28,7 +28,7 @@ def api_semaforo(
     _: CanViewPred,
     site_id: Optional[int] = None,
 ) -> dict:
-    items = dash_service.semaforo(db, site_id=site_id)
+    items = dash_service.semaforo(db, site_id=site_id, user=user)
     return {
         "items": items,
         "updated_at": datetime.now(timezone.utc).isoformat(),
@@ -72,8 +72,8 @@ def api_alertas_activas(
 
 
 @router.get("/sites")
-def api_sites(db: DbSession, _: CanViewSites) -> dict:
-    return {"items": dash_service.list_sites(db)}
+def api_sites(db: DbSession, user: CurrentUser, _: CanViewSites) -> dict:
+    return {"items": dash_service.list_sites(db, user=user)}
 
 
 @router.get("/executive")

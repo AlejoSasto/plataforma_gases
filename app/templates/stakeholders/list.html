@@ -1,154 +1,63 @@
 {% extends "base.html" %}
-{% block page_title %}Partes interesadas{% endblock %}
+{% from "components/macros.html" import page_header, data_table %}
+{% block page_title %}Contactos{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Gestiona contactos, canales y suscripciones a alertas.</p>
-  </div>
-</div>
-
-<div class="row g-4">
-  <div class="col-lg-7">
-    <div class="panel panel-flush mb-3">
-      <div class="table-responsive-wrap">
-        <table class="table table-hover align-middle mb-0" id="stake-table">
-          <thead class="table-light">
-            <tr><th>Nombre</th><th>Tipo</th><th>Org.</th><th>Email</th><th>Canales</th></tr>
-          </thead>
-          <tbody>
-          {% for s in stakeholders %}
-            <tr data-id="{{ s.id }}" style="cursor:pointer">
-              <td>{{ s.name }}</td>
-              <td>{{ s.type }}</td>
-              <td>{{ s.organization or "—" }}</td>
-              <td>{{ s.email or "—" }}</td>
-              <td class="small">{{ (s.notify_channels or [])|join(", ") }}</td>
-            </tr>
-          {% else %}
-            <tr><td colspan="5" class="text-secondary text-center py-5">No hay partes interesadas registradas</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div id="subs-box" class="panel d-none">
-      <h2 class="section-title mb-3">Suscripciones de <span id="subs-name"></span></h2>
-      <ul id="subs-list" class="list-group list-group-flush mb-3 border rounded"></ul>
-      <div class="row g-3 align-items-end">
-        <div class="col-md-5">
-          <label class="form-label" for="sub-site">Sitio</label>
-          <select id="sub-site" class="form-select">
-            <option value="">Opcional</option>
-            {% for s in sites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label" for="sub-level">Nivel mínimo</label>
-          <select id="sub-level" class="form-select">
-            {% for lv in ["PRECAUCION", "ALERTA", "CRITICO"] %}<option value="{{ lv }}">{{ lv }}</option>{% endfor %}
-          </select>
-        </div>
-        <div class="col-md-3">
-          <button class="btn btn-outline-primary w-100" type="button" id="add-sub">Añadir</button>
-        </div>
+{{ page_header("Contactos de aviso", "Quién recibe qué aviso y por qué canal.") }}
+<div class="layout-2">
+  <div class="card">
+    <table>
+      <thead><tr><th>Nombre</th><th>Tipo</th><th>Correo</th><th>Canales</th></tr></thead>
+      <tbody>
+      {% for s in stakeholders %}
+        <tr data-sid="{{ s.id }}" style="cursor:pointer">
+          <td>{{ s.name }}</td>
+          <td>{{ s.type }}</td>
+          <td>{{ s.email or "—" }}</td>
+          <td class="help">{{ (s.notify_channels or [])|join(", ") }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="muted">No hay contactos todavía</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div id="subs-box" class="hidden" style="margin-top: var(--space-4)">
+      <h2>Avisos de <span id="subs-name"></span></h2>
+      <ul id="subs-list"></ul>
+      <div class="row-flex">
+        <select id="sub-site">
+          <option value="">Todas las zonas</option>
+          {% for s in sites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+        </select>
+        <select id="sub-level">
+          <option value="PRECAUCION">Vigilar</option>
+          <option value="ALERTA">Actuar ya</option>
+          <option value="CRITICO">Evacuar</option>
+        </select>
+        <button class="btn" type="button" id="add-sub">Añadir</button>
       </div>
     </div>
   </div>
-  <div class="col-lg-5">
-    <div class="panel">
-      <h2 class="section-title mb-3">Alta / edición</h2>
-      <form id="stake-form" class="vstack gap-3">
-        <input type="hidden" id="stake-id">
-        <div>
-          <label class="form-label" for="name">Nombre</label>
-          <input class="form-control" id="name" required>
-        </div>
-        <div>
-          <label class="form-label" for="type">Tipo</label>
-          <select class="form-select" id="type"><option value="interno">interno</option><option value="externo">externo</option></select>
-        </div>
-        <div>
-          <label class="form-label" for="organization">Organización</label>
-          <input class="form-control" id="organization">
-        </div>
-        <div>
-          <label class="form-label" for="email">Email</label>
-          <input class="form-control" type="email" id="email">
-        </div>
-        <div>
-          <label class="form-label" for="phone">Teléfono</label>
-          <input class="form-control" id="phone">
-        </div>
-        <div>
-          <label class="form-label" for="channels">Canales</label>
-          <input class="form-control" id="channels" placeholder="email,whatsapp" value="email">
-        </div>
-        <button class="btn btn-primary" type="submit">Guardar</button>
-        <div id="stake-msg" class="small"></div>
-      </form>
-    </div>
+  <div class="card">
+    <h2>Alta / edición</h2>
+    <form id="stake-form" class="stack">
+      <input type="hidden" id="stake-id">
+      <label for="name">Nombre</label>
+      <input id="name" required>
+      <label for="type">Tipo</label>
+      <select id="type"><option value="interno">interno</option><option value="externo">externo</option></select>
+      <label for="organization">Organización</label>
+      <input id="organization">
+      <label for="email">Correo</label>
+      <input type="email" id="email">
+      <label for="phone">Teléfono</label>
+      <input id="phone">
+      <label for="channels">Canales</label>
+      <input id="channels" value="email">
+      <button class="btn" type="submit">Guardar</button>
+    </form>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-  let selectedId = null;
-  document.getElementById("stake-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const body = {
-      name: document.getElementById("name").value,
-      type: document.getElementById("type").value,
-      organization: document.getElementById("organization").value || null,
-      email: document.getElementById("email").value || null,
-      phone: document.getElementById("phone").value || null,
-      notify_channels: document.getElementById("channels").value.split(",").map((s) => s.trim()).filter(Boolean),
-    };
-    const id = document.getElementById("stake-id").value;
-    if (id) await PG.api(`/api/stakeholders/${id}`, { method: "PATCH", body });
-    else await PG.api("/api/stakeholders", { method: "POST", body });
-    location.reload();
-  });
-
-  async function loadSubs(id, name) {
-    selectedId = id;
-    document.getElementById("subs-box").classList.remove("d-none");
-    document.getElementById("subs-name").textContent = name;
-    const rows = await PG.api(`/api/stakeholders/${id}/subscriptions`);
-    const ul = document.getElementById("subs-list");
-    ul.innerHTML = rows.length ? rows.map((s) =>
-      `<li class="list-group-item d-flex justify-content-between align-items-center small">
-        sitio=${s.site_id || "—"} · min=${s.min_level}
-        <button class="btn btn-sm btn-outline-danger" data-del="${s.id}">×</button>
-      </li>`).join("") : `<li class="list-group-item small text-secondary">Sin suscripciones</li>`;
-    ul.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", async () => {
-      await PG.api(`/api/subscriptions/${b.dataset.del}`, { method: "DELETE" });
-      loadSubs(id, name);
-    }));
-  }
-
-  document.querySelectorAll("#stake-table tr[data-id]").forEach((tr) => {
-    tr.addEventListener("click", () => {
-      document.getElementById("stake-id").value = tr.dataset.id;
-      const tds = tr.children;
-      document.getElementById("name").value = tds[0].textContent.trim();
-      document.getElementById("type").value = tds[1].textContent.trim();
-      document.getElementById("organization").value = tds[2].textContent.trim() === "—" ? "" : tds[2].textContent.trim();
-      document.getElementById("email").value = tds[3].textContent.trim() === "—" ? "" : tds[3].textContent.trim();
-      loadSubs(tr.dataset.id, tds[0].textContent.trim());
-    });
-  });
-
-  document.getElementById("add-sub").addEventListener("click", async () => {
-    if (!selectedId) return;
-    const site = document.getElementById("sub-site").value;
-    await PG.api(`/api/stakeholders/${selectedId}/subscriptions`, {
-      method: "POST",
-      body: {
-        site_id: site ? Number(site) : null,
-        min_level: document.getElementById("sub-level").value,
-      },
-    });
-    loadSubs(selectedId, document.getElementById("subs-name").textContent);
-  });
-</script>
+<script src="/static/js/pages/stakeholders.js"></script>
 {% endblock %}

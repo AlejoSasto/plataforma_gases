@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es-CO" data-theme="sala">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sala de control | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<main class="sala">
+  <header class="sala__top"><img src="assets/img/isotipo.svg" alt=""><strong>Vigía, sala de control</strong>
+    <span class="topbar__live" style="margin-left:24px"><span class="dot-live"></span>Datos al día</span>
+    <span class="sala__clock" data-clock>10:35</span></header>
+  <section class="sala__alert" role="alert">
+    <i data-icon="triangle-alert" class="ico" style="width:56px;height:56px;color:var(--st-actuar)"></i>
+    <div><div class="big">Frente 3 Sur: actuar ya</div><p>El metano podría llegar al límite hacia las 10:42. Verificar ventilación y preparar la salida del personal.</p></div>
+    <div class="reading">0,72 %<small>Límite 1,0 %</small></div>
+  </section>
+  <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:start">
+    <section class="panel"><div class="panel__head"><h2>Metano en Frente 3 Sur</h2></div><div class="chart chart--fill" data-chart="now-next" data-big="1"></div></section>
+    <div class="sala__zones" style="grid-template-columns:1fr 1fr">
+      <section class="zone-tile zone-tile--vigilar"><div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><h2>Frente 1 Norte</h2><span class="status status--vigilar"><i data-icon="eye"></i>Vigilar</span></div><div class="zone-tile__gases"><div><span>Metano</span><b>0,31 %</b></div><div><span>Monóxido</span><b>28 ppm</b></div></div></section>
+      <section class="zone-tile zone-tile--normal"><div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><h2>Frente 2 Norte</h2><span class="status status--normal"><i data-icon="circle-check"></i>Normal</span></div><div class="zone-tile__gases"><div><span>Metano</span><b>0,21 %</b></div><div><span>Monóxido</span><b>6 ppm</b></div></div></section>
+      <section class="zone-tile zone-tile--sindatos"><div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><h2>Frente 4 Sur</h2><span class="status status--sindatos"><i data-icon="circle-dashed"></i>Sin datos</span></div><div class="zone-tile__gases"><div><span>Oxígeno</span><b>—</b></div><div><span>Metano</span><b>0,19 %</b></div></div><p class="faint">Sin señal desde las 10:21</p></section>
+      <section class="zone-tile zone-tile--normal"><div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><h2>Galería principal</h2><span class="status status--normal"><i data-icon="circle-check"></i>Normal</span></div><div class="zone-tile__gases"><div><span>Metano</span><b>0,18 %</b></div><div><span>Monóxido</span><b>4 ppm</b></div></div></section>
+    </div>
+  </div>
+</main>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

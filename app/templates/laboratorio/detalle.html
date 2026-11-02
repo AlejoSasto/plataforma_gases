@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block page_title %}Modelo{% endblock %}
+{% block content %}
+<div class="lab-banner">{{ copy.LAB_BADGE }}</div>
+<h1>{{ model.name }} v{{ model.version }}</h1>
+<p class="muted">{{ model.algorithm }} · {{ model.status }}</p>
+<div class="card">
+  <h2>Métricas</h2>
+  <pre class="help">{{ model.metrics }}</pre>
+</div>
+<p style="margin-top: var(--space-4)"><a href="/laboratorio">Volver al catálogo</a></p>
+{% if can_promote and model.status != 'production' %}
+<button class="btn" type="button" data-promote="{{ model.id }}">Promover a production</button>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/zoo.js"></script>
+{% endblock %}

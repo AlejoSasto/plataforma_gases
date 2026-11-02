@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header %}
+{% block page_title %}Pantallas de sala{% endblock %}
+{% block content %}
+{{ page_header("Pantallas de sala", "Pantallas que muestran el estado sin una sesión personal.") }}
+<div class="card" style="overflow:auto">
+  <table class="data">
+    <thead><tr><th>Nombre</th><th>Última vez vista</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      {% for d in devices %}
+      <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.last_seen_label }}</td>
+        <td>{% if d.stale %}La pantalla de la sala no se actualiza desde hace 5 min{% elif d.revoked %}Revocada{% else %}Activa{% endif %}</td>
+        <td>
+          {% if not d.revoked %}
+          <button class="btn btn-ghost" type="button" data-rev="{{ d.id }}">Revocar</button>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="card stack" style="margin-top: var(--space-5)">
+  <h2>Nueva pantalla</h2>
+  <form id="kiosk-form" class="stack">
+    <label for="k-name">Nombre</label>
+    <input id="k-name" placeholder="Pantalla sala principal" required>
+    <label for="k-sites">Zonas que muestra</label>
+    <select id="k-sites" multiple size="6">
+      {% for s in sites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+    </select>
+    <button class="btn" type="submit">Crear enlace</button>
+    <p class="help" id="k-msg"></p>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/kiosk.js"></script>
+{% endblock %}

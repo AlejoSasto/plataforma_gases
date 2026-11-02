@@ -1,14 +1,35 @@
-# Contexto del sistema — Plataforma de Monitoreo y Predicción de Gases
+# Contexto del sistema — Vigía (gases en la mina)
 
-> **Documento canónico de contexto.** Úsalo como fuente única para agentes, onboarding y decisiones de implementación. Los planes numerados (`01`–`13`) son el historial de ejecución; este archivo describe el **estado real del sistema**. Ante conflicto, **priorizar el código**.
+> **Documento canónico de contexto.** Describe el **estado real del código** (auditoría 2026-11-02). El mapa de ejecución es [`00_INDICE_Y_ROADMAP.md`](00_INDICE_Y_ROADMAP.md). El paquete **14–22** es el destino del jurado + identidad visual; gana a los planes 04, 05, 07, 11, 12 y 13 cuando haya conflicto. Ante duda: **código = qué hay hoy**.
+
+**Qué cubre:** propósito, planes, stack, arquitectura, datos de campo, notebooks, modelo de datos v2, RBAC y credenciales, flujos (auth / ETL / ML / alertas / reportes), mapa HTTP, UX Vigía, env, arranque, tests, migraciones y pendientes.
+
+**Qué no cubre (a propósito):** marco teórico de la tesis, dumps de notebooks, artefactos MLflow (`mlruns/`), secretos reales de `.env`, ni el código línea a línea.
 
 | Campo | Valor |
 |-------|--------|
-| Nombre | Plataforma de monitoreo y predicción de gases (tesis) |
+| Nombre de trabajo (UI) | **Vigía** · descriptor «Gases en la mina» (`app/shared/copy.py`) |
+| Nombre formal (tesis) | Plataforma de monitoreo y predicción de gases |
 | Arquitectura | Monolito FastAPI + Jinja2 + PostgreSQL |
-| Versión app | `0.1.0` |
+| Versión app | `0.1.0` (`app/main.py`, título FastAPI `Vigía`) |
 | Runtime | Python 3.11+ |
-| Actualizado | 2026-09-27 (ML/métricas ampliadas) |
+| Base de datos | `proyecto_gases` (Compose: host `5433`); tests: `proyecto_gases_test` |
+| Alembic head | `c1d2e3f4a5b6` |
+| Actualizado | 2026-11-02 (Vigía + login seguro + planes 15–20) |
+
+### Índice rápido
+
+| § | Tema |
+|---|------|
+| 1–3 | Propósito, planes, stack |
+| 4 | Estructura del repo y módulos |
+| 5 | Datasets, catálogo de gases, notebooks |
+| 6–7 | Modelo de datos, roles y permisos |
+| 8 | Flujos (auth, ETL, Model Zoo, inferencia, alertas, reportes) |
+| 9–10 | Rutas HTTP y UX |
+| 11–12 | Env y arranque local |
+| 13–14 | Reglas de trabajo y pendiente |
+| 15 | Tests, migraciones, artefactos legado |
 
 ---
 
@@ -18,7 +39,7 @@ Sistema web para:
 
 1. **Ingestar** lecturas de sensores de gases (Excel `dls_report` / CSV processed).
 2. **Entrenar y promover** modelos de ML (riesgo + forecast de concentración 5–10 min).
-3. **Predecir** concentración futura y riesgo por lectura; **generar alertas** tempranas.
+3. **Predecir** concentración a 6/12/18 min con cuantiles; **generar avisos** en lenguaje natural.
 4. **Notificar** a partes interesadas (email / WhatsApp stub).
 5. **Visualizar** proyección por tipo de gas, semáforo operativo, ejecutivo e histórico.
 6. **Exportar** reportes PDF/Excel.
@@ -40,11 +61,25 @@ No es un microservicio; toda la lógica vive en un solo proceso FastAPI con mód
 | 07 Dashboard UI | F6 | ✅ |
 | 08 Reportes | F7 | ✅ |
 | 09 Despliegue GCP / CI-CD | F8 | ⬜ Pendiente |
-| 10 Seguridad / hardening | F9 | ⬜ Pendiente |
+| 10 Seguridad / hardening | F9 | ⬜ Resto pendiente (login/CSP/CSRF ✅ 2026-11-02) |
 | 11 Mapeo UX/UI pantallas | Complementa F6 | ✅ |
 | 12 Model Zoo / series / métricas thesis | Extiende F3–F4 | ✅ |
-| 13 MVP forecast home + UX presentación | Cierra gap thesis operativo | ✅ |
-| Mejora UX consola profesional | Refino visual | ✅ |
+| 13 MVP forecast home + UX presentación | Cierra gap thesis operativo | ✅ historial (supersedido por 17–18) |
+| Mejora UX consola profesional | Refino visual | ✅ historial |
+| **14** Reformulación índice | Mapa jurado | ✅ documento 2026-11-01 |
+| **15** Datos reales y formulación | OE1–OE2 | ✅ G0 6/12/18; ETL E1–E6; 0 sintéticos en DEV; `verify --plan 15` |
+| **16** Modelo de datos v2 | forecasts, umbrales, linaje | ✅ M1–M9 + `c1d2e3f4a5b6`; catálogo sembrado en DEV; `verify --plan 16` |
+| **17** Transformers y evaluación | OE3 | ✅ 10 adaptadores, conformal, decisión, `reports/thesis/`; `verify --plan 17` |
+| **18** UX lenguaje natural | OE4 | ✅ Pantallas ES, copy, contraste; `verify --plan 18` |
+| **19** Usuarios, roles y acceso | OE4 | ✅ 6 roles, CSRF, TOTP, kiosco; `verify --plan 19` |
+| **20** Pruebas y bucle | transversal | ✅ DB test aislada, `verify` 13 etapas, E2E Playwright |
+| **21** Sistema de diseño Vigía | OE4 identidad | ✅ Tokens, tipografía, ilustraciones; doc en `planes/21_*.md` |
+| **22** Mockups → app | OE4 UI | ✅ Kit en `mockups/vigia-design-kit/`; cascarón aplicado en `app/` |
+| Login / CSP (tramo Plan 10) | seguridad UI | ✅ POST `/ingresar`, strip query, CSRF ASGI, recursos locales |
+| 09 Despliegue GCP | F8 | ⬜ edge-first pendiente |
+| 10 Hardening (resto) | F9 | ⬜ k6, pip-audit, HSTS prod, backups |
+
+Mapa y orden con compuertas: [`00_INDICE_Y_ROADMAP.md`](00_INDICE_Y_ROADMAP.md). `PLAN_EJECUCION_03_INGESTA_ETL.md` es playbook histórico del Plan 03.
 
 ---
 
@@ -52,20 +87,21 @@ No es un microservicio; toda la lógica vive en un solo proceso FastAPI con mód
 
 | Capa | Tecnología | Notas |
 |------|------------|--------|
-| API / web | FastAPI, Uvicorn, Gunicorn | `app/main.py` |
-| Validación | Pydantic v2, pydantic-settings | Config vía env |
-| ORM / migraciones | SQLAlchemy 2, Alembic | Nunca `create_all` en entornos compartidos |
-| DB | PostgreSQL 15 | Compose puerto host `5433` (contenedor `5432`) |
-| Auth | JWT (python-jose) + bcrypt (passlib) | Cookies HttpOnly |
-| Frontend | Jinja2 + Bootstrap 5 + Inter + Chart.js | Sin SPA |
-| Estilos | `app/static/css/theme.css` | Tokens teal/slate |
-| ETL | pandas, openpyxl | Inbox + upload API |
-| Jobs | APScheduler | Inbox ETL e inferencia opcional |
-| ML | scikit-learn, XGBoost, **PyTorch**, MLflow | `ml_core/` + `model_registry` en DB |
+| API / web | FastAPI `0.1.0`, Uvicorn, Gunicorn | `app/main.py`; Gunicorn en Docker (no recarga Python montado) |
+| Validación | Pydantic v2, pydantic-settings | Config vía env (`.env` + `app/core/config.py`) |
+| ORM / migraciones | SQLAlchemy 2, Alembic | Head: `c1d2e3f4a5b6`. Nunca `create_all` |
+| DB | PostgreSQL 15 | Host `5433` → `5432`; DEV `proyecto_gases`, TEST `proyecto_gases_test` |
+| Auth | JWT + bcrypt + CSRF ASGI | Cookies HttpOnly; form POST `/ingresar` + JSON `/auth/login` |
+| Frontend | Jinja2 + **Archivo** (UI) + **IBM Plex Mono** (solo Laboratorio) + ECharts 5 + Lucide sprite + htmx | **Sin CDN**; recursos en `app/static/` |
+| Estilos | `tokens.css` (fuente Vigía) + `base` / `layout` / `components` | Color fuerte solo para estado de gases |
+| Marca / mockups | `mockups/vigia-design-kit/`, `app/static/img/*.svg`, `app/static/brand/` | Planes 21–22 |
+| ETL | pandas, openpyxl | Inbox + upload API + scripts CSV |
+| Jobs | APScheduler | Inbox ETL e inferencia (mismo proceso) |
+| ML | scikit-learn, XGBoost, **PyTorch**, MLflow `<3` | Zoo Plan 17 en `ml_core/forecasting/` |
 | Reportes | ReportLab (PDF), openpyxl (Excel) | `storage/reports/` |
-| Tests | pytest, httpx | `tests/unit`, `tests/integration` |
+| Tests | pytest, httpx, Playwright (E2E) | DB de test aislada; `scripts/verify.py` |
 
-Dependencias: `requirements.txt` (no hay `pyproject.toml`). Torch en Linux/Docker: instalar CPU según comentario del requirements.
+Dependencias: `requirements.txt` (no hay `pyproject.toml` ni `pytest.ini`). Torch en Linux/Docker: CPU (`pip install torch --index-url https://download.pytorch.org/whl/cpu`). En Windows el `requirements` instala `torch` de PyPI.
 
 ---
 
@@ -75,23 +111,30 @@ Dependencias: `requirements.txt` (no hay `pyproject.toml`). Torch en Linux/Docke
 plataforma-gases/
 ├── app/
 │   ├── main.py                 # App, routers, schedulers, /health
-│   ├── core/                   # config, database, security, logging
-│   ├── shared/                 # dependencies, exceptions, pagination, gas_catalog, formatting
-│   ├── modules/                # dominios (ver §6–§7)
-│   ├── templates/              # Jinja2 por pantalla + partials
-│   └── static/                 # css/, js/, img/
-├── ml_core/                    # columns, data_io, features, Model Zoo, metrics
-│   └── models/                 # registry, architectures, train_tabular/sequence, metrics
-├── migrations/                 # Alembic versions/
-├── scripts/                    # seed, superadmin, ETL, normalize, train/retrain
-├── tests/
-├── data/                       # raw/, processed/, inbox/  (no hay curated/)
-├── storage/reports/
-├── docker/                     # Dockerfile.app, Dockerfile.mlflow, Dockerfile.worker (placeholder, no está en Compose)
-├── planes/                     # este contexto + planes 00–13
+│   ├── core/                   # config, database, security, csrf, passwords, rate_limit, logging
+│   ├── shared/                 # copy, design_tokens, access, dependencies, gas_catalog, templating
+│   ├── modules/                # dominios (ver §6–§7); ingestion/pipeline E1–E6; forecasting/
+│   ├── templates/              # Jinja2 (base, auth, dashboard, alerts, laboratorio, …)
+│   └── static/                 # css/, fonts/, icons/sprite.svg, img/*.svg, brand/, vendor/, js/
+├── ml_core/                    # forecasting/, validation/, domain/, features/, models/ (legado tabular)
+├── migrations/versions/        # cadena Alembic (head c1d2e3f4a5b6)
+├── scripts/                    # seed, verify, diagnose, load, train, purge_synthetic, …
+├── tests/                      # unit, integration, guards, ui, e2e, perf
+├── mockups/vigia-design-kit/   # tokens, mockups HTML, screenshots, tools (Planes 21–22)
+├── notebooks/                  # investigación (no runtime) — ver §5.4
+├── data/                       # raw/, processed/, inbox/
+├── docs/                       # g0_visto_director, ux/, marca/, etl/
+├── storage/                    # reports/, outbox/ (gitignored)
+├── docker/                     # Dockerfile.app, mlflow, worker (placeholder)
+├── planes/                     # 00, CONTEXTO, 01–22, BITACORA
+├── .github/workflows/          # verify.yml (Plan 20)
 ├── docker-compose.yml          # db:5433, mlflow:5000, app:8000
+├── alembic.ini
+├── requirements.txt
 └── .env.example
 ```
+
+`mlruns/` es local/gitignored. `templates/home.html` es legado; el home operativo es `dashboard/hoy.html`.
 
 ### Convención por módulo
 
@@ -103,16 +146,32 @@ Plantilla objetivo en `app/modules/<nombre>/`:
 - `service.py` — lógica de negocio
 - `router.py` — HTTP API y/o HTML
 
-**Estado real:** no todos los módulos tienen `repository.py`. Lo tienen: `auth`, `users`, `roles_permissions`, `sensors_ingestion`, `ml_training`. Lo omiten (lógica en `service`): `alerts`, `predictions`, `reports`, `dashboard`, `stakeholders`, `audit`. `auth` no tiene `models.py` (usa `users`). `dashboard` no persiste tablas propias.
+**Estado real de archivos:**
+
+| Módulo | models | schemas | repository | service | router / extra |
+|--------|:------:|:-------:|:----------:|:-------:|----------------|
+| `auth` | — (usa `users`) | sí | sí | sí | `router.py` (login HTML + API) |
+| `users` | sí | sí | sí | sí | `router.py` |
+| `roles_permissions` | sí | sí | sí | sí | `router.py` |
+| `sensors_ingestion` | sí | sí | sí | sí | `router.py` + `scheduler.py` |
+| `ml_training` | sí | sí | sí | sí | `router.py` |
+| `catalog` | sí | sí | sí | sí | `router.py` + `seed.py` |
+| `forecasting` | sí | sí | sí | sí | `router.py` + `scheduler.py` |
+| `alerts` | sí | sí | — | sí | `router.py` + `rules.py` + `recommendations.py` |
+| `stakeholders` | sí | sí | — | sí | `router.py` + `notifier.py` |
+| `reports` | sí | sí | — | sí | `router.py` + `generator.py` |
+| `dashboard` | — | — | — | sí | `ui_router.py` + `api_router.py` + `nav.py` |
+| `audit` | sí | — | — | sí | `router.py` |
 
 ### Mapa de dependencias
 
 ```
 core (config, db, security)
   ├── auth / users / roles_permissions     ← requeridos por casi todo
+  ├── catalog
   ├── sensors_ingestion
   │     └── ml_training
-  │           └── predictions
+  │           └── forecasting
   │                 └── alerts
   │                       └── stakeholders (notificaciones)
   ├── dashboard     (consume todo; UI + APIs de polling)
@@ -130,14 +189,18 @@ Fuente de verdad para entrenamiento/ingesta: `gas_readings` en PostgreSQL. Los a
 
 | Ruta | Qué es | ¿Entra al ETL? |
 |------|--------|----------------|
-| `data/raw/dls_report_*.xlsx` | Excel iNet, hoja `Resumen`, cabecera fila 24 | Sí (`ml_core.data_io.load_dls_report`) |
-| `data/raw/alarmReport_*.xlsx` | Reportes de alarma | No (no hay parser) |
-| `data/raw/Historial del registro de datos.xlsx` | Bitácora de **sesiones** de un MX6 CO2 (33 filas, nov–dic 2024). No son lecturas | No |
+| `data/raw/dls_report_*.xlsx` | **56** Excel iNet (incluye copias `(1)`/`(2)`). Hoja `Resumen`, cabecera fila **24** | Sí (`ml_core.data_io.load_dls_report`) vía upload o inbox |
+| `data/raw/alarmReport_*.xlsx` | **2** reportes de alarma | No (no hay parser) |
+| `data/raw/Historial del registro de datos.xlsx` | Bitácora de **sesiones** de un MX6 CO2 (nov–dic 2024). No son lecturas | No |
 | `data/processed/Procesamiento_de_Datos.csv` | Consolidado **real** | Sí (`--consolidado`) |
-| `data/processed/Procesamiento_de_Datos_YYYY-MM.csv` | Mismo consolidado partido por mes | Origen del consolidado |
+| `data/processed/Procesamiento_de_Datos_YYYY-MM.csv` | Mismo consolidado partido por mes (9 archivos) | Origen del consolidado |
+| `data/processed/Procesamiento de Datos.xlsx` | Copia Excel del consolidado | No (el loader usa CSV) |
 | `data/processed/Procesamiento_de_Datos_24m.csv` | Zoo aumentado a 24 meses | Sí (`--augmented-24m`, marca `is_synthetic`) |
-| `data/processed/augmentation_manifest.json` | Trazabilidad source_month → target_month | Solo al marcar sintéticos |
-| `data/inbox/` | Cola automática (.xlsx/.xls) | Sí, si `ETL_INBOX_ENABLED` |
+| `data/processed/augmentation_manifest.json` | Trazabilidad source_month → target_month | Solo al marcar sintéticos (`ml_core/augmentation.py`) |
+| `data/inbox/` | Cola automática (.xlsx/.xls) + `processed/` y `failed/` | Sí, si `ETL_INBOX_ENABLED` |
+| `data/curated/` | Carpeta vacía (legado de un diseño anterior) | No |
+
+**Compose:** el servicio `app` **no monta** `data/` ni copia `scripts/`. Inbox y carga CSV se ejecutan contra el host (`uvicorn` + `python scripts/...`), no dentro del contenedor.
 
 Esquema canónico de 15 columnas: `ml_core/columns.py` (`Leyendo`, `Gas`, `Sensor`, `Tiempo de Inicio`, STEL/TWA, temperatura, etc.).
 
@@ -163,40 +226,75 @@ Gases (nombre → código canónico `gas_catalog`): CO2, CO, O2, H2S, NO2, gas c
 
 Unidades típicas: `%vol`, `ppm`, `%lel`.
 
-### Dataset sintético 24 meses
+### Dataset sintético 24 meses (retirado del loader)
 
-~**176.738 filas**, ene-2024–dic-2025. Los meses faltantes se clonan desde los 9 meses reales (`source_month` → `target_month`). Filas inventadas: `is_synthetic=true`. **No incluye** mar-2023 (empieza en ene-2024).
+El archivo `Procesamiento_de_Datos_24m.csv` puede seguir en disco, pero **`--augmented-24m` ya no existe** (Plan 15 F1). El loader solo acepta el consolidado real. `ml_core/augmentation.py` se movió a `legacy/`. CHECK en DB: `is_synthetic=false`.
 
-Carga:
+Carga permitida:
 
 ```bash
 python scripts/load_processed_dataset.py --consolidado
-python scripts/load_processed_dataset.py --augmented-24m
-# o --all
 ```
 
 ### Catálogo de gases (`app/shared/gas_catalog.py`)
 
-Códigos: `CH4`, `CO`, `H2S`, `CO2`, `O2`, `NO2`, `UNKNOWN`. Alias: `LEL(CH4)`/`LEL`/`Gas combustible` → CH4; se limpia prefijo `Sensor SN:`; `SIN_SITIO` → “Sin sitio asignado”.
+Códigos: `CH4`, `CO`, `H2S`, `CO2`, `O2`, `NO2`, `UNKNOWN`. Alias: `LEL(CH4)`/`LEL`/`Gas combustible`/`METANO` → CH4; se limpia prefijo `Sensor SN:`; `SIN_SITIO` → “Sin sitio asignado”. Labels UI: Metano (CH₄), etc. Prioridad thesis: `thesis_priority_gases()` → CH4, CO, H2S.
+
+El CSV canónico tiene 15 columnas (`ml_core/columns.py`). En PostgreSQL **no** se persisten `Descripción`, `Número de Periodo`, `Factor de Respuesta` ni `Factor`; sí `leyendo`, `unidad`, `stel_max`, `twa_max`, `alarma`, `temperatura`, `tiempo_inicio/fin`, `is_synthetic`, `source_file`.
+
+### 5.4 Notebooks (investigación, no runtime)
+
+La app **no importa** notebooks. El pipeline productivo es `ml_core` + `scripts/` + módulo `sensors_ingestion`. Los notebooks documentan el trabajo exploratorio de tesis y **generaron** los CSV processed.
+
+| Archivo | Rol | Notas |
+|---------|-----|-------|
+| `notebooks/01_exploracion.ipynb` | Explora `data/raw` y conforma CSV mes a mes | Fuente original de `cargar_dls_report` (portado a `ml_core/data_io.py`) |
+| `notebooks/ETL_–_Carga_y_limpieza_de_datos_.ipynb` | ETL de investigación (Colab) | Misma familia que 02/03 |
+| `notebooks/02_ETL_–_Carga_y_limpieza_de_datos copy.ipynb` | Copia del ETL (~3.6 MB, outputs) | No usar como fuente de código |
+| `notebooks/03_ETl_PROCESADO.ipynb` | ETL procesado (~33 MB, outputs) | Confirma 13.894 filas en 9 CSV mes-año |
+
+`01_exploracion.ipynb` importa `from config import RAW_DIR, PROCESSED_DIR, …`. **Ese `config.py` de raíz ya no existe** (la app usa `app.core.config`). Los notebooks son legado; no hay que “arreglarlos” para correr el sistema.
 
 ---
 
 ## 6. Modelo de datos
 
+Esquema **v2** (Plan 16–19, Alembic `b1c2d3e4f5a6` … `c1d2e3f4a5b6`). La tabla `predictions` se retiró: el pronóstico vive en `forecasts` + `forecast_quantiles`. El permiso `predictions.view` queda como alias de `status.view` / `history.view`.
+
 ### Diagrama lógico (resumen)
 
 ```
-users ──┬── user_roles ── roles ── role_permissions ── permissions
-        └── refresh_tokens
+ACCESO
+users ─┬─ user_roles ── roles ── role_permissions ── permissions
+       ├─ user_site_scopes ── sites
+       ├─ refresh_tokens
+       ├─ password_reset_tokens
+       ├─ user_invitations
+       └─ kiosk_devices
 
-sites ── sensors ── gas_readings ── etl_runs
-                 └── predictions ── model_registry / training_jobs
-                 └── alerts ── alert_notifications ── stakeholders
-                                                      └── stakeholder_subscriptions
-                                                      └── stakeholder_user ── users
+CATÁLOGO
+gas_types ── normative_thresholds
+app_settings
 
-reports ── users
-audit_log ── users
+DATOS
+sites ── sensors ── gas_readings ── etl_runs ── etl_run_steps
+                 │        └── data_quality_issues
+                 └── reading_grid
+                 └── threshold_events
+
+MODELOS
+model_registry ── model_evaluations
+training_jobs
+
+PRONÓSTICO Y AVISOS
+forecasts ── forecast_quantiles
+     └── forecast_explanations
+     └── alerts ── alert_notifications ── stakeholders
+            └── alert_outcomes                  └── stakeholder_subscriptions
+                                                    └── stakeholder_user ── users
+
+SALIDAS
+reports · audit_log
 ```
 
 ### Tablas y campos principales
@@ -205,39 +303,61 @@ audit_log ── users
 
 | Tabla | Campos clave | Relaciones |
 |-------|--------------|------------|
-| `users` | email (unique), password_hash, full_name, is_active | M2M roles; 1:N refresh_tokens |
+| `users` | email (unique), password_hash, full_name, is_active, failed_login_count, locked_until, last_login_at, must_change_password, totp_* | M2M roles; 1:N refresh_tokens |
 | `user_roles` | user_id, role_id | PK compuesta |
-| `refresh_tokens` | token_hash, expires_at, revoked_at | N:1 user |
+| `refresh_tokens` | token_hash, expires_at, revoked_at, user_agent, ip, last_used_at | N:1 user |
+| `user_site_scopes` | user_id, site_id | sin filas = todos los sitios (si el rol lo permite) |
+| `password_reset_tokens` | token_hash, user_id, expires_at, used_at | N:1 user |
+| `user_invitations` | email, role_ids JSONB, token_hash, invited_by, expires_at, accepted_at | — |
+| `kiosk_devices` | name, token_hash, site_ids JSONB, created_by, revoked_at | — |
 | `roles` | name (unique), description | M2M permissions |
 | `permissions` | code (unique), description | — |
 | `role_permissions` | role_id, permission_id | PK compuesta |
+
+#### Catálogo
+
+| Tabla | Campos clave | Relaciones |
+|-------|--------------|------------|
+| `gas_types` | code PK, display_name, canonical_unit, lel_percent_vol, physical_max, max_rate_per_min, priority | 1:N umbrales |
+| `normative_thresholds` | gas_code, level (vigilar/actuar/evacuar), direction, value, verified, valid_from | UQ (gas_code, level, valid_from) |
+| `app_settings` | key PK, value JSONB | horizontes 6/12/18, grid_step 6 |
 
 #### Sensores e ingesta
 
 | Tabla | Campos clave | Relaciones |
 |-------|--------------|------------|
 | `sites` | name (unique), description | 1:N sensors |
-| `sensors` | site_id, code, gas_type (canónico CH4/CO/H2S/…), unit; UQ (code, gas_type) | N:1 site; 1:N gas_readings |
-| `etl_runs` | status, rows_ingested/rejected, source_files (JSONB), log (JSONB), triggered_by_user_id | 1:N gas_readings |
-| `gas_readings` | sensor_id, leyendo, unidad, stel_max, twa_max, alarma, temperatura, tiempo_inicio/fin, is_synthetic, source_file, etl_run_id | N:1 sensor, etl_run |
+| `sensors` | site_id, code, gas_type, unit, display_name, kind, location_note, is_active; UQ (code, gas_type) | N:1 site |
+| `etl_runs` | status, rows_ingested/rejected, source_files, log, triggered_by_user_id | 1:N readings, steps |
+| `etl_run_steps` | etl_run_id, step E1–E6, rows_in/out/rejected, duration_ms, details | N:1 etl_run |
+| `gas_readings` | sensor_id, leyendo, value_canonical, unit_canonical, quality_status, tiempo_inicio; UQ (sensor_id, tiempo_inicio); CHECK is_synthetic=false | N:1 sensor, etl_run |
+| `data_quality_issues` | gas_reading_id?, sensor_id, etl_run_id, code, severity, details | linaje |
+| `reading_grid` | PK (sensor_id, ts), value, is_imputed, is_missing | entrada de modelos |
+| `threshold_events` | sensor_id, gas_code, level, started_at, ended_at, peak_value | verdad de referencia |
 
-#### ML y predicciones
+#### ML y pronóstico
 
 | Tabla | Campos clave | Relaciones |
 |-------|--------------|------------|
-| `model_registry` | name, version, algorithm, params/metrics (JSONB), mlflow_run_id, artifact_uri, status (`staging`/`production`/`archived`), scope, trained_by, trained_at | FK users |
-| `training_jobs` | model_registry_id, status, dataset_version, params, log, triggered_by | FK registry, users |
-| `predictions` | gas_reading_id, model_registry_id, probability, predicted_label, risk_level, **predicted_concentration**, **horizon_minutes** | FK readings, registry |
+| `model_registry` | name, version, algorithm, family, problem_spec/calibration/selection_score JSONB, status, scope | FK users |
+| `model_evaluations` | model_id, fold_index, gas_code, horizon_min, forecast_metrics, event_metrics, is_final_test | N:1 registry |
+| `training_jobs` | model_registry_id, status, dataset_version, params, log | FK registry, users |
+| `forecasts` | sensor_id, model_id, issued_at, status_level, exceed_prob, confidence; UQ (sensor_id, model_id, issued_at) | reemplaza `predictions` |
+| `forecast_quantiles` | forecast_id, horizon_min, q10, q50, q90, q95 | N:1 forecast |
+| `forecast_explanations` | forecast_id, method, factors JSONB, plain_text | N:1 forecast |
 
 #### Alertas y stakeholders
 
 | Tabla | Campos clave | Relaciones |
 |-------|--------------|------------|
-| `alerts` | prediction_id, gas_reading_id, sensor_id, level, message, recommendation, status (`abierta`/`reconocida`/`resuelta`), acknowledged_by/at, **resolved_at**, resolution_note (no hay `resolved_by`) | FKs prediction, reading, sensor, user |
+| `alerts` | forecast_id, gas_reading_id, sensor_id, kind (anticipado/confirmado), level, threshold_id, expected_at, plain_message, status, resolved_by | FKs forecast, reading, sensor, user |
+| `alert_outcomes` | alert_id PK, outcome, event_id, lead_minutes | ¿fue acertado? |
 | `stakeholders` | name, type, organization, email, phone, notify_channels (JSONB) | 1:N subscriptions; M2M users |
 | `stakeholder_user` | stakeholder_id, user_id | vínculo interesado ↔ stakeholder |
 | `stakeholder_subscriptions` | stakeholder_id, site_id?, sensor_id?, min_level | filtros de notificación |
 | `alert_notifications` | alert_id, stakeholder_id, channel, status, sent_at, error | trazabilidad de envío |
+
+Vista `missed_events_v`: episodios en `threshold_events` sin aviso previo acertado.
 
 #### Reportes y auditoría
 
@@ -250,23 +370,44 @@ audit_log ── users
 
 ## 7. Roles, permisos y aterrizaje UI
 
-### Permisos (`scripts/seed_roles_permissions.py`)
+### Permisos (`scripts/seed_roles_permissions.py`, Plan 19)
 
-`users.manage`, `roles.manage`, `sensors.manage`, `models.train`, `models.promote`, `predictions.view`, `alerts.view`, `alerts.resolve`, `stakeholders.manage`, `reports.export`, `dashboard.view_all_sites`, `audit.view`.
+Canónicos: `status.view`, `alerts.view`, `alerts.acknowledge`, `alerts.resolve`, `history.view`, `reliability.view`, `reports.export`, `thresholds.manage`, `stakeholders.manage`, `data.upload`, `data.quality.view`, `models.train`, `models.promote`, `users.manage`, `roles.manage`, `kiosk.manage`, `audit.view`.
 
-### Roles
+Alias de compatibilidad (siguen existiendo en DB): `predictions.view`, `sensors.manage`, `dashboard.view_all_sites`.
 
-| Rol | Permisos (resumen) | Home UI |
-|-----|-------------------|---------|
-| `admin` | todos | Semáforo `/` |
-| `ingeniero_datos` | sensors, models train/promote, predictions, alerts view, reports | Panel ingeniero `/?view=ingeniero` |
-| `operador_mina` | alerts view/resolve, predictions.view | Semáforo `/` |
-| `interesado` | alerts.view, reports.export | `/executive` |
-| `auditor` | predictions, alerts, reports, dashboard.view_all_sites, audit.view | `/audit` |
+### Roles (v2)
 
-Superadmin: `scripts/create_superadmin.py` + `SUPERADMIN_*` en env.
+| Rol visible | Código | Permisos (resumen) | Home UI |
+|-------------|--------|-------------------|---------|
+| Administrador | `admin` | todos | Hoy `/` |
+| Supervisor de seguridad | `supervisor_seguridad` | ver, avisos, límites, contactos, informes, kiosco | Hoy `/` |
+| Operador de sala | `operador` | estado/avisos/historial de **sus zonas**; Ya lo vi / cerrar | Hoy `/` |
+| Gerencia | `gerencia` | resumen, confiabilidad, informes (lectura) | `/resumen` |
+| Analista de datos | `analista` | cargar datos, calidad, laboratorio, promover | `/?view=ingeniero` |
+| Auditor | `auditor` | lectura + calidad + bitácora | `/bitacora` |
 
-La navegación del sidebar se arma por **permisos**, no por rol hardcodeado. El **aterrizaje** (`home_path_for_user` / `GET /`) sí usa roles (interesado puro → ejecutivo; ingeniero puro → panel; auditor puro → auditoría).
+Migración: `ingeniero_datos` → `analista`, `operador_mina` → `operador`, `interesado` → `gerencia`. Script `scripts/migrate_roles_v2.py`. Un operador **sin zonas** no ve nada. Quien entrena no aprueba umbrales, salvo admin.
+
+Superadmin: `scripts/create_superadmin.py` + `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD` / `SUPERADMIN_FULL_NAME` (opcional, default `Super Admin`). El script **actualiza** el usuario si el email ya existe.
+
+### Credenciales locales
+
+**No hay usuarios semilla fijos embebidos en la imagen.** Se crean con scripts o fixtures.
+
+| Origen | Email | Password | Rol | Cuándo existe |
+|--------|-------|----------|-----|----------------|
+| Superadmin (`.env` + script) | el de `SUPERADMIN_EMAIL` | `SUPERADMIN_PASSWORD` | `admin` | Tras `python scripts/create_superadmin.py` |
+| Pruebas / DEV habitual | `test.admin@example.com` | `AdminPass123!` | `admin` | Fixture pytest; **también en DEV** si se sembró a mano (Compose actual) |
+| Fixture operador | `test.operador@example.com` | `OperadorPass123!` | `operador` | Solo test DB salvo que exista en DEV |
+
+Login UI: `http://localhost:8000/ingresar` (`/login` → 301).  
+- **Nativo (sin JS):** `POST /ingresar` (form + `csrf_token`) → cookies + 303 a `/` o `/mi-cuenta`.  
+- **JSON:** `POST /auth/login` (con cabecera CSRF).  
+`GET /ingresar?email=&password=` → 302 a `/ingresar` limpio (nunca reutiliza la clave en Location).  
+`DELETE /api/users/{id}` es **baja lógica** (`is_active=false`).
+
+La navegación del sidebar se arma por **permisos**, no por rol hardcodeado. El **aterrizaje** (`home_path_for_user` / `GET /`) sí usa roles (gerencia pura → `/resumen`; analista puro → panel; auditor puro → `/bitacora`).
 
 ---
 
@@ -274,14 +415,14 @@ La navegación del sidebar se arma por **permisos**, no por rol hardcodeado. El 
 
 ### 8.1 Autenticación
 
-1. UI `/login` → `POST /auth/login` (email/password).
-2. Access JWT en cookie `access_token` (claims: sub, roles, permissions).
-3. Refresh opaco (hash SHA-256 en DB) en cookie `refresh_token`.
-4. `get_current_user` + `require_permission(code)` en rutas protegidas.
-5. `POST /auth/refresh` rota tokens; `POST /auth/logout` revoca y limpia cookies.
-6. HTML sin sesión → redirect `/login`; sin permiso → `/403`.
-7. Defaults: access 30 min, refresh 7 días, HS256.
-8. Cambio de clave (logueado): `POST /profile/password`. **Recuperación** (olvidé mi clave) no existe.
+1. UI `/ingresar` (layout Vigía a dos columnas). Envío nativo `POST /ingresar` (form) **o** mejora progresiva JSON `POST /auth/login`. CSRF double-submit: cookie `csrf_token` + campo/cabecera; middleware ASGI en `app/core/csrf.py` (no consume el body del POST).
+2. Access JWT 15 min en cookie **`access_token`**. Refresh opaco 8 h en **`refresh_token`**, con rotación y detección de reutilización (revoca todas las sesiones).
+3. Cookies: `HttpOnly` (sesión), `SameSite=lax`, `path=/`. `Secure` si `ENVIRONMENT=prod`. CSP **`default-src 'self'`** (sin CDN). Páginas auth: `Referrer-Policy: no-referrer`, `Cache-Control: no-store`.
+4. Scripts de página en `app/static/js/` y `app/static/js/pages/` (CSP bloquea inline).
+5. 5 fallos → bloqueo 15 min (mensaje genérico). Rate limit por IP y correo. Contraseña NIST: 12+, lista de comunes, no nombre/correo.
+6. Invitación 72 h, recuperación 30 min, cambio forzado, TOTP + códigos de respaldo. Sin SMTP: `storage/outbox/`.
+7. Kiosco: `/sala?kiosk=` con token hasheado. Equipo `/equipo`, pantallas `/pantallas`, cuenta `/mi-cuenta`.
+8. HTML sin sesión → `/ingresar`; sin permiso → 403. Auditoría: `auth.login_ok`, `auth.locked`, `user.invited`, `kiosk.created`, …
 
 ### 8.2 Ingesta ETL
 
@@ -289,20 +430,16 @@ La navegación del sidebar se arma por **permisos**, no por rol hardcodeado. El 
 2. **Inbox:** `data/inbox` (.xlsx/.xls); APScheduler si `ETL_INBOX_ENABLED=true`.
 3. **Scripts:** `scripts/load_processed_dataset.py`, `scripts/run_etl_inbox.py`.
 4. Por fila: get_or_create `Site`/`Sensor` con **nombres canónicos** (`gas_catalog`) → `GasReading` → `EtlRun`.
-5. Tras ETL exitoso: `run_predictions_for_etl_run` (fallo ML no aborta el ETL).
+5. Tras ETL exitoso: ciclo de pronóstico (`app/modules/forecasting/cycle.py`); un fallo de ML no aborta el ETL.
 6. Éxito inbox → `inbox/processed`; error → `inbox/failed`.
 7. Backfill opcional: `scripts/normalize_sensors_display.py`.
 8. El historial de sesiones MX6 y los `alarmReport_*` **no** se ingieren.
 
 ### 8.3 Modelos de IA — qué son y qué NO son
 
-El sistema **no usa LLMs** (GPT, Claude, BERT, Hugging Face). El “Model Zoo” son **10 algoritmos clásicos / redes pequeñas** entrenados sobre `gas_readings` para dos problemas de tesis:
+El sistema **no usa LLMs** para explicar avisos. El zoo **vigente (Plan 17)** está en `ml_core/forecasting/adapters/`: persistencia, ETS, LightGBM cuantílico, LSTM, TFT, PatchTST, iTransformer, Chronos-2, TimesFM y TTM. Horizontes **6 / 12 / 18 min** (G0). Inferencia: `ml_core/forecasting/serve.py` + `app/modules/forecasting/cycle.py`, persistida en `forecasts` / `forecast_quantiles`.
 
-1. **Clasificación de riesgo:** ¿esta lectura (o su ventana) corresponde a un `evento_final` (alarma, STEL o percentil 95 del sensor)?
-2. **Regresión / forecast:** ¿cuál será la concentración (`Leyendo`) en ~**7.5 min** (rango operativo 5–10 min)?
-3. **Lead time:** ¿el clasificador avisa *antes* de que ocurra el evento (ventana 5–10 min)?
-
-Catálogo canónico: `ml_core/models/registry.py`. Arquitecturas DL: `ml_core/models/architectures.py`. Orquestador: `ml_core/models/train_model.py`. Persistencia: tablas `training_jobs` + `model_registry`. Artefactos: **MLflow** experimento `plataforma-gases-training`. Inferencia en vivo: `app/modules/predictions/service.py`.
+El zoo tabular histórico (sklearn/XGBoost, Plan 12) sigue en `ml_core/models/` y MLflow `plataforma-gases-training`; **ya no** hay módulo `app/modules/predictions`.
 
 #### 8.3.1 Catálogo (10 algoritmos)
 
@@ -456,86 +593,72 @@ Estados: `staging` → `production` → `archived`.
 2. Dentro de sequence, prefiere task `both`, luego `regression`, si no el primero.
 3. Si no hay sequence, elige por `task` pedido o el production más reciente.
 
-Puede haber más de un `production` si tienen **tasks distintas**. El runtime **ignora** un tabular production si existe un DL production: el forecast del home depende de eso.
+Puede haber más de un `production` si tienen **tasks distintas**. El runtime **ignora** un tabular production si existe un DL production: el forecast de Hoy depende de eso.
 
 ---
 
-### 8.4 Inferencia, semáforo y forecast (cómo el modelo vive en producción)
+### 8.4 Inferencia, semáforo y forecast (producción)
 
-Archivo: `app/modules/predictions/service.py`. Una predicción por `gas_reading_id` (si ya existe, se reutiliza).
+**Vigente (Plan 17):** `ml_core/forecasting/serve.py` + `app/modules/forecasting/cycle.py` escriben `forecasts` / `forecast_quantiles` (horizontes G0: 6/12/18 min). Semáforo y avisos en Hoy vía `dashboard`. API: `/api/forecasts`. Gráficos con `charts.js` (SVG) / ECharts local — **sin Chart.js ni CDN**.
+
+Ciclo actual (resumen):
 
 ```
-gas_readings (reales, no sintéticas)
-        ↓ trigger
-predict_for_reading → fila predictions
+gas_readings (reales)
         ↓
-evaluate_and_create_alert  (si ALERTA/CRITICO o hard-alarm)
+forecasting/cycle → forecasts + forecast_quantiles
         ↓
-dispatch_alert_notifications
+reglas de avisos (umbrales / probabilidad de excedencia)
         ↓
-UI: semáforo `/`, forecast-by-gas, /alerts, /executive
+UI Hoy `/` · Avisos `/avisos` · Resumen `/resumen` · Confiabilidad
 ```
 
-**Triggers**
+**Triggers** (vars `PREDICTION_*` siguen vigentes en env):
 
 | Trigger | Condición | Límite |
 |---------|-----------|--------|
-| Post-ETL | Tras ingesta exitosa (`sensors_ingestion`) | `PREDICTION_POST_ETL_LIMIT` (default 500; 0 = todas). Solo `is_synthetic=false` |
+| Post-ETL | Tras ingesta exitosa | `PREDICTION_POST_ETL_LIMIT` (default 500; 0 = todas). Solo `is_synthetic=false` |
 | Job APScheduler | `PREDICTION_JOB_ENABLED=true` | intervalo `PREDICTION_JOB_INTERVAL_SECONDS` (120) |
-| On-the-fly | `forecast_concentration_for_reading` / home Chart.js | no persiste; solo si el production es sequence |
+| Serve on-demand | `ml_core/forecasting/serve` | persiste cuantiles; UI lee `forecasts` |
 
 Si no hay modelo production, el ETL **no falla** (stats `skipped=1`).
 
-**Camino tabular (sklearn/XGB)**
+**Camino sequence / transformers (producción actual)**
 
-1. Ventana de ~25 lecturas del mismo sensor (`ROLLING_WINDOW+5`).
-2. Recalcula las 5 features; vector 2D.
-3. `predict_proba` → P(clase 1). Label = 1 si P ≥ 0.5.
-4. No rellena `predicted_concentration` (salvo que en el futuro se use un regresor tabular en producción; hoy el home de forecast exige PyTorch).
+1. Ventana lookback → tensor; normalización del artefacto.
+2. Salida multihorizonte + cuantiles (conformal cuando aplica).
+3. Decisión operativa: Normal / Vigilar / Actuar ya / Evacuar según umbrales del catálogo.
+4. Persistencia en `forecasts` / `forecast_quantiles` (no en la tabla retirada `predictions`).
 
-**Camino sequence (PyTorch)**
+**Camino tabular legado (sklearn/XGB, zoo / laboratorio)**
 
-1. Tensor `[1, lookback, 5]`, padding si faltan pasos.
-2. Normaliza con `norm_mean/std` del `.pt`.
-3. Sigmoid de logits → `probability`. Label = 1 si P ≥ `cls_threshold` guardado.
-4. Cabeza reg: desnormaliza `yhat * reg_std + reg_mean` → `predicted_concentration`.
-5. Si solo hay regresión (sin logits): P ≈ \|c\| / (\|c\|+1) (suave, no es probabilidad calibrada).
-6. `horizon_minutes` se guarda solo si hay concentración.
+Sigue en `ml_core/models/` y MLflow para entrenamiento y comparación. Inferencia home ya no escribe `predictions`. Detalle de features/métricas: §8.3.
 
-**Riesgo operativo** (no son las métricas thesis; son umbrales de **probabilidad**):
+**Riesgo / estados operativos** (umbrales de probabilidad o excedencia; nombres UI en `copy.py`):
 
-| `risk_level` | Default | Env |
-|--------------|---------|-----|
-| NORMAL | P &lt; 0.3 | — |
-| PRECAUCION | P ≥ 0.3 | `RISK_THRESHOLD_PRECAUTION` |
-| ALERTA | P ≥ 0.6 | `RISK_THRESHOLD_ALERT` |
-| CRITICO | P ≥ 0.85 | `RISK_THRESHOLD_CRITICAL` |
+| Estado UI | Idea | Env (legado probabilidad) |
+|-----------|------|---------------------------|
+| Normal | bajo riesgo | — |
+| Vigilar | atención | `RISK_THRESHOLD_PRECAUTION` (~0.3) |
+| Actuar ya | alto | `RISK_THRESHOLD_ALERT` (~0.6) |
+| Evacuar | crítico | `RISK_THRESHOLD_CRITICAL` (~0.85) |
 
-Función: `probability_to_risk_level`. La fila `predictions` guarda `probability`, `predicted_label`, `risk_level`, `predicted_concentration`, `horizon_minutes`, FKs a reading y `model_registry`.
-
-**Alertas a partir del modelo** (`alerts/rules.py`): se crea alerta si `risk_level ∈ {ALERTA, CRITICO}` **o** hard-alarm (campo alarma / STEL / TWA). Si hay hard-alarm y el modelo dijo NORMAL/PRECAUCION, se **sube** el nivel de la alerta a ALERTA. Recomendación textual por gas.
-
-**Forecast del home** (`GET /dashboard/api/forecast-by-gas`):
-
-- Histórico real reciente (no sintético), agregado por gas canónico (prioridad CH4, CO, H2S).
-- Trazo futuro a t+h **solo si** `has_sequence_production`.
-- Concentración on-the-fly desde la última lectura por sensor (`forecast_concentration_for_reading`).
-- Chart.js en `dashboard/operador.html` (poll ~10 s).
+**Avisos** (`alerts/rules.py`): se crean ante riesgo alto/crítico o hard-alarm (alarma / STEL / TWA). Recomendación textual por gas.
 
 **Superficies que leen el modelo / sus salidas**
 
 | Superficie | Qué muestra |
 |------------|-------------|
-| `/` operador | Semáforo por sensor + forecast por gas |
-| `/?view=ingeniero` | Snapshot de jobs/modelos |
-| `/ml/models` | Matriz zoo + gates thesis |
-| `/ml/models/{id}` | Métricas, params, promote |
-| `/ml/train` | Selector algoritmos / task / lookback / horizonte |
-| `/ml/compare` | Comparativa + chart |
-| `/alerts` | Alertas derivadas de predicción + reglas |
-| `/executive` | KPIs de alertas (efecto del modelo, no las métricas crudas) |
-| Reportes `desempeno_modelo` / `comparativa_modelos` | PDF/Excel de metrics JSONB |
+| `/` Hoy | Franja de estado, zonas, avisos, proyección |
+| `/avisos` | Avisos derivados de forecast + reglas |
+| `/resumen` | KPIs gerencia |
+| `/confiabilidad` | Lenguaje natural sobre el modelo |
+| `/laboratorio/modelos` | Matriz zoo + gates thesis |
+| `/laboratorio/entrenar` | Selector algoritmos / task / lookback / horizonte |
+| `/laboratorio/comparar` | Comparativa |
+| `/informes` | PDF/Excel (`desempeno_modelo`, …) |
 | MLflow `:5000` | Runs y artefactos |
+| `/api/forecasts` | JSON de pronósticos |
 
 ### 8.5 Alertas
 
@@ -568,129 +691,144 @@ Tipos: `alertas_periodo`, `desempeno_modelo`, `resumen_ejecutivo`, `comparativa_
 
 | Método | Ruta | Notas |
 |--------|------|-------|
-| GET | `/login` | HTML |
-| POST | `/auth/login` | cookies |
+| GET | `/ingresar` | HTML login Vigía; strip `?email`/`?password` → 302 limpio |
+| POST | `/ingresar` | Form autenticado → 303 `/` o `/mi-cuenta` |
+| GET | `/login` | 301 → `/ingresar` |
+| POST | `/auth/login` | JSON + CSRF → cookies |
 | POST | `/auth/refresh` | rota refresh |
 | POST | `/auth/logout` | revoca |
 | GET | `/auth/me` | usuario actual |
+| POST | `/auth/recuperar`, `/auth/recuperar/confirmar`, `/auth/invitar` | reset / invitación |
+| * | `/auth/totp/*`, `/auth/sesiones*` | TOTP y sesiones (Mi cuenta) |
 
-### UI HTML (`dashboard/ui_router`)
+### UI HTML en español (`dashboard/ui_router`)
 
-| Ruta | Permiso típico | Template |
-|------|----------------|----------|
-| `/` | home por rol | `operador.html` (semáforo+forecast) o `ingeniero.html` |
-| `/sites`, `/sites/{id}`, `/sensors/{id}` | `predictions.view` | `sites/*` |
-| `/alerts`, `/alerts/{id}` | `alerts.view` | `alerts/*` |
-| `/ingestion` | `sensors.manage` | `ingestion/panel.html` |
-| `/ml/models`, `/ml/models/{id}`, `/ml/train`, **`/ml/compare`** | `models.train` | `ml/*` |
-| `/executive` | ruta: `alerts.view`; ítem sidebar: `reports.export` o admin | `dashboard/ejecutivo.html` |
-| `/reports` | `reports.export` | `reports/index.html` |
-| `/stakeholders` | `stakeholders.manage` | `stakeholders/list.html` |
-| `/users` | `users.manage` | `users/list.html` |
-| `/roles` | `roles.manage` | `roles/list.html` |
-| `/audit` | `audit.view` | `audit/list.html` |
-| `/profile` | autenticado | `profile/index.html` |
-| `POST /profile/password` | autenticado | cambio de clave |
-| `/403` | — | `errors/403.html` |
-| `/interesado/alertas` | — | redirect 302 → `/executive` |
+Las rutas inglesas (`/alerts`, `/sites`, `/ml/models`, `/login`, …) hacen **301** a las españolas.
+
+| Ruta | Permiso típico | Notas |
+|------|----------------|-------|
+| `/` | autenticado | **Hoy** (`dashboard/hoy.html`) |
+| `/fragmentos/hoy` | autenticado | Fragmento htmx |
+| `/avisos`, `/avisos/{id}` | `alerts.view` | Lista / detalle |
+| `/zonas`, `/zonas/{id}`, `/sensores/{id}` | status/history | Sitios y sensores |
+| `/historial` | history | Series / pasado |
+| `/informes` | `reports.export` | Generar PDF/Excel |
+| `/confiabilidad` | reliability/audit | Frases “de cada 10” |
+| `/resumen` | gerencia | Panel ejecutivo |
+| `/datos/cargar`, `/datos/calidad` | data.* | Ingesta y calidad |
+| `/ajustes/limites` | `thresholds.manage` | Umbrales |
+| `/laboratorio`, `/laboratorio/*` | `models.train` | Área técnica |
+| `/equipo`, `/roles` | users/roles.manage | Personas y roles |
+| `/contactos` | `stakeholders.manage` | Interesados |
+| `/bitacora` | `audit.view` | Auditoría |
+| `/mi-cuenta`, `POST …/contrasena` | autenticado | Perfil |
+| `/pantallas`, `/sala` | kiosk | Dispositivos y sala |
+| `/_componentes` | solo `ENVIRONMENT=local` | Catálogo de macros |
+| `/403` | — | Sin acceso |
 
 ### Dashboard API (polling)
 
 Prefijo `/dashboard/api`: `semaforo`, `forecast-by-gas`, `series/{sensor_id}`, `alertas-activas`, `sites`, `executive`, `ingeniero`.
 
-### APIs REST
+### APIs REST (detalle)
 
-| Prefijo | Uso |
-|---------|-----|
-| `/api/users` | CRUD + roles |
-| `/api/roles`, `/api/permissions` | RBAC |
-| `/api/ingestion` | upload, runs |
-| `/api/ml` | **catalog**, train, jobs, models, compare, promote |
-| `/api/predictions` | list/get |
-| `/api/alerts` | list/get, acknowledge, resolve |
-| `/api/stakeholders` | CRUD; suscripciones en `/api/stakeholders/{id}/subscriptions` y `DELETE /api/subscriptions/{id}` |
-| `/api/audit` | list |
-| `/api/reports` | generate + download |
+| Método | Ruta | Permiso |
+|--------|------|---------|
+| GET/POST | `/api/users` | `users.manage` |
+| GET/PATCH | `/api/users/{id}` | `users.manage` |
+| DELETE | `/api/users/{id}` | baja lógica (`is_active=false`) |
+| POST | `/api/users/{id}/roles` | asignar roles |
+| GET/POST | `/api/roles` | `roles.manage` (POST crea) |
+| PATCH | `/api/roles/{id}` | `roles.manage` |
+| GET | `/api/permissions` | `roles.manage` |
+| POST | `/api/ingestion/upload` | `sensors.manage` (Excel dls_report) |
+| GET | `/api/ingestion/runs`, `/api/ingestion/runs/{id}` | `sensors.manage` |
+| POST | `/api/ml/train` | `models.train` (síncrono) |
+| GET | `/api/ml/catalog`, `/jobs`, `/models`, `/models/compare` | `models.train` |
+| POST | `/api/ml/models/{id}/promote` | `models.promote` |
+| GET | `/api/forecasts`, … | status/history (reemplaza `/api/predictions`) |
+| GET | `/api/alerts`, `/api/alerts/{id}` | `alerts.view` |
+| POST | `/api/alerts/{id}/acknowledge`, `/resolve` | `alerts.resolve` (UI detalle llama estas) |
+| GET/POST | `/api/stakeholders` | `stakeholders.manage` |
+| GET/PATCH/DELETE | `/api/stakeholders/{id}` | |
+| GET/POST | `/api/stakeholders/{id}/subscriptions` | |
+| DELETE | `/api/subscriptions/{id}` | |
+| GET | `/api/audit` | `audit.view` |
+| GET | `/api/reports` | `reports.export` |
+| POST | `/api/reports/alertas`, `/ejecutivo`, `/modelo/{id}`, `/comparativa` | |
+| GET | `/api/reports/{id}/download` | |
 
-Otros: `GET /health`, estáticos en `/static`.
+Otros: `GET /health` (sin auth), `GET /_demo/not-found` (demo del handler, Plan 01), estáticos en `/static`. OpenAPI: `/docs`.
 
 ---
 
-## 10. UX / UI — consola profesional
+## 10. UX / UI — Vigía
 
-### Identidad visual
+Fuente de verdad visual: [`21_SISTEMA_DE_DISENO_VIGIA.md`](21_SISTEMA_DE_DISENO_VIGIA.md), mockups en `mockups/vigia-design-kit/`, tokens en `app/static/css/tokens.css`. Reglas Cursor: `.cursor/rules/vigia-*.mdc`.
 
-| Token | Valor | Uso |
-|-------|-------|-----|
-| Primary | `#0F766E` (teal) | Botones, acentos, focus |
-| Info | `#0284C8` | Charts / links secundarios |
-| Canvas | `#F1F5F9` (slate claro) | Fondo main |
-| Surface | `#FFFFFF` | Paneles |
-| Sidebar | `#0F172A` (slate profundo) | Nav |
-| Tipografía | Inter (import en `theme.css`) | UI completa |
-| Radio / sombra | 12px / sombra suave | `.panel` |
+### Identidad
 
-Colores de riesgo (semántica conservada): NORMAL verde, PRECAUCION ámbar, ALERTA naranja, CRITICO rojo — badges en estilo *pill suave* (tint + texto).
+| Elemento | Valor |
+|----------|--------|
+| Marca | **Vigía** · «Gases en la mina» |
+| Fondo | Polvo de roca `#EEF0EF` |
+| Texto | Antracita `#1A1E24` |
+| Acción | Aire fresco `#1C5A8E` (nunca verde/ámbar/rojo de estado en botones) |
+| Tipografía UI | **Archivo** (local, `font-stretch` 88 % en títulos) |
+| Tipografía técnica | **IBM Plex Mono** solo Laboratorio / Calidad |
+| Estados | Normal / Vigilar / Actuar ya / Evacuar / Sin datos — color + ícono sprite + palabra |
+| Sala | `data-theme="sala"`, escala ×1,35 |
+| Recursos | Fuentes, `sprite.svg`, ECharts, htmx en `app/static/` — **sin CDN** |
+| Ilustraciones | `login-hero.svg`, `vacio-despejado.svg`, `sensor-sin-datos.svg`, `error-galeria.svg`, isotipo |
 
-### Primitivas de layout (`theme.css`)
+### Cascarón
 
-- `.panel` / `.panel-flush` — superficie blanca con borde y padding
-- `.page-header` — título + subtítulo + acciones
-- `.filters-bar` — toolbar de filtros con gap amplio
-- `.section-title` / `.section-desc` — jerarquía de sección
-- `.kpi-card`, `.sensor-card` — métricas y semáforo
-- Sidebar flex columna; grupos **Operación / Datos / Administración**
-- Responsive: sidebar colapsable `<768px` (`.app-sidebar.is-open`)
+- Riel antracita 232 px (grupos Operación / Seguimiento / Datos / Administración), isotipo + franja de estratos.
+- Topbar 56 px: mina · datos al día · avisos / salir.
+- Contenido máx. 1360 px. Bajo 900 px: barra inferior de 4 ítems.
+- Macros: `templates/components/macros.html`. Gráficos solo `app/static/js/charts.js` (renderer SVG).
+- Textos operativos: `app/shared/copy.py`. Laboratorio = única zona con jerga técnica.
 
-### Partials reutilizables
+### Inventario de pantallas (Plan 18 + Vigía)
 
-`_kpi_card.html`, `_risk_badge.html`, `_alerts_table.html`, `_empty_state.html`, `_metric_gate.html`.
+| # | Pantalla | Ruta | Notas |
+|---|----------|------|-------|
+| P1 | Ingresar | `/ingresar` | Dos columnas + `login-hero.svg` |
+| P2 | Hoy | `/` | Franja de estado + zonas + avisos; *corte de mina pendiente de datos* |
+| P3 | Avisos | `/avisos` | Pestañas + filtros |
+| P4 | Detalle aviso | `/avisos/{id}` | Lecturas, por qué, qué hacer |
+| P5 | Zonas / sensores | `/zonas`, `/sensores/{id}` | |
+| P6 | Historial | `/historial` | |
+| P7 | Informes | `/informes` | |
+| P8 | Confiabilidad | `/confiabilidad` | Lenguaje natural |
+| P9 | Resumen | `/resumen` | Gerencia |
+| P10 | Equipo | `/equipo` | |
+| P11 | Cargar datos / calidad | `/datos/*` | |
+| P12 | Límites | `/ajustes/limites` | |
+| P13–15 | Laboratorio | `/laboratorio/*` | Banner «Área técnica» |
+| P16 | Contactos | `/contactos` | |
+| P17 | Bitácora | `/bitacora` | |
+| P18 | Sala | `/sala` | Oscuro / kiosco |
+| P19 | Mi cuenta / pantallas | `/mi-cuenta`, `/pantallas` | |
 
-Legado: `stakeholders/interesado_alertas.html` (la ruta vieja redirige a `/executive`).
-
-### Patrón de pantalla
-
-```
-page-header → (filters-bar opcional) → panel(s) con contenido
-```
-
-### Inventario de pantallas
-
-| # | Pantalla | Ruta | Audiencia |
-|---|----------|------|-----------|
-| P1 | Login | `/login` | público |
-| P2 | Home predictivo (forecast + semáforo) | `/` | operador, admin |
-| P2b | Panel ingeniero | `/?view=ingeniero` | ingeniero_datos |
-| P3 | Sitios / sensores | `/sites`, `/sensors/{id}` | predictions.view |
-| P4–P5 | Alertas list/detail | `/alerts` | alerts.view |
-| P6 | Ingesta ETL | `/ingestion` | sensors.manage |
-| P7–P9 | Modelos / detalle / train / **compare** | `/ml/models`, `/ml/train`, `/ml/compare` | models.train |
-| P10 | Resumen ejecutivo | `/executive` | interesado, admin (y quien tenga `reports.export` en nav) |
-| P11 | Reportes | `/reports` | reports.export |
-| P12 | Stakeholders | `/stakeholders` | stakeholders.manage |
-| P13 | Usuarios / roles | `/users`, `/roles` | admin |
-| P14 | Auditoría | `/audit` | auditor, admin |
-| P15 | Perfil (incluye cambio de clave) | `/profile` | autenticado |
-
-### Sidebar (agrupado)
+### Riel (agrupado)
 
 ```
-[Marca] Plataforma Gases — “Monitoreo predictivo de gases · mina”
-Operación:   Inicio · Sitios y sensores · Alertas
-Datos:       Ingesta / ETL · Modelos · Reportes · Resumen ejecutivo
-Admin:       Partes interesadas · Usuarios · Roles y permisos · Auditoría
-[Footer]     Nombre / email (perfil)
+[Isotipo] Vigía — Gases en la mina
+Operación:     Hoy · Avisos · Zonas · Historial
+Seguimiento:   Informes · Confiabilidad · Resumen
+Datos:         Cargar · Calidad · Ajustes · Laboratorio (Técnico)
+Administración: Equipo · Pantallas · Contactos · Bitácora
+[Pie] avatar + Mi cuenta
 ```
 
-Ítems visibles según permisos. Ejecutivo en nav: `reports.export` o rol `admin` (la ruta exige `alerts.view`).
+Ítems filtrados por permisos (`dashboard/nav` / plantilla `base.html`).
 
-### Micro-interacciones
+### Pendiente de UI (kit aún no cableado del todo)
 
-- Hover suave en `.panel` / `.sensor-card`
-- Active del sidebar con fondo sólido / barra
-- `:focus-visible` accesible en controles
-
-**Fuera de alcance UX actual:** iconos SVG masivos, librerías UI nuevas, cambios de lógica/API.
+- Corte esquemático de la mina en Hoy (`sites.map_x` / `map_y` + `mine-map.js`).
+- Revisión humana captura a captura vs `mockups/.../screenshots/`.
+- Co-diseño con operadores (`docs/ux/codiseno.md`).
 
 ---
 
@@ -712,7 +850,7 @@ Ver `.env.example`. Resumen:
 | `NOTIFICATIONS_DRY_RUN`, `SMTP_*`, `WHATSAPP_*` | Notificaciones |
 | `REPORTS_DIR` | Salida reportes |
 | `GCS_BUCKET` | Reservado Plan 09 (opcional) |
-| `SUPERADMIN_*` | Solo script create_superadmin |
+| `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, `SUPERADMIN_FULL_NAME` | Solo script `create_superadmin.py` |
 
 Nunca versionar secretos reales en `.env` ni en este documento.
 
@@ -736,8 +874,9 @@ python scripts/create_superadmin.py
 # Datos (opcional, si la DB está vacía):
 python scripts/load_processed_dataset.py --consolidado
 
-uvicorn app.main:app --reload
-# http://localhost:8000/health · /login · /docs
+docker compose up -d --build   # o uvicorn app.main:app --reload en el host
+# http://localhost:8000/health · /ingresar · /docs
+# Tras cambiar Python montado: docker compose restart app (Gunicorn no recarga)
 ```
 
 | Servicio Compose | Puerto host |
@@ -750,41 +889,115 @@ uvicorn app.main:app --reload
 
 | Script | Uso |
 |--------|-----|
-| `seed_roles_permissions.py` | Permisos y roles base |
+| `seed_roles_permissions.py` / `migrate_roles_v2.py` | Permisos y roles Plan 19 |
+| `seed_catalog.py` | Gases, umbrales, ajustes G0 |
 | `create_superadmin.py` | Usuario admin inicial |
 | `check_db.py` | Sanity check de conexión |
-| `load_processed_dataset.py` | Carga consolidado y/o 24m |
+| `load_processed_dataset.py --consolidado` | Solo datos reales |
+| `purge_synthetic.py` | Purga sintéticos (con `--confirm`) |
+| `verify.py` | Verificador Plan 20 (`--plan`, `--fast`, `--full`) |
+| `diagnose_real_data.py` | Diagnóstico G0 |
 | `run_etl_inbox.py` | Una pasada del inbox |
-| `normalize_sensors_display.py` | Backfill nombres canónicos |
-| `train_full_model_zoo.py` | Entrena tabulares + DL y promueve el mejor |
-| `retrain_dl_and_promote.py` | Reentrena secuencias y promueve |
-| `retrain_promote_dl_forecast.py` | Reentrena DL orientado a forecast |
 
-Tests: `pytest`.
+Tests: `python scripts/verify.py` o `pytest` contra `proyecto_gases_test` (§15).
+
+Login local típico en Compose DEV: `test.admin@example.com` / `AdminPass123!` (§7).
 
 ---
 
 ## 13. Reglas de trabajo (para agentes y humanos)
 
-1. **No saltar fases pendientes** (09 GCP, 10 seguridad) sin que el checklist previo esté verde.
+1. **No saltar compuertas del paquete 14–22** (G0 en Plan 15). Planes 09/10 al edge-first; no reabrir 04/05/12/13 salvo para retirarlos.
 2. **Migraciones solo con Alembic.**
-3. **Módulos nuevos** siguen la convención `models/schemas/repository/service/router` (repository solo si hay persistencia propia).
-4. **UI:** reutilizar `.panel`, `.page-header`, `.filters-bar` y partials; no introducir frameworks CSS/JS nuevos sin decisión explícita.
+3. **Módulos nuevos** siguen `models/schemas/repository/service/router`.
+4. **UI Vigía:** solo variables de `tokens.css`; sin CDN; sin Bootstrap/Chart.js/Inter; color de estado solo para gases. Reglas `.cursor/rules/vigia-*.mdc`.
 5. **Secretos** solo por env / Secret Manager.
-6. **Este archivo** es el contexto general; actualizarlo cuando cambie arquitectura, **datos**, modelo de datos, rutas o UX de forma material.
-7. Los planes `01`–`13` en `planes/` son la bitácora de ejecución; ante conflicto, **priorizar el código real** y luego sincronizar este contexto.
+6. **Este archivo** se actualiza cuando cambie arquitectura, datos, modelo, rutas, tests o UX de forma material.
+7. Planes `01`–`13` son bitácora histórica; ante conflicto, **priorizar el código** y este contexto.
+8. **Notebooks** no son runtime.
 
 ---
 
 ## 14. Pendiente conocido
 
-- **Plan 09:** Cloud Run, Cloud SQL, GCS, Scheduler, CI/CD. `docker/Dockerfile.worker` es placeholder (no hay worker en Compose; no hay Celery).
-- **Plan 10:** rate limiting, hardening, pruebas de carga, auditoría de seguridad formal.
-- WhatsApp: stub (no implementación productiva).
-- Recuperación de contraseña (flujo “olvidé mi clave”): no implementada. El cambio de clave en `/profile` sí existe.
-- Parser de `alarmReport_*.xlsx` y del historial de sesiones MX6: no implementado (no son lecturas).
-- RMSE thesis ≤ 0.05: puede no alcanzarse con el consolidado real irregular; documentar al promover.
+- **Humano (no se inventa):** visto del director en `docs/g0_visto_director.md`; 3–5 sesiones SUS en mina (`docs/ux/aceptacion.md`).
+- **UI Vigía restante:** corte esquemático de la mina en Hoy (`map_x`/`map_y`); alinear capturas con `screenshots/`; co-diseño operadores.
+- **Plan 09:** Cloud Run / Cloud SQL / GCS — reencuadrar edge-first. CI verify ya existe.
+- **Plan 10 (resto):** k6, pip-audit, HSTS de producción, backups Cloud SQL. Login/CSP/CSRF ya operativos.
+- WhatsApp stub; sin parser de `alarmReport_*` ni historial MX6.
+- RMSE thesis ≤ 0.05 puede no cumplirse con el consolidado irregular.
+- Legado inocuo: `templates/home.html`, `data/curated/`, fotos antiguas en `static/img/region/` (sustituidas por SVG Vigía en pantallas activas).
 
 ---
 
-*Fin del contexto canónico. Para detalle de un plan concreto, ver `planes/0X_*.md` correspondiente.*
+## 15. Tests, migraciones y artefactos legado
+
+### 15.1 Suite pytest
+
+`tests/conftest.py` apunta a `TEST_DATABASE_URL` (`proyecto_gases_test`) y **aborta** si coincide con `DATABASE_URL`. Al iniciar la sesión: `alembic upgrade head` + semillas. Cada prueba corre en transacción con SAVEPOINT y rollback. Fábricas: `tests/factories.py`. Comando: `python scripts/verify.py` (`--plan NN`, `--fast`, `--full`). CI: `.github/workflows/verify.yml`.
+
+| Archivo | Qué cubre |
+|---------|-----------|
+| `tests/unit/test_security.py` | JWT / hash |
+| `tests/unit/test_build_features.py` | Features 2D |
+| `tests/unit/test_ml_core_data_io.py` | Parser dls_report |
+| `tests/unit/test_model_zoo_metrics.py` | Gates thesis |
+| `tests/unit/test_risk_and_recommendations.py` | Riesgo + textos de alerta |
+| `tests/integration/test_auth_flow.py` | login / me / refresh / logout |
+| `tests/integration/test_rbac.py` | Permisos |
+| `tests/integration/test_ingestion.py` | Upload ETL |
+| `tests/integration/test_ml_training.py` | Train/promote (permisos) |
+| `tests/integration/test_alerts.py` | Alertas |
+| `tests/integration/test_stakeholders.py` | Stakeholders |
+| `tests/integration/test_reports.py` | Reportes |
+| `tests/integration/test_dashboard_ui.py` | HTML por rol |
+| `tests/integration/test_ux_plan18.py` | Lenguaje natural y pantallas Plan 18 |
+| `tests/integration/test_access_plan19.py` | CSRF, TOTP, kiosco, alcance por zona |
+| `tests/guards/` | Causalidad, sintéticos, walk-forward, conformal |
+| `tests/ui/test_plain_language.py` | Términos prohibidos en HTML operativo |
+| `tests/e2e/` | Ingreso, a11y, captura visual |
+| `tests/perf/` | Persistencia < 1 s y p95 de `/` |
+
+Comando: `python scripts/verify.py` (`--plan NN`, `--fast`, `--full`). `pytest` directo también apunta a la DB de pruebas.
+
+### 15.2 Cadena Alembic (head actual)
+
+```
+0001_init
+  → f2b543b2597b  auth_users_roles
+  → 3d0bc22f046c  sensors_etl
+  → 3984deaeebee  ml_training
+  → 33a39369ffe4  predictions_alerts
+  → c2be2667ab48  stakeholders_notifications
+  → 51e28c39eed2  reports_table
+  → a1b2c3d4e5f6  prediction_forecast_fields
+  → b1c2d3e4f5a6  catalog_gas_types_thresholds_settings
+  → b2c3d4e5f6a7  readings_quality_lineage
+  → b3c4d5e6f7a8  readings_no_synthetic_check
+  → b4c5d6e7f8a9  reading_grid_and_events
+  → b5c6d7e8f9a0  models_evaluations
+  → b6c7d8e9f0a1  forecasts_explanations
+  → b7c8d9e0f1a2  alerts_v2_outcomes
+  → b8c9d0e1f2a3  access_v2
+  → b9d0e1f2a3b4  drop_predictions
+  → c1d2e3f4a5b6  access_v3          ← HEAD
+```
+
+`0001_init` no crea tablas (esqueleto Plan 01).
+
+### 15.3 Docker
+
+| Artefacto | Uso |
+|-----------|-----|
+| `docker/Dockerfile.app` | Python 3.11-slim + torch CPU + Gunicorn `app.main:app` |
+| `docker/Dockerfile.mlflow` | `mlflow server` sqlite + `/mlartifacts` |
+| `docker/Dockerfile.worker` | Placeholder (`print(...)`); **no** está en Compose |
+| Compose `app` volumes | `./app`, `./ml_core`, `./mlruns`, `./storage/reports` — **no** `data/` |
+
+### 15.4 Acciones de auditoría (códigos `audit_log.action`)
+
+`login`, `logout`; `user.create` / `user.update` / `user.deactivate` / `user.roles_update`; `role.create` / `role.update`; `ingestion.upload`; `ml.train` / `ml.promote`; `alert.acknowledge` / `alert.resolve`; `report.generate` / `report.download`.
+
+---
+
+*Fin del contexto canónico. Planes: `planes/00`–`22`, `BITACORA_BUCLE.md`. Diseño: `mockups/vigia-design-kit/`.*

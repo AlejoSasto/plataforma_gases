@@ -1,4 +1,4 @@
-"""Tests de dashboard UI y APIs (Planes 07/11)."""
+"""Tests de dashboard UI y APIs (Planes 07/11/18)."""
 
 from __future__ import annotations
 
@@ -8,10 +8,16 @@ from app.modules.users.models import User
 
 
 def test_login_page_has_theme(client: TestClient) -> None:
-    res = client.get("/login")
+    res = client.get("/login", follow_redirects=True)
     assert res.status_code == 200
-    assert "theme.css" in res.text
-    assert "Plataforma Gases" in res.text
+    assert "tokens.css" in res.text
+    tokens = client.get("/static/css/tokens.css")
+    assert tokens.status_code == 200
+    assert "Archivo" in tokens.text
+    assert "IBM Plex Mono" in tokens.text
+    assert "Vigía" in res.text
+    assert "theme.css" not in res.text
+    assert "bootstrap" not in res.text.lower()
 
 
 def test_home_requires_auth(client: TestClient) -> None:
@@ -26,10 +32,10 @@ def test_operador_sees_semaforo_not_users(
     assert client.post("/auth/login", json={"email": user.email, "password": password}).status_code == 200
     home = client.get("/")
     assert home.status_code == 200
-    assert "Semáforo" in home.text or "semaforo" in home.text.lower() or "sensor" in home.text.lower()
-    assert 'href="/users"' not in home.text
-    assert 'href="/ml/models"' not in home.text
-    assert 'href="/alerts"' in home.text
+    assert "Hoy" in home.text or "sensor" in home.text.lower() or "zona" in home.text.lower()
+    assert 'href="/equipo"' not in home.text
+    assert 'href="/laboratorio"' not in home.text
+    assert 'href="/avisos"' in home.text
 
     api = client.get("/dashboard/api/semaforo")
     assert api.status_code == 200
@@ -45,5 +51,5 @@ def test_admin_sidebar_has_admin_links(client: TestClient, admin_user: tuple[Use
     assert client.post("/auth/login", json={"email": admin.email, "password": password}).status_code == 200
     home = client.get("/")
     assert home.status_code == 200
-    assert 'href="/users"' in home.text
-    assert 'href="/stakeholders"' in home.text
+    assert 'href="/equipo"' in home.text
+    assert 'href="/contactos"' in home.text

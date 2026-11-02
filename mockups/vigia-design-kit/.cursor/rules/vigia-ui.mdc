@@ -1,0 +1,31 @@
+---
+description: Sistema de diseño Vigía. Aplicar al crear o editar templates, CSS o JS de interfaz.
+globs: app/templates/**/*.html, app/static/css/**/*.css, app/static/js/**/*.js
+alwaysApply: false
+---
+# Interfaz Vigía
+
+Fuente de verdad: `design/docs/21_SISTEMA_DE_DISENO_VIGIA.md` y `app/static/css/tokens.css`.
+Referencia visual: `design/mockups/*.html` y `design/screenshots/*.png`.
+
+## Obligatorio
+- Usar SOLO variables de `tokens.css` para color, tipografía, espaciado, radio y sombra. Nunca hex sueltos en templates ni en CSS nuevo.
+- Tipografía: Archivo para toda la interfaz (títulos al 88 % de ancho con `--stretch-display`). Lecturas con `font-variant-numeric: tabular-nums`. IBM Plex Mono SOLO en Laboratorio y Calidad de los datos.
+- Los colores de estado (`--st-*`) se usan SOLO para el estado de los gases. Nunca como decoración ni en botones.
+- Todo estado lleva color + ícono + palabra con el macro `status_badge`. Nunca solo color.
+- Paneles: borde de 1 px y radio `--r-panel`, sin sombra. Sombra solo en elementos flotantes.
+- Íconos: sprite local `static/icons/sprite.svg` (Lucide), con texto o `aria-label`.
+- Recursos locales: nada de CDN (fuentes, ECharts, htmx, íconos viven en `app/static/`).
+- Textos en tipo oración, sin MAYÚSCULAS sostenidas, sin flechas "→" en botones.
+- Componentes como macros en `app/templates/components/`; páginas sobre `layouts/app.html`.
+- Responsivo: bajo 900 px aparece la barra inferior y el corte de la mina pasa a lista de zonas.
+- Accesibilidad: foco visible, `lang="es-CO"`, objetivos de 40 px o más, `aria-live` en la franja de estado.
+
+## Prohibido
+- Bootstrap, Chart.js, Inter o `theme.css` en código nuevo (se retiran en la fase F7 del Plan 18).
+- Tarjetas idénticas con sombra gris, degradados decorativos, etiquetas en mayúsculas sobre títulos.
+
+## Antes de dar una pantalla por terminada
+1. Captura con los tamaños de `design/tools/screenshots.py` y compárala con su par en `design/screenshots/`.
+2. `python design/tools/check_contrast.py` en verde si tocaste colores.
+3. `python scripts/verify.py --plan 18` en verde.

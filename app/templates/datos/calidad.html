@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header, data_table %}
+{% block page_title %}Calidad de los datos{% endblock %}
+{% block content %}
+{{ page_header("Calidad de los datos", "Cobertura, huecos y la decisión de horizonte.") }}
+<div class="card" style="margin-bottom: var(--space-5)">
+  <h2>Horizonte que podemos mirar</h2>
+  <p>{{ quality.g0.note }}</p>
+</div>
+<div class="layout-2">
+  <div class="card">
+    <h2>Lecturas del último día</h2>
+    {{ data_table(["Sensor", "Lecturas"], coverage_rows) }}
+  </div>
+  <div class="card">
+    <h2>Problemas detectados</h2>
+    {{ data_table(["Código", "Gravedad", "Cuándo"], issue_rows) }}
+  </div>
+</div>
+{% endblock %}

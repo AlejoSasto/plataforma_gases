@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header, metric_big, empty_state %}
+{% block page_title %}Confiabilidad{% endblock %}
+{% block content %}
+{{ page_header("¿Qué tan confiable es el sistema?", "Cifras honestas, en lenguaje de operación.") }}
+{% if not snap.has_data %}
+  {{ empty_state("shield-check", "Aún no hay situaciones evaluadas", snap.recall_phrase) }}
+{% else %}
+<div class="metric-grid">
+  {{ metric_big(snap.timely, "Avisó a tiempo", snap.recall_phrase) }}
+  {{ metric_big((snap.lead_avg or "—") ~ " min", "Anticipación", snap.lead_phrase) }}
+  {{ metric_big(snap.missed, "No avisadas", "Situaciones peligrosas que no se avisaron. Las mostramos para no ocultar fallos.") }}
+</div>
+<p class="help" style="margin-top: var(--space-5)">{{ g0.note }}</p>
+{% endif %}
+{% endblock %}

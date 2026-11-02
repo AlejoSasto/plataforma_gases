@@ -17,11 +17,6 @@ from app.shared.gas_catalog import (
     normalize_sensor_code,
     normalize_site_name,
 )
-from ml_core.augmentation import (
-    load_augmentation_manifest,
-    manifest_summary,
-    mark_synthetic_from_manifest,
-)
 from ml_core.columns import EXPECTED_COLUMNS
 from ml_core.data_io import CleanResult, load_and_clean, load_and_clean_csv
 
@@ -193,19 +188,12 @@ def _persist_clean_result(
         db.commit()
         db.refresh(run)
         if status == "success" and ingested > 0:
-            try:
-                from app.modules.predictions.service import run_predictions_for_etl_run
-
-                pred_stats = run_predictions_for_etl_run(db, run.id)
-                log = dict(run.log or {})
-                log["predictions"] = pred_stats
-                run.log = log
-                db.add(run)
-                db.commit()
-                db.refresh(run)
-            except Exception:  # noqa: BLE001 — ETL no falla por predicción
-                db.rollback()
-                db.refresh(run)
+            log = dict(run.log or {})
+            log["forecasts"] = {"skipped": 1, "reason": "plan_17"}
+            run.log = log
+            db.add(run)
+            db.commit()
+            db.refresh(run)
         return run
     except Exception as exc:  # noqa: BLE001
         db.rollback()
@@ -254,23 +242,15 @@ def ingest_csv_paths(
     mark_against_real: Path | None = None,
     manifest_path: Path | None = None,
 ) -> EtlRun:
+    if is_synthetic or mark_against_real is not None or manifest_path is not None:
+        raise ValueError("Carga sintética / 24m retirada (Plan 15 F1). Solo datos reales.")
     clean = load_and_clean_csv(paths)
-    extra: dict[str, Any] = {"is_synthetic_default": is_synthetic}
-    if mark_against_real is not None and mark_against_real.exists():
-        from ml_core.data_io import load_processed_csv
-
-        real_df = load_processed_csv(mark_against_real)
-        clean.dataframe = mark_synthetic_from_manifest(clean.dataframe, real_df)
-        extra["synthetic_marked_against"] = mark_against_real.name
-        is_synthetic = False  # per-row flags already set
-    if manifest_path is not None and manifest_path.exists():
-        manifest = load_augmentation_manifest(manifest_path)
-        extra["augmentation_manifest"] = manifest_summary(manifest)
+    extra: dict[str, Any] = {"is_synthetic_default": False}
     return _persist_clean_result(
         db,
         clean,
         triggered_by_user_id=triggered_by_user_id,
-        is_synthetic_default=is_synthetic,
+        is_synthetic_default=False,
         audit=False,
         extra_log=extra,
     )

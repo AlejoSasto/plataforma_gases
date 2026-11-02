@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import status_banner, zone_card, alert_card, empty_state, chart %}
+{% block page_title %}Hoy{% endblock %}
+{% block content %}
+<div id="hoy-root" hx-get="/fragmentos/hoy" hx-trigger="every {{ grid_seconds }}s" hx-swap="innerHTML">
+  {% include "dashboard/_hoy_inner.html" %}
+</div>
+{% endblock %}

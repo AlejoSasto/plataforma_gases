@@ -1,0 +1,79 @@
+{
+  "source": "C:\\Users\\FA-BI\\OneDrive\\Documentos\\Maestria IA\\Tesis\\plataforma-gases\\data\\processed\\Procesamiento_de_Datos.csv",
+  "stages": [
+    {
+      "name": "E1",
+      "rows_in": 13894,
+      "rows_out": 13894,
+      "rows_rejected": 0,
+      "details": {
+        "kind": "csv",
+        "source": "Procesamiento_de_Datos.csv",
+        "expected_columns": [
+          "Descripción",
+          "Sensor",
+          "Número de Periodo",
+          "Gas",
+          "Leyendo",
+          "Unidad",
+          "STEL Máx",
+          "TWA máximo",
+          "Tiempo de Inicio",
+          "Tiempo de finalización",
+          "Sitio",
+          "Factor de Respuesta",
+          "Factor",
+          "Alarma",
+          "Temperatura"
+        ]
+      }
+    },
+    {
+      "name": "E2",
+      "rows_in": 13894,
+      "rows_out": 13894,
+      "rows_rejected": 0,
+      "details": {
+        "rejected_sample": [],
+        "rejected_total": 0
+      }
+    },
+    {
+      "name": "E3",
+      "rows_in": 13894,
+      "rows_out": 13894,
+      "rows_rejected": 0,
+      "details": {
+        "conversions": 4714,
+        "unidad_desconocida": 0
+      }
+    },
+    {
+      "name": "E4",
+      "rows_in": 13894,
+      "rows_out": 13894,
+      "rows_rejected": 0,
+      "details": {
+        "issue_counts": {
+          "fuera_de_rango_fisico": 2337,
+          "hueco": 2335,
+          "salto_imposible": 133,
+          "valor_congelado": 32
+        },
+        "n_issues": 4837
+      }
+    },
+    {
+      "name": "E6",
+      "rows_in": 13894,
+      "rows_out": 821205,
+      "rows_rejected": 0,
+      "details": {
+        "imputed_steps": 31,
+        "missing_steps": 821152,
+        "step_minutes": 1
+      }
+    }
+  ],
+  "grid_rows": 821205
+}

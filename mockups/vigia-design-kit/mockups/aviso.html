@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aviso | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html" aria-current="page"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">AR</div><div class="rail__who"><strong>Ana Rojas</strong><span>Supervisora de seguridad</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<div class="page-head">
+  <div class="page-head__text">
+    <a href="avisos.html" class="faint">Avisos</a>
+    <h1 style="margin-top:4px">Metano en Frente 3 Sur</h1>
+  </div>
+  <div class="page-head__actions"><button class="btn">Ya lo vi</button><button class="btn btn--primary"><i data-icon="check"></i>Cerrar aviso</button></div>
+</div>
+
+<div class="home-grid">
+  <div class="stack">
+    <article class="alert-card">
+      <div class="alert-card__head"><i data-icon="triangle-alert"></i><strong>Actuar ya</strong><span class="kind" style="color:inherit"><i data-icon="clock"></i>Aviso anticipado</span><time>Creado a las 10:33</time></div>
+      <div class="alert-card__body">
+        <p class="alert-card__lead">Se espera que el metano llegue al límite en unos 7 minutos, hacia las 10:42.</p>
+        <dl class="readings">
+          <div><dt>Ahora</dt><dd>0,72 <small>%</small></dd></div>
+          <div><dt>Esperado en 10 min</dt><dd>1,05 <small>%</small></dd></div>
+          <div class="is-limit"><dt>Límite para actuar</dt><dd>1,0 <small>%</small></dd></div>
+        </dl>
+        <div class="why"><div class="why__icon"><i data-icon="lightbulb"></i></div><div>
+          <h3>Por qué avisamos</h3>
+          <p>El metano viene subiendo sin pausa desde hace 20 minutos y el monóxido en la misma zona también aumentó. Estimación confiable por ahora.</p></div></div>
+        <div class="todo"><div class="todo__icon"><i data-icon="shield-check"></i></div><div>
+          <h3>Qué hacer</h3>
+          <ol><li>Verificar que la ventilación del Frente 3 Sur esté funcionando.</li>
+          <li>Suspender trabajos con equipos que puedan generar chispa.</li>
+          <li>Preparar la salida del personal del frente si sigue subiendo.</li></ol></div></div>
+      </div>
+    </article>
+
+    <section class="panel">
+      <div class="panel__head"><h2>Ahora y lo que viene</h2><span class="faint">Última hora y próximos 10 minutos</span></div>
+      <div class="chart" data-chart="now-next"></div>
+      <div class="chart-note">
+        <span><i class="key-line"></i>Lo que marcó el sensor</span>
+        <span><i class="key-line key-line--dash"></i>Lo que se espera</span>
+        <span><i class="key-band"></i>Rango probable</span>
+      </div>
+    </section>
+  </div>
+
+  <aside class="stack">
+    <section class="panel">
+      <div class="panel__head"><h3>Seguimiento</h3></div>
+      <div class="panel__body">
+        <ol class="timeline">
+          <li><span class="tl-dot is-done"></span><div><strong>El sistema emitió el aviso</strong><span>10:33</span></div></li>
+          <li><span class="tl-dot is-done"></span><div><strong>Se notificó a 3 contactos</strong><span>10:33 por correo y en la sala de control</span></div></li>
+          <li><span class="tl-dot is-pending"></span><div><strong>Pendiente: alguien debe marcarlo como visto</strong><span>Hace 2 min</span></div></li>
+          <li><span class="tl-dot is-pending"></span><div><strong>Cierre con nota</strong><span>Cuando la zona vuelva a la normalidad</span></div></li>
+        </ol>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel__head"><h3>Sobre esta zona</h3></div>
+      <div class="panel__body" style="display:grid;gap:10px">
+        <p><strong>Frente 3 Sur</strong><br><span class="muted">Manto 2, nivel inferior</span></p>
+        <p class="muted">4 sensores activos. Último aviso en esta zona: hace 6 días, también por metano.</p>
+        <a href="#">Ver historial de la zona</a>
+      </div>
+    </section>
+  </aside>
+</div>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html" aria-current="page"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

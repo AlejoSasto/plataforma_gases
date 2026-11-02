@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Query
 from app.modules.alerts import service as alerts_service
 from app.modules.alerts.schemas import AlertResponse, ResolveAlertRequest
 from app.modules.stakeholders.service import alert_ids_visible_to_user
+from app.shared.access import scoped_site_ids, site_allowed
 from app.shared.dependencies import CurrentUser, DbSession, require_permission
 from app.shared.exceptions import NotFoundError, PermissionDeniedError
 from app.shared.pagination import Page, PageParams
@@ -16,6 +17,7 @@ from app.shared.pagination import Page, PageParams
 router = APIRouter(prefix="/api/alerts", tags=["alerts"])
 
 CanView = Annotated[object, Depends(require_permission("alerts.view"))]
+CanAck = Annotated[object, Depends(require_permission("alerts.acknowledge"))]
 CanResolve = Annotated[object, Depends(require_permission("alerts.resolve"))]
 
 
@@ -32,6 +34,7 @@ def list_alerts(
 ) -> Page[AlertResponse]:
     params = PageParams(page=page, page_size=page_size)
     visible = alert_ids_visible_to_user(db, actor.id)
+    scope = scoped_site_ids(db, actor)
     items, total = alerts_service.list_alerts(
         db,
         offset=params.offset,
@@ -39,6 +42,7 @@ def list_alerts(
         status=status,
         level=level,
         site_id=site_id,
+        site_ids=scope,
         visible_ids=visible,
     )
     return Page(
@@ -59,6 +63,11 @@ def get_alert(
     visible = alert_ids_visible_to_user(db, actor.id)
     if visible is not None and alert_id not in visible:
         raise PermissionDeniedError("Alerta fuera de tus suscripciones")
+    from app.modules.sensors_ingestion.models import Sensor
+
+    row = db.query(Sensor).filter(Sensor.id == alert.sensor_id).first()
+    if row is not None and not site_allowed(db, actor, row.site_id):
+        raise PermissionDeniedError("Zona fuera de tu alcance")
     return AlertResponse(**alerts_service.alert_to_dict(db, alert))
 
 
@@ -67,7 +76,7 @@ def acknowledge_alert(
     alert_id: int,
     db: DbSession,
     actor: CurrentUser,
-    _: CanResolve,
+    _: CanAck,
 ) -> AlertResponse:
     alert = alerts_service.acknowledge_alert(db, alert_id, actor)
     return AlertResponse(**alerts_service.alert_to_dict(db, alert))

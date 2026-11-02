@@ -39,3 +39,11 @@ class ValidationError(AppError):
 
     def __init__(self, message: str = "Datos inválidos") -> None:
         super().__init__(message)
+
+
+class LockedError(AppError):
+    code = "locked"
+    status_code = 429
+
+    def __init__(self, message: str = "Por seguridad bloqueamos el acceso por 15 minutos.") -> None:
+        super().__init__(message)

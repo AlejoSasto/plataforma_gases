@@ -1,0 +1,148 @@
+/* =====================================================================
+   VIGÍA — Tokens del sistema de diseño (fuente única de verdad)
+   Plataforma de monitoreo y pronóstico de gases · Minería de carbón
+   Copiar tal cual a app/static/css/tokens.css
+   ===================================================================== */
+
+/* ---------- Tipografías (servidas localmente: funciona sin internet en bocamina) ---------- */
+@font-face {
+  font-family: "Archivo";
+  src: url("../fonts/archivo-latin-standard-normal.woff2") format("woff2-variations"),
+       url("../fonts/archivo-latin-standard-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Archivo";
+  src: url("../fonts/archivo-latin-ext-standard-normal.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face { font-family: "IBM Plex Mono"; src: url("../fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("../fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("../fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+
+:root {
+  /* ---------- Paleta base (nombrada a partir de la mina) ---------- */
+  --c-antracita:      #1A1E24;  /* carbón antracita: texto principal, riel de navegación */
+  --c-pizarra:        #4A525E;  /* roca pizarra: texto secundario */
+  --c-esteril:        #5F6772;  /* material estéril: ayudas, marcas de tiempo (≥4,5:1 sobre fondo y superficie) */
+  --c-entibado:       #DCE0E3;  /* líneas, bordes, separadores */
+  --c-polvo-roca:     #EEF0EF;  /* polvo de roca inertizante: fondo general */
+  --c-blanco:         #FFFFFF;
+
+  --c-ventilacion:      #1C5A8E; /* azul de aire fresco (planos de ventilación): acción principal */
+  --c-ventilacion-700:  #154672;
+  --c-ventilacion-50:   #E5EEF6;
+  --c-retorno:          #8E3B2E; /* rojo del aire de retorno: SOLO en planos e ilustraciones, nunca en UI de estado */
+  --c-lampara:          #FFE3A1; /* luz de lámpara minera: SOLO brillos de ilustración, nunca en UI */
+
+  /* ---------- Roles semánticos — modo claro (oficinas, gerencia, operador de día) ---------- */
+  --bg:            var(--c-polvo-roca);
+  --surface:       var(--c-blanco);
+  --surface-2:     #F5F6F6;
+  --surface-sunk:  #E6E9EA;
+  --border:        var(--c-entibado);
+  --border-strong: #C3C9CE;
+  --text:          var(--c-antracita);
+  --text-2:        var(--c-pizarra);
+  --text-3:        var(--c-esteril);
+  --accent:        var(--c-ventilacion);
+  --accent-hover:  var(--c-ventilacion-700);
+  --accent-soft:   var(--c-ventilacion-50);
+  --accent-text:   #FFFFFF;
+  --focus:         #2F7BD0;
+  --rail-bg:       var(--c-antracita);
+  --rail-text:     #C9D0D8;
+  --rail-active:   #FFFFFF;
+  --chart-measured: #1A1E24;
+  --chart-expected: #1C5A8E;
+  --chart-band:     rgba(28, 90, 142, 0.14);
+  --chart-grid:     #E2E5E7;
+
+  /* ---------- Estados operativos (la ÚNICA fuente de color fuerte) ---------- */
+  --st-normal:        #1F8A5B;  --st-normal-soft:  #E5F3EC;  --st-normal-ink:  #14603F;
+  --st-vigilar:       #B97E00;  --st-vigilar-soft: #FBF0D6;  --st-vigilar-ink: #6E4B00;
+  --st-actuar:        #D2581A;  --st-actuar-soft:  #FCE7DA;  --st-actuar-ink:  #93390A;
+  --st-evacuar:       #C1262E;  --st-evacuar-soft: #FAE3E4;  --st-evacuar-ink: #921A20;
+  --st-sindatos:      #7D8590;  --st-sindatos-soft:#ECEEF0;  --st-sindatos-ink:#454C56;
+
+  /* ---------- Tipografía ---------- */
+  --font-ui:      "Archivo", "Segoe UI", system-ui, sans-serif;
+  --font-reading: "Archivo", "Segoe UI", system-ui, sans-serif; /* lecturas: Archivo con cifras tabulares */
+  --font-tech:    "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace; /* SOLO área técnica (Laboratorio, calidad de datos) */
+  --stretch-display: 88%;   /* semicondensado, como la señalética minera */
+  --stretch-ui:      100%;
+
+  /* Escala (base 16, razón ≈1,25). tamaño / interlineado */
+  --fs-kiosk:   3.5rem;    --lh-kiosk:   1.05;  /* 56 / 59 — solo sala de control */
+  --fs-display: 2.5rem;    --lh-display: 1.1;   /* 40 / 44 — frase de estado general */
+  --fs-h1:      1.875rem;  --lh-h1:      1.2;   /* 30 / 36 — título de página */
+  --fs-h2:      1.375rem;  --lh-h2:      1.27;  /* 22 / 28 — título de bloque */
+  --fs-h3:      1.125rem;  --lh-h3:      1.33;  /* 18 / 24 — título de tarjeta */
+  --fs-body:    1rem;      --lh-body:    1.5;   /* 16 / 24 */
+  --fs-small:   0.875rem;  --lh-small:   1.43;  /* 14 / 20 */
+  --fs-micro:   0.8125rem; --lh-micro:   1.38;  /* 13 / 18 — marcas de tiempo, nunca contenido clave */
+  --fs-read-xl: 2.75rem;   /* 44 — lectura protagonista */
+  --fs-read-l:  1.5rem;    /* 24 — lectura en tarjeta */
+  --fs-read-m:  1rem;      /* 16 — lectura en tabla */
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700;
+
+  /* ---------- Espaciado (base 4) ---------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px; --sp-5: 20px;
+  --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px; --sp-16: 64px;
+
+  /* ---------- Forma: el radio comunica jerarquía, no es uniforme ---------- */
+  --r-chip:  999px; /* insignias de estado */
+  --r-ctrl:  6px;   /* botones, campos */
+  --r-panel: 10px;  /* paneles de contenido */
+  --r-sheet: 14px;  /* diálogos y hojas flotantes */
+  --shadow-float: 0 10px 30px rgba(26, 30, 36, 0.12), 0 2px 6px rgba(26, 30, 36, 0.06); /* solo flotantes */
+
+  /* ---------- Movimiento ---------- */
+  --dur-fast: 120ms; --dur: 180ms; --ease: cubic-bezier(.2,.7,.2,1);
+
+  /* ---------- Layout ---------- */
+  --rail-w: 232px; --rail-w-collapsed: 68px; --topbar-h: 56px; --content-max: 1360px;
+}
+
+/* ---------- Modo sala de control (oscuro, ×1,35) ---------- */
+[data-theme="sala"] {
+  --bg:            #0F1216;
+  --surface:       #171B21;
+  --surface-2:     #1E232B;
+  --surface-sunk:  #0B0E11;
+  --border:        #2B323C;
+  --border-strong: #3A4350;
+  --text:          #E7EAEE;
+  --text-2:        #A6AFBA;
+  --text-3:        #8790A0;
+  --accent:        #7FB2E5;
+  --accent-hover:  #A3C8EE;
+  --accent-soft:   #1B2B3D;
+  --accent-text:   #0F1216;
+  --rail-bg:       #0B0E11;
+  --chart-measured: #E7EAEE;
+  --chart-expected: #7FB2E5;
+  --chart-band:     rgba(127, 178, 229, 0.18);
+  --chart-grid:     #252B34;
+
+  --st-normal:  #3FB97F; --st-normal-soft:  #12291F; --st-normal-ink:  #7DDCAE;
+  --st-vigilar: #E8B12B; --st-vigilar-soft: #2E2410; --st-vigilar-ink: #F5CF6E;
+  --st-actuar:  #F58444; --st-actuar-soft:  #331B0E; --st-actuar-ink:  #FFB085;
+  --st-evacuar: #FF5D5D; --st-evacuar-soft: #3A1214; --st-evacuar-ink: #FF9C9C;
+  --st-sindatos:#8790A0; --st-sindatos-soft:#1E232B; --st-sindatos-ink:#B8C0CC;
+
+  font-size: 135%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur: 0ms; }
+}

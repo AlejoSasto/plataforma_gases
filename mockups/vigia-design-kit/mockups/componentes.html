@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Componentes | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html" aria-current="page"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">AR</div><div class="rail__who"><strong>Ana Rojas</strong><span>Supervisora de seguridad</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<div class="page-head"><div class="page-head__text"><h1>Componentes</h1><p>Catálogo vivo. En la app vive en /_componentes (solo entorno local) y es la base de las capturas de regresión visual.</p></div></div>
+<div class="stack">
+<section class="panel"><div class="panel__head"><h2>Estados</h2></div><div class="panel__body" style="display:flex;gap:10px;flex-wrap:wrap">
+  <span class="status status--normal"><i data-icon="circle-check"></i>Normal</span>
+  <span class="status status--vigilar"><i data-icon="eye"></i>Vigilar</span>
+  <span class="status status--actuar"><i data-icon="triangle-alert"></i>Actuar ya</span>
+  <span class="status status--evacuar"><i data-icon="siren"></i>Evacuar</span>
+  <span class="status status--sindatos"><i data-icon="circle-dashed"></i>Sin datos</span>
+  <span class="status status--actuar status--lg"><i data-icon="triangle-alert"></i>Actuar ya</span>
+</div></section>
+<section class="panel"><div class="panel__head"><h2>Botones</h2></div><div class="panel__body" style="display:flex;gap:10px;flex-wrap:wrap">
+  <button class="btn btn--primary">Cerrar aviso</button><button class="btn">Ya lo vi</button><button class="btn btn--quiet">Cancelar</button><button class="btn btn--danger">Evacuar zona</button><button class="btn btn--primary btn--lg">Ingresar</button>
+</div></section>
+<section class="panel"><div class="panel__head"><h2>Lecturas</h2></div><div class="panel__body">
+  <dl class="readings"><div><dt>Ahora</dt><dd>0,72 <small>%</small></dd></div><div><dt>Esperado en 10 min</dt><dd>1,05 <small>%</small></dd></div><div class="is-limit"><dt>Límite para actuar</dt><dd>1,0 <small>%</small></dd></div></dl>
+</div></section>
+<section class="panel"><div class="panel__head"><h2>Estados vacíos e ilustraciones</h2></div><div class="panel__body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+  <div class="empty"><img src="assets/img/vacio-despejado.svg" alt=""><h3>No hay avisos abiertos</h3><p>Todas las zonas están normales. Te avisaremos aquí si algo cambia.</p></div>
+  <div class="empty"><img src="assets/img/sensor-sin-datos.svg" alt=""><h3>Este sensor no envía datos</h3><p>Última lectura hace 14 min. Revisa la conexión o la batería.</p><button class="btn">Ver último dato</button></div>
+  <div class="empty"><img src="assets/img/error-galeria.svg" alt=""><h3>Esta página no existe</h3><p>Puede que el enlace esté mal escrito o que la página se haya movido.</p><a class="btn btn--primary" href="hoy.html">Volver a Hoy</a></div>
+</div></section>
+</div>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html" aria-current="page"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

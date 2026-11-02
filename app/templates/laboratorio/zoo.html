@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "partials/_metric_gate.html" import gate_badge %}
+{% block page_title %}Laboratorio{% endblock %}
+{% block content %}
+<div class="tech-banner">{{ copy.LAB_BADGE }}. {{ copy.TECHNICAL_NOTE }}</div>
+<header class="page-header">
+  <div>
+    <h1>Catálogo de modelos</h1>
+    <p class="page-subtitle">Métricas, umbrales thesis y estado de promoción.</p>
+  </div>
+  <div class="row-flex">
+    <a class="btn btn-ghost" href="/laboratorio/comparar">Comparar</a>
+    <a class="btn" href="/laboratorio/entrenar">Entrenar</a>
+  </div>
+</header>
+<div class="card">
+  <table id="models-table">
+    <thead>
+      <tr>
+        <th>Nombre</th><th>Algoritmo</th><th>Estado</th><th>Familia</th><th>Métricas</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for m in models %}
+      <tr data-family="{{ m.family or '' }}" data-status="{{ m.status }}">
+        <td><a href="/laboratorio/modelos/{{ m.id }}">{{ m.name }} v{{ m.version }}</a></td>
+        <td>{{ m.algorithm }}</td>
+        <td>{{ m.status }}</td>
+        <td>{{ m.family or "—" }}</td>
+        <td class="help">{{ m.metrics }}</td>
+        <td>
+          {% if can_promote and m.status != 'production' %}
+          <button class="btn btn-ghost" type="button" data-promote="{{ m.id }}">Promover</button>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="muted">Sin modelos registrados</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/zoo.js"></script>
+{% endblock %}

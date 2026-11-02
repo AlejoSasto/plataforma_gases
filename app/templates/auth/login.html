@@ -1,54 +1,44 @@
 {% extends "base.html" %}
+{% from "components/macros.html" import icon %}
+{% block title %}{{ copy.LOGIN_TITLE }}{% endblock %}
 {% block body %}
-<div class="login-page">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-5 col-lg-4">
-        <div class="text-center mb-4">
-          <div class="login-brand">Plataforma Gases</div>
-          <p class="text-secondary mb-0 mt-2">Prevención predictiva de gases · horizonte 5–10 min</p>
-        </div>
-        <div class="login-card">
-          <form id="login-form" class="vstack gap-3">
-            <div>
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control form-control-lg" id="email" name="email" required autocomplete="username">
-            </div>
-            <div>
-              <label for="password" class="form-label">Contraseña</label>
-              <input type="password" class="form-control form-control-lg" id="password" name="password" required autocomplete="current-password">
-            </div>
-            <div id="error" class="alert alert-danger d-none py-2 mb-0" role="alert"></div>
-            <button type="submit" class="btn btn-primary btn-lg w-100">Iniciar sesión</button>
-            <p class="small text-secondary text-center mb-0 mt-1">
-              <span title="Fase futura">¿Olvidaste tu contraseña?</span>
-            </p>
-          </form>
+<main class="login">
+  <section class="login__art" aria-label="{{ copy.BRAND }}">
+    <img class="hero" src="/static/img/login-hero.svg" alt="">
+    <div class="login__brand"><img src="/static/img/isotipo.svg" alt=""><strong>{{ copy.BRAND }}</strong></div>
+    <p class="login__claim">{{ copy.LOGIN_SUB }}</p>
+    <div class="login__status"><span class="dot-live" aria-hidden="true"></span>{{ copy.LOGIN_STATUS }}</div>
+  </section>
+  <section class="login__form">
+    <form id="login-form" class="login__box" method="post" action="/ingresar" autocomplete="on">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div>
+        <h1>{{ copy.LOGIN_TITLE }}</h1>
+        <p class="muted" style="margin-top:6px">{{ copy.LOGIN_HINT }}</p>
+      </div>
+      <div id="error" class="form-error{% if not error %} hidden{% endif %}" role="alert">{{ icon("info") }}<span>{{ error or "" }}</span></div>
+      <div class="field">
+        <label for="email">Correo</label>
+        <input class="input" type="email" id="email" name="email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <div class="field__pw">
+          <input class="input" type="password" id="password" name="password" required autocomplete="current-password">
+          <button class="btn btn--quiet" type="button" id="toggle-pass">{{ copy.SHOW_PASSWORD }}</button>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+      <label class="check"><input type="checkbox" id="keep" name="keep" value="on"> {{ copy.KEEP_SESSION }}</label>
+      <div id="totp-box" class="{% if not show_totp %}hidden{% endif %}">
+        <label for="totp">{{ copy.LOGIN_TOTP }}</label>
+        <input class="input" id="totp" name="totp" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+      </div>
+      <button class="btn btn--primary btn--lg btn--block" type="submit">{{ copy.LOGIN_CTA }}</button>
+      <a href="/recuperar" style="justify-self:center">{{ copy.FORGOT }}</a>
+    </form>
+  </section>
+</main>
 {% endblock %}
 {% block scripts %}
-<script>
-  document.getElementById("login-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const errorEl = document.getElementById("error");
-    errorEl.classList.add("d-none");
-    try {
-      await PG.api("/auth/login", {
-        method: "POST",
-        body: {
-          email: document.getElementById("email").value,
-          password: document.getElementById("password").value,
-        },
-      });
-      window.location.href = "/";
-    } catch (err) {
-      errorEl.textContent = (err.data && err.data.message) || "Credenciales inválidas";
-      errorEl.classList.remove("d-none");
-    }
-  });
-</script>
+<script src="/static/js/login.js"></script>
 {% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block page_title %}Entrenar{% endblock %}
+{% block content %}
+<div class="lab-banner">{{ copy.LAB_BADGE }}</div>
+<h1>Nuevo entrenamiento</h1>
+<div class="card" style="max-width: 40rem">
+  <form id="train-form" class="stack">
+    <label for="dataset_version">Dataset</label>
+    <input id="dataset_version" value="gas_readings">
+    <label for="scope">Scope</label>
+    <input id="scope" value="global">
+    <label for="task">Tarea</label>
+    <select id="task">
+      <option value="classification">Clasificación</option>
+      <option value="regression">Regresión</option>
+      <option value="both" selected>Ambas</option>
+    </select>
+    <fieldset>
+      <legend>Algoritmos</legend>
+      {% for a in ["logistic_regression","decision_tree","random_forest","svm","mlp","xgboost","lstm","gru","transformer"] %}
+      <label><input class="algo" type="checkbox" value="{{ a }}" {% if a in ["random_forest","xgboost"] %}checked{% endif %}> {{ a }}</label>
+      {% endfor %}
+    </fieldset>
+    <button class="btn" type="submit">Lanzar entrenamiento</button>
+    <p id="train-msg" class="help"></p>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/train.js"></script>
+{% endblock %}

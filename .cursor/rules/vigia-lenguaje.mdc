@@ -1,0 +1,18 @@
+---
+description: Lenguaje natural no técnico en vistas operativas. Aplicar a templates, copy.py y textos de avisos.
+globs: app/templates/**/*.html, app/shared/copy.py, app/modules/alerts/**/*.py, ml_core/forecasting/explain/**/*.py
+alwaysApply: false
+---
+# Lenguaje de Vigía
+
+La plataforma la usan operadores, supervisores y gerencia. No son expertos en IA.
+
+- Todos los textos visibles salen de `app/shared/copy.py`. No escribir textos en el template.
+- Vistas operativas (todo salvo `/laboratorio/*`, `/datos/calidad`, `/_componentes`): prohibidos los términos de `copy.FORBIDDEN_TERMS` (modelo, algoritmo, predicción, probabilidad, cuantil, percentil, recall, precisión, F1, RMSE, MAE, MASE, dataset, entrenamiento, staging, production, threshold, lead time, ML, IA, transformer, LSTM, TFT, ETL, JSON, API, ID).
+- Equivalencias: pronóstico → "lo que viene"; q50 → "se espera alrededor de"; q10–q90 → "podría estar entre"; probabilidad → "posibilidad alta, media o baja"; recall → "de cada 10 situaciones, avisó a tiempo en N"; lead time → "avisa N minutos antes"; falsos positivos → "avisos innecesarios por turno".
+- Estados: Normal, Vigilar, Actuar ya, Evacuar, Sin datos (exactamente así).
+- Frases cortas, en presente, con verbo de acción. Primero qué pasa, luego la cifra. Sin culpar a nadie.
+- Botones dicen lo que hacen y la confirmación repite el verbo: "Cerrar aviso" → "Aviso cerrado".
+- Errores: qué pasó y cómo resolverlo, sin disculpas ni vaguedades.
+- Números en es-CO (coma decimal), hora de 24 h de Bogotá, unidad después del número.
+- El Laboratorio sí usa términos técnicos y lleva el banner "Área técnica".

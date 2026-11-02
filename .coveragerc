@@ -1,0 +1,14 @@
+[run]
+relative_files = true
+omit =
+    */.venv/*
+    */tests/*
+
+[report]
+include =
+    ml_core/forecasting/decision.py
+    ml_core/validation/*
+    app/shared/access.py
+show_missing = true
+fail_under = 95
+skip_empty = true

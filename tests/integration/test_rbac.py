@@ -48,21 +48,21 @@ def test_admin_creates_user_and_assigns_role(
     roles_res = client.get("/api/roles")
     assert roles_res.status_code == 200
     roles = {r["name"]: r["id"] for r in roles_res.json()}
-    assert "operador_mina" in roles
+    assert "operador" in roles
 
     email = f"nuevo.operador.{uuid.uuid4().hex[:8]}@example.com"
     create_res = client.post(
         "/api/users",
         json={
             "email": email,
-            "password": "NuevoPass123!",
+            "password": "ClaveOperativa456!",
             "full_name": "Nuevo Operador",
-            "role_ids": [roles["operador_mina"]],
+            "role_ids": [roles["operador"]],
         },
     )
     assert create_res.status_code == 201
     created = create_res.json()
-    assert created["roles"] == ["operador_mina"]
+    assert created["roles"] == ["operador"]
     assert "password" not in created
     assert "password_hash" not in created
 
@@ -70,13 +70,13 @@ def test_admin_creates_user_and_assigns_role(
     client.post("/auth/logout")
     login2 = client.post(
         "/auth/login",
-        json={"email": email, "password": "NuevoPass123!"},
+        json={"email": email, "password": "ClaveOperativa456!"},
     )
     assert login2.status_code == 200
     me = client.get("/auth/me")
     assert me.status_code == 200
     me_body = me.json()
-    assert "operador_mina" in me_body["roles"]
+    assert "operador" in me_body["roles"]
     assert "alerts.view" in me_body["permissions"]
     assert "users.manage" not in me_body["permissions"]
 
@@ -85,5 +85,5 @@ def test_admin_creates_user_and_assigns_role(
         a.action
         for a in db.query(AuditLog).order_by(AuditLog.id.desc()).limit(20).all()
     }
-    assert "login" in actions
+    assert "auth.login_ok" in actions or "login" in actions
     assert "user.create" in actions

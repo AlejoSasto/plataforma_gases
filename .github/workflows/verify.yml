@@ -1,0 +1,44 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: proyecto_gases
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/proyecto_gases
+      TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/proyecto_gases_test
+      JWT_SECRET: ci-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python scripts/ensure_test_db.py
+      - name: verify
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python scripts/verify.py --full
+          else
+            python scripts/verify.py --fast
+          fi

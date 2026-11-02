@@ -16,8 +16,13 @@ class Settings(BaseSettings):
     )
     jwt_secret: str = "cambiame-en-produccion"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
-    refresh_token_expire_days: int = 7
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 1
+    refresh_token_expire_hours: int = 8
+    login_max_attempts: int = 5
+    login_lock_minutes: int = 15
+    login_rate_limit: int = 20
+    login_rate_window_seconds: int = 60
     environment: Literal["local", "prod"] = "local"
     mlflow_tracking_uri: str = "http://localhost:5000"
     gcs_bucket: Optional[str] = None

@@ -1,0 +1,15 @@
+{
+  "dt_p50_min_priority_max": 5.7708,
+  "dt_p50_min_by_gas": {
+    "CH4": 5.7708,
+    "CO": 2.5375,
+    "H2S": 1.0
+  },
+  "band": "medium",
+  "horizons_min": [
+    6,
+    12,
+    18
+  ],
+  "note": "2 < Δt ≤ 10 min (Δt=5.77). Horizontes = 1, 2 y 3 pasos. Solicitar al proveedor el export de datalog por intervalo."
+}

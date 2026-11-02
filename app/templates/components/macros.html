@@ -1,0 +1,158 @@
+{% macro icon(name, size=20) -%}
+{% set aliases = {
+  'sun': 'house', 'map': 'map-pinned', 'bar-chart-3': 'gauge',
+  'clipboard-check': 'check', 'contact': 'users', 'user': 'users',
+  'menu': 'sliders-horizontal', 'sin_datos': 'circle-dashed'
+} %}
+{% set ico = aliases.get(name, name) %}
+<svg class="ico" width="{{ size }}" height="{{ size }}" aria-hidden="true"><use href="/static/icons/sprite.svg#i-{{ ico }}"></use></svg>
+{%- endmacro %}
+
+{% macro status_badge(level, size="md") -%}
+{% set key = level|status_key %}
+{% set css_level = 'sindatos' if key == 'sin_datos' else key %}
+<span class="status status--{{ css_level }}{% if size == 'lg' %} status--lg{% endif %}">{{ icon(key|status_icon, 15) }} {{ key|status_word }}</span>
+{%- endmacro %}
+
+{% macro status_banner(summary, level='normal') -%}
+{% set key = level|status_key %}
+{% set css_level = 'sindatos' if key == 'sin_datos' else key %}
+<section class="state-line state-line--{{ css_level }}" role="status" aria-live="polite">
+  <div class="state-line__icon">{{ icon(key|status_icon, 28) }}</div>
+  <div>
+    <h1>{{ summary }}</h1>
+  </div>
+</section>
+{%- endmacro %}
+
+{% macro page_header(title, subtitle='', actions='') -%}
+<header class="page-head">
+  <div class="page-head__text">
+    <h1>{{ title }}</h1>
+    {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+  </div>
+  {% if actions %}<div class="page-head__actions">{{ actions }}</div>{% endif %}
+</header>
+{%- endmacro %}
+
+{% macro gas_tile(gas, now, next, unit='%') -%}
+<div class="card">
+  <div class="muted">{{ gas }}</div>
+  <div class="metric-big">
+    <span class="label">Ahora</span>
+    <span class="reading num-lg">{{ now }}</span>
+  </div>
+  <p class="muted">{{ next }}</p>
+</div>
+{%- endmacro %}
+
+{% macro zone_card(zone) -%}
+<a class="card stretched" href="{{ zone.href }}">
+  <div class="row-flex" style="justify-content:space-between">
+    <strong>{{ zone.site_name }}</strong>
+    {{ status_badge(zone.status_key) }}
+  </div>
+  <p class="muted">{{ zone.gas_type }} · {{ zone.sensor_code }}</p>
+  {{ gas_tile(zone.gas_type, zone.now_txt, zone.next_txt) }}
+</a>
+{%- endmacro %}
+
+{% macro alert_card(alert, can_resolve=false) -%}
+{% set key = alert.status_key|status_key %}
+{% set css_level = 'sindatos' if key == 'sin_datos' else key %}
+<article class="alert-item alert-item--{{ css_level }}">
+  <div class="alert-item__top">
+    {{ status_badge(alert.status_key) }}
+    <time>{{ alert.created_at or "" }}</time>
+  </div>
+  <h3>{{ alert.title }}</h3>
+  <p>{{ alert.headline }}</p>
+  <p class="faint">{{ alert.now }} · {{ alert.expected }} · {{ alert.limit }}</p>
+  {{ explain_block(alert.why) }}
+  {{ action_block(alert.action) }}
+  <div class="alert-item__actions">
+    {% if can_resolve and alert.status == 'abierta' %}
+    <button class="btn" type="button" data-ack="{{ alert.id }}">{{ copy.ACK }}</button>
+    {% endif %}
+    <a class="btn" href="{{ alert.href }}">{{ alert.detail }}</a>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro explain_block(explanation) -%}
+{% if explanation %}
+<p>{{ explanation }}</p>
+{% endif %}
+{%- endmacro %}
+
+{% macro action_block(recommendation) -%}
+{% if recommendation %}
+<p><strong>{{ recommendation }}</strong></p>
+{% endif %}
+{%- endmacro %}
+
+{% macro metric_big(value, label, help='') -%}
+<div class="card metric-big">
+  <span class="label">{{ label }}</span>
+  <span class="reading num-lg">{{ value }}</span>
+  {% if help %}<p class="help">{{ help }}</p>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro chart(kind, data_url='', data_json=none) -%}
+<div class="chart"
+     data-chart="{{ kind }}"
+     {% if data_url %}data-url="{{ data_url }}"{% endif %}
+     {% if data_json %}data-payload='{{ data_json | tojson }}'{% endif %}></div>
+{%- endmacro %}
+
+{% macro empty_state(icon_name, title, text, action_href='', action_label='', image='') -%}
+<div class="empty">
+  {% if image %}
+  <img src="{{ image }}" alt="">
+  {% elif icon_name in ('circle-check', 'bell') %}
+  <img src="/static/img/vacio-despejado.svg" alt="">
+  {% elif icon_name in ('circle-dashed', 'sensor') %}
+  <img src="/static/img/sensor-sin-datos.svg" alt="">
+  {% else %}
+  <img src="/static/img/vacio-despejado.svg" alt="">
+  {% endif %}
+  <h2>{{ title }}</h2>
+  <p>{{ text }}</p>
+  {% if action_href %}
+  <a class="btn btn--primary" href="{{ action_href }}">{{ action_label }}</a>
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro data_table(columns, rows) -%}
+<table class="table">
+  <thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+  {% else %}
+    <tr><td colspan="{{ columns|length }}" class="muted">Sin filas</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% macro filter_bar() -%}
+<div class="filters">{{ caller() }}</div>
+{%- endmacro %}
+
+{% macro confirm_dialog(dialog_id, title, body, confirm_label='Confirmar') -%}
+<dialog id="{{ dialog_id }}">
+  <h2>{{ title }}</h2>
+  <p>{{ body }}</p>
+  <form method="dialog" class="row-flex">
+    <button class="btn btn--quiet" value="cancel">Cancelar</button>
+    <button class="btn btn--primary" value="ok">{{ confirm_label }}</button>
+  </form>
+</dialog>
+{%- endmacro %}
+
+{% macro toast(message) -%}
+<div class="toast" role="status">{{ icon("check", 18) }} {{ message }}</div>
+{%- endmacro %}

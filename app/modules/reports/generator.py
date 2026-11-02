@@ -1,7 +1,7 @@
 """Generadores de reportes PDF (ReportLab) y Excel (openpyxl).
 
-Paleta alineada con theme.css (Plan 07):
-  primary #0E9F6E, info #0EA5E9, risk colors.
+Paleta alineada con tokens de interfaz (Plan 18):
+  accent #1E3A5F, estados operativo.
 """
 
 from __future__ import annotations
@@ -31,11 +31,11 @@ from app.modules.ml_training.repository import get_model, list_models
 from app.modules.sensors_ingestion.models import GasReading, Sensor
 from app.modules.stakeholders.service import alert_ids_visible_to_user
 
-PRIMARY = colors.HexColor("#0E9F6E")
-INFO = colors.HexColor("#0EA5E9")
-TEXT = colors.HexColor("#111827")
-MUTED = colors.HexColor("#6B7280")
-HEADER_BG = colors.HexColor("#ECFDF5")
+PRIMARY = colors.HexColor("#1E3A5F")
+INFO = colors.HexColor("#3B82F6")
+TEXT = colors.HexColor("#14181F")
+MUTED = colors.HexColor("#5A6472")
+HEADER_BG = colors.HexColor("#E8EEF6")
 RISK_COLORS = {
     "NORMAL": colors.HexColor("#16A34A"),
     "PRECAUCION": colors.HexColor("#F59E0B"),

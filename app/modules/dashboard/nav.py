@@ -16,11 +16,13 @@ def template_context(user: User, *, title: str = "", active_nav: str = "") -> di
 
 
 def home_path_for_user(user: User) -> str:
-    roles = set(user.role_names)
-    if "interesado" in roles and "admin" not in roles:
-        return "/executive"
-    if "ingeniero_datos" in roles and "admin" not in roles and "operador_mina" not in roles:
+    from app.shared.access import canonical_role
+
+    roles = {canonical_role(r) for r in user.role_names}
+    if "gerencia" in roles and "admin" not in roles:
+        return "/resumen"
+    if "analista" in roles and "admin" not in roles and "operador" not in roles:
         return "/?view=ingeniero"
-    if "auditor" in roles and "admin" not in roles and "operador_mina" not in roles:
-        return "/audit"
+    if "auditor" in roles and "admin" not in roles and "operador" not in roles:
+        return "/bitacora"
     return "/"

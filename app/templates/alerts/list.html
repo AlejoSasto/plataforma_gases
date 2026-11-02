@@ -1,58 +1,46 @@
 {% extends "base.html" %}
-{% block page_title %}Bandeja de alertas{% endblock %}
+{% from "components/macros.html" import page_header, alert_card, empty_state, filter_bar %}
+{% block page_title %}Avisos{% endblock %}
 {% block content %}
-<div class="page-header">
+{{ page_header("Avisos", "Qué está pasando y qué hay que hacer.") }}
+<nav class="tabs" aria-label="Estado de avisos">
+  <a class="{% if status == 'abierta' %}active{% endif %}" href="/avisos?status=abierta">Abiertos</a>
+  <a class="{% if status == 'reconocida' %}active{% endif %}" href="/avisos?status=reconocida">Vistos</a>
+  <a class="{% if status == 'resuelta' %}active{% endif %}" href="/avisos?status=resuelta">Cerrados</a>
+</nav>
+{% call filter_bar() %}
+<form method="get" class="row-flex">
+  <input type="hidden" name="status" value="{{ status }}">
   <div>
-    <p class="page-subtitle mb-0">Filtra y gestiona alertas abiertas, reconocidas y resueltas.</p>
-  </div>
-</div>
-
-<form class="filters-bar" method="get">
-  <div>
-    <label class="form-label">Estado</label>
-    <select name="status" class="form-select" style="min-width: 9rem;">
+    <label for="level">Nivel</label>
+    <select name="level" id="level">
       <option value="">Todos</option>
-      {% for s in ["abierta", "reconocida", "resuelta"] %}
-      <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+      {% for lv in [("vigilar","Vigilar"),("actuar","Actuar ya"),("evacuar","Evacuar"),("PRECAUCION","Vigilar"),("ALERTA","Actuar ya"),("CRITICO","Evacuar")] %}
+      <option value="{{ lv[0] }}" {% if level == lv[0] %}selected{% endif %}>{{ lv[1] }}</option>
       {% endfor %}
     </select>
   </div>
   <div>
-    <label class="form-label">Nivel</label>
-    <select name="level" class="form-select" style="min-width: 9rem;">
-      <option value="">Todos</option>
-      {% for lv in ["PRECAUCION", "ALERTA", "CRITICO"] %}
-      <option value="{{ lv }}" {% if level == lv %}selected{% endif %}>{{ lv }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div>
-    <label class="form-label">Sitio</label>
-    <select name="site_id" class="form-select" style="min-width: 12rem;">
-      <option value="">Todos</option>
+    <label for="site_id">Zona</label>
+    <select name="site_id" id="site_id">
+      <option value="">Todas</option>
       {% for s in sites %}
       <option value="{{ s.id }}" {% if site_id|string == s.id|string %}selected{% endif %}>{{ s.name }}</option>
       {% endfor %}
     </select>
   </div>
-  <div>
-    <button class="btn btn-primary" type="submit">Filtrar</button>
-  </div>
+  <button class="btn" type="submit">Filtrar</button>
 </form>
+{% endcall %}
 
-{% with alerts=alerts, empty_message="No hay alertas con estos filtros" %}
-{% include "partials/_alerts_table.html" %}
-{% endwith %}
-
-<nav class="mt-3" aria-label="Paginación">
-  <ul class="pagination pagination-sm mb-0">
-    {% if page > 1 %}
-    <li class="page-item"><a class="page-link" href="?page={{ page - 1 }}&status={{ status }}&level={{ level }}&site_id={{ site_id }}">Anterior</a></li>
-    {% endif %}
-    <li class="page-item disabled"><span class="page-link">Pág. {{ page }} · {{ total }} total</span></li>
-    {% if page * page_size < total %}
-    <li class="page-item"><a class="page-link" href="?page={{ page + 1 }}&status={{ status }}&level={{ level }}&site_id={{ site_id }}">Siguiente</a></li>
-    {% endif %}
-  </ul>
-</nav>
+{% if alerts %}
+<div class="stack">
+  {% for a in alerts %}
+    {{ alert_card(a, can_resolve) }}
+  {% endfor %}
+</div>
+{% else %}
+  {{ empty_state("bell-off", copy.EMPTY_ALERTS_TITLE, copy.EMPTY_ALERTS_TEXT) }}
+{% endif %}
+<p class="help">Pág. {{ page }} · {{ total }} avisos</p>
 {% endblock %}

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoja de marca | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  body { background: var(--bg); }
+  .sheet { max-width: 1280px; margin: 0 auto; padding: 48px; display: grid; gap: 28px; }
+  .sheet h1 { font-size: 2.5rem; font-stretch: 86%; }
+  .sheet > p { color: var(--text-2); max-width: 70ch; }
+  .row { display: grid; gap: 20px; }
+  .row-2 { grid-template-columns: 1.2fr 1fr; }
+  .row-3 { grid-template-columns: repeat(3, 1fr); }
+  .lockup { display: flex; align-items: center; gap: 18px; padding: 40px; border-radius: var(--r-panel); }
+  .lockup img { width: 72px; height: 72px; }
+  .lockup strong { font-size: 3.25rem; font-stretch: 86%; font-weight: 700; line-height: 1; letter-spacing: 0.005em; }
+  .lockup span { display: block; font-size: 1rem; margin-top: 6px; }
+  .lockup--dark { background: var(--c-antracita); color: #fff; } .lockup--dark span { color: #9AA4B1; }
+  .lockup--light { background: #fff; border: 1px solid var(--border); } .lockup--light span { color: var(--text-2); }
+  .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  .sw { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: #fff; }
+  .sw div { height: 84px; }
+  .sw p { padding: 10px 12px; font-size: 13px; line-height: 1.35; }
+  .sw b { display: block; font-size: 14px; }
+  .sw code { font-family: var(--font-tech); font-size: 12px; color: var(--text-2); }
+  .states { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .st { border-radius: 10px; padding: 14px; display: grid; gap: 8px; }
+  .st small { font-family: var(--font-tech); font-size: 11.5px; }
+  .type { display: grid; gap: 14px; padding: 28px; }
+  .type .meta { font-size: 13px; color: var(--text-3); }
+  .t-display { font-size: 2.5rem; line-height: 1.1; font-weight: 650; font-stretch: 88%; }
+  .t-h1 { font-size: 1.875rem; font-weight: 600; font-stretch: 88%; }
+  .t-body { font-size: 1rem; max-width: 60ch; }
+  .t-read { font-size: 2.75rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .t-tech { font-family: var(--font-tech); font-size: 14px; }
+  .illus { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .illus figure { margin: 0; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px; text-align: center; }
+  .illus img { width: 100%; height: 140px; object-fit: contain; }
+  .illus figcaption { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+  .hero-tile { border-radius: 10px; overflow: hidden; height: 100%; min-height: 300px; background: #13171C; }
+  .hero-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div>
+    <h1>Vigía, hoja de marca</h1>
+    <p style="margin-top:8px">Identidad para la plataforma de monitoreo y pronóstico de gases. Nace de la mina: estratos de roca y mantos de carbón, el azul del aire fresco en los planos de ventilación y la luz de la lámpara del minero. El color fuerte se reserva para el estado de los gases.</p>
+  </div>
+
+  <div class="row row-2">
+    <div class="row">
+      <div class="lockup lockup--dark"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></div>
+      <div class="lockup lockup--light"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></div>
+    </div>
+    <div class="hero-tile"><img src="assets/img/login-hero.svg" alt="Ilustración del corte de la mina"></div>
+  </div>
+
+  <section class="panel"><div class="panel__head"><h2>Paleta base</h2><span class="faint">Nombres tomados de la mina</span></div><div class="panel__body">
+    <div class="swatches">
+      <div class="sw"><div style="background:#1A1E24"></div><p><b>Antracita</b><code>#1A1E24</code><br>Texto principal y riel</p></div>
+      <div class="sw"><div style="background:#4A525E"></div><p><b>Pizarra</b><code>#4A525E</code><br>Texto secundario</p></div>
+      <div class="sw"><div style="background:#5F6772"></div><p><b>Estéril</b><code>#5F6772</code><br>Ayudas y horas</p></div>
+      <div class="sw"><div style="background:#DCE0E3"></div><p><b>Entibado</b><code>#DCE0E3</code><br>Líneas y bordes</p></div>
+      <div class="sw"><div style="background:#EEF0EF"></div><p><b>Polvo de roca</b><code>#EEF0EF</code><br>Fondo general</p></div>
+      <div class="sw"><div style="background:#1C5A8E"></div><p><b>Aire fresco</b><code>#1C5A8E</code><br>Acción principal</p></div>
+    </div>
+  </div></section>
+
+  <section class="panel"><div class="panel__head"><h2>Estados de los gases</h2><span class="faint">Siempre con color, ícono y palabra</span></div><div class="panel__body">
+    <div class="states">
+      <div class="st" style="background:var(--st-normal-soft);color:var(--st-normal-ink)"><span class="status status--normal" style="background:#fff"><i data-icon="circle-check"></i>Normal</span><small>#1F8A5B · #E5F3EC</small></div>
+      <div class="st" style="background:var(--st-vigilar-soft);color:var(--st-vigilar-ink)"><span class="status status--vigilar" style="background:#fff"><i data-icon="eye"></i>Vigilar</span><small>#B97E00 · #FBF0D6</small></div>
+      <div class="st" style="background:var(--st-actuar-soft);color:var(--st-actuar-ink)"><span class="status status--actuar" style="background:#fff"><i data-icon="triangle-alert"></i>Actuar ya</span><small>#D2581A · #FCE7DA</small></div>
+      <div class="st" style="background:var(--st-evacuar-soft);color:var(--st-evacuar-ink)"><span class="status status--evacuar"><i data-icon="siren"></i>Evacuar</span><small>#C1262E · #FAE3E4</small></div>
+      <div class="st" style="background:var(--st-sindatos-soft);color:var(--st-sindatos-ink)"><span class="status status--sindatos" style="background:#fff"><i data-icon="circle-dashed"></i>Sin datos</span><small>#7D8590 · #ECEEF0</small></div>
+    </div>
+  </div></section>
+
+  <div class="row row-2">
+    <section class="panel type">
+      <span class="meta">Archivo, semicondensada al 88 %. Frase de estado, 40 px, peso 650</span>
+      <p class="t-display">Dos zonas necesitan atención</p>
+      <span class="meta">Título de página, 30 px, peso 600</span>
+      <p class="t-h1">Metano en Frente 3 Sur</p>
+      <span class="meta">Cuerpo, 16 px sobre 24 px</span>
+      <p class="t-body">El metano viene subiendo sin pausa desde hace 20 minutos y el monóxido en la misma zona también aumentó.</p>
+    </section>
+    <section class="panel type">
+      <span class="meta">Lecturas: Archivo, cifras tabulares, peso 600</span>
+      <p class="t-read">0,72 %</p>
+      <span class="meta">Área técnica únicamente: IBM Plex Mono</span>
+      <p class="t-tech">MASE 0,74 · RMSE 0,031 · recall 0,94</p>
+    </section>
+  </div>
+
+  <section class="panel"><div class="panel__head"><h2>Ilustraciones</h2><span class="faint">Línea simple, materiales de la mina, un solo acento</span></div><div class="panel__body">
+    <div class="illus">
+      <figure><img src="assets/img/vacio-despejado.svg" alt=""><figcaption>Sin avisos: galería despejada</figcaption></figure>
+      <figure><img src="assets/img/sensor-sin-datos.svg" alt=""><figcaption>Sensor sin señal</figcaption></figure>
+      <figure><img src="assets/img/error-galeria.svg" alt=""><figcaption>Página no encontrada</figcaption></figure>
+    </div>
+  </div></section>
+</main>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

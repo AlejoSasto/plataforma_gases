@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confiabilidad | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html" aria-current="page"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">GM</div><div class="rail__who"><strong>Gloria Moreno</strong><span>Gerencia</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<div class="page-head">
+  <div class="page-head__text"><h1>¿Qué tan confiable es el sistema?</h1>
+  <p>Comparamos cada aviso con lo que los sensores marcaron después. Así sabemos si el sistema avisó a tiempo, cuánto antes lo hizo y cuántas veces avisó sin necesidad.</p></div>
+  <div class="page-head__actions"><select class="select" aria-label="Periodo"><option>Últimos 3 meses</option></select><button class="btn"><i data-icon="download"></i>Informe para gerencia</button></div>
+</div>
+
+<div class="trust-grid">
+  <section class="panel trust">
+    <p class="trust__q">¿Avisó a tiempo cuando hubo peligro?</p>
+    <p class="trust__a">De cada 10 situaciones de riesgo, avisó a tiempo en <span class="reading">9</span></p>
+    <div class="of-ten" data-of-ten="9" role="img" aria-label="9 de cada 10"></div>
+    <p class="faint">Basado en 34 situaciones en las que un gas llegó al límite para actuar.</p>
+  </section>
+  <section class="panel trust">
+    <p class="trust__q">¿Con cuánta anticipación?</p>
+    <p class="trust__a">Avisa, en la mitad de los casos, <span class="reading">7</span> minutos antes o más</p>
+    <div><div class="lead-bar"><span style="width:70%"></span></div><div class="lead-scale"><span>0 min</span><span>5</span><span>10 min</span></div></div>
+    <p class="faint">En el 10 % de los casos con menos margen, avisó con 3 minutos.</p>
+  </section>
+  <section class="panel trust">
+    <p class="trust__q">¿Cuántas veces avisa sin necesidad?</p>
+    <p class="trust__a">Menos de <span class="reading">1</span> aviso innecesario por turno</p>
+    <dl class="readings" style="grid-template-columns:1fr 1fr"><div><dt>Por turno</dt><dd>0,6</dd></div><div><dt>Meta</dt><dd>1,0</dd></div></dl>
+    <p class="faint">Un aviso es innecesario si el gas no llegó al límite en los 15 minutos siguientes.</p>
+  </section>
+</div>
+
+<div class="home-grid" style="margin-top:24px">
+  <section class="panel">
+    <div class="panel__head"><h2>Avisos a tiempo, mes a mes</h2><span class="faint">De cada 10 situaciones</span></div>
+    <div class="chart chart--sm" data-chart="monthly"></div>
+  </section>
+  <section class="honest">
+    <div class="why__icon"><i data-icon="info"></i></div>
+    <div><h3>Lo que el sistema no avisó</h3>
+      <p class="muted" style="margin-top:4px">Hubo 3 situaciones sin aviso previo, las tres en Frente 2 Norte durante cambios de turno. El equipo técnico las está revisando.</p>
+      <p class="faint" style="margin-top:10px">Estas cifras se calculan solo con lecturas reales de los sensores de la mina.</p></div>
+  </section>
+</div>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

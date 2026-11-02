@@ -1,44 +1,22 @@
 {% extends "base.html" %}
-{% block page_title %}Auditoría{% endblock %}
+{% from "components/macros.html" import page_header, filter_bar %}
+{% block page_title %}Bitácora{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Historial de acciones del sistema.</p>
-  </div>
-</div>
-<form class="filters-bar" method="get">
-  <div style="min-width: 16rem;">
-    <label class="form-label" for="action">Acción</label>
-    <input class="form-control" name="action" id="action" value="{{ action }}" placeholder="ej. alert.acknowledge">
-  </div>
-  <div>
-    <button class="btn btn-primary" type="submit">Filtrar</button>
-  </div>
+{{ page_header("Bitácora", "Quién hizo qué y cuándo, en frases.") }}
+{% call filter_bar() %}
+<form method="get" class="row-flex">
+  <input name="action" value="{{ action }}" placeholder="Buscar acción">
+  <button class="btn" type="submit">Filtrar</button>
 </form>
-<div class="panel panel-flush">
-  <div class="table-responsive-wrap">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light"><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>Detalle</th></tr></thead>
-      <tbody>
-      {% for e in entries %}
-        <tr>
-          <td class="small text-secondary">{{ e.created_at }}</td>
-          <td>{{ e.user_id or "—" }}</td>
-          <td><code>{{ e.action }}</code></td>
-          <td class="small">{{ e.resource_type or "" }} {{ e.resource_id or "" }}</td>
-          <td class="small">
-            <details>
-              <summary>{{ e.details or "ver metadata" }}</summary>
-              <pre class="mb-0 small">{{ e.metadata | tojson(indent=2) }}</pre>
-            </details>
-          </td>
-        </tr>
-      {% else %}
-        <tr><td colspan="5" class="text-secondary text-center py-5">No hay eventos de auditoría con estos filtros</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
+{% endcall %}
+<div class="card">
+  <ul class="timeline">
+    {% for e in entries %}
+      <li>{{ e.phrase }}</li>
+    {% else %}
+      <li class="muted">No hay movimientos con estos filtros</li>
+    {% endfor %}
+  </ul>
 </div>
-<p class="small text-secondary mt-3 mb-0">Pág. {{ page }} · {{ total }} registros</p>
+<p class="help">Pág. {{ page }} · {{ total }} registros</p>
 {% endblock %}

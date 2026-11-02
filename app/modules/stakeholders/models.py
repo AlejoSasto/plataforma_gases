@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -40,7 +40,6 @@ class Stakeholder(Base):
 
 class StakeholderUser(Base):
     __tablename__ = "stakeholder_user"
-    __table_args__ = (UniqueConstraint("stakeholder_id", "user_id"),)
 
     stakeholder_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("stakeholders.id", ondelete="CASCADE"), primary_key=True

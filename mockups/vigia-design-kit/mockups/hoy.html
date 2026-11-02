@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoy | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html" aria-current="page"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">AR</div><div class="rail__who"><strong>Ana Rojas</strong><span>Supervisora de seguridad</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<section class="state-line" aria-live="polite">
+  <div class="state-line__icon"><i data-icon="triangle-alert"></i></div>
+  <div>
+    <h1>Dos zonas necesitan atención</h1>
+    <p>En el Frente 3 Sur el metano podría llegar al límite en unos 7 minutos. El resto de la mina está normal.</p>
+  </div>
+  <div class="state-line__meta"><strong>10:35</strong>Domingo 1 de noviembre</div>
+</section>
+
+<div class="home-grid">
+  <div class="stack">
+    <section class="panel" aria-labelledby="t-mapa">
+      <div class="panel__head"><h2 id="t-mapa">La mina ahora</h2><span class="faint">Toca una zona para ver sus gases</span></div>
+      <div class="mine" data-mine></div>
+      <ul class="zone-list" data-zone-list aria-label="Zonas ordenadas por prioridad"></ul>
+      <div class="mine-legend">
+        <span><i style="background:var(--st-normal)"></i>Normal</span>
+        <span><i style="background:var(--st-vigilar)"></i>Vigilar</span>
+        <span><i style="background:var(--st-actuar)"></i>Actuar ya</span>
+        <span><i style="background:var(--st-evacuar)"></i>Evacuar</span>
+        <span><i style="background:transparent;border:2px dashed var(--st-sindatos)"></i>Sin datos</span>
+        <span style="margin-left:auto"><i data-icon="wind" class="ico ico-sm" style="color:var(--accent)"></i>Entrada de aire fresco</span>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="t-f3">
+      <div class="panel__head"><h2 id="t-f3">Frente 3 Sur: ahora y en los próximos 10 minutos</h2>
+        <span class="status status--actuar"><i data-icon="triangle-alert"></i>Actuar ya</span></div>
+      <div class="chart" data-chart="now-next" style="height:300px"></div>
+      <div class="chart-note">
+        <span><i class="key-line"></i>Lo que marcó el sensor</span>
+        <span><i class="key-line key-line--dash"></i>Lo que se espera</span>
+        <span><i class="key-band"></i>Rango probable</span>
+      </div>
+      <div class="panel--flush" style="border-top:1px solid var(--border)">
+        <table class="gas-table">
+          <thead><tr><th>Gas</th><th>Ahora</th><th>En 10 min</th><th class="hide-sm">Última hora</th><th>Estado</th></tr></thead>
+          <tbody>
+      <tr class="is-hot"><td class="gas-name"><strong>Metano</strong><span>Frente 3 Sur</span></td>
+        <td class="reading-cell">0,72<small>%</small></td><td class="reading-cell">1,05<small>%</small></td>
+        <td class="hide-sm"><div data-spark data-state="actuar" data-values="0.38,0.4,0.37,0.42,0.45,0.5,0.56,0.63,0.68,0.72"></div></td>
+        <td><span class="status status--actuar"><i data-icon="triangle-alert"></i>Actuar ya</span></td></tr>
+      <tr><td class="gas-name"><strong>Monóxido de carbono</strong><span>Frente 3 Sur</span></td>
+        <td class="reading-cell">11<small>ppm</small></td><td class="reading-cell">14<small>ppm</small></td>
+        <td class="hide-sm"><div data-spark data-values="9,10,9,10,11,10,11,12,11,11"></div></td>
+        <td><span class="status status--normal"><i data-icon="circle-check"></i>Normal</span></td></tr>
+      <tr><td class="gas-name"><strong>Oxígeno</strong><span>Frente 3 Sur</span></td>
+        <td class="reading-cell">20,6<small>%</small></td><td class="reading-cell">20,5<small>%</small></td>
+        <td class="hide-sm"><div data-spark data-values="20.8,20.8,20.7,20.7,20.7,20.6,20.6,20.6,20.6,20.6"></div></td>
+        <td><span class="status status--normal"><i data-icon="circle-check"></i>Normal</span></td></tr>
+      <tr><td class="gas-name"><strong>Ácido sulfhídrico</strong><span>Frente 3 Sur</span></td>
+        <td class="reading-cell">0,4<small>ppm</small></td><td class="reading-cell">0,4<small>ppm</small></td>
+        <td class="hide-sm"><div data-spark data-values="0.3,0.4,0.4,0.3,0.4,0.4,0.4,0.5,0.4,0.4"></div></td>
+        <td><span class="status status--normal"><i data-icon="circle-check"></i>Normal</span></td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <aside class="stack">
+    <section class="panel panel--flush" aria-labelledby="t-avisos">
+      <div class="panel__head"><h2 id="t-avisos">Avisos abiertos</h2><a href="avisos.html" class="faint">Ver todos</a></div>
+      <div class="alert-list">
+        <article class="alert-item alert-item--actuar">
+          <div class="alert-item__top"><span class="status status--actuar"><i data-icon="triangle-alert"></i>Actuar ya</span><span class="kind"><i data-icon="clock"></i>Anticipado</span><time datetime="10:33">hace 2 min</time></div>
+          <h3>Metano en Frente 3 Sur</h3>
+          <p>Se espera que llegue al límite en unos 7 minutos.</p>
+          <div class="alert-item__actions"><a class="btn btn--primary" href="aviso.html">Ver qué hacer</a><button class="btn">Ya lo vi</button></div>
+        </article>
+        <article class="alert-item alert-item--vigilar">
+          <div class="alert-item__top"><span class="status status--vigilar"><i data-icon="eye"></i>Vigilar</span><span class="kind"><i data-icon="clock"></i>Anticipado</span><time datetime="10:21">hace 14 min</time></div>
+          <h3>Monóxido en Frente 1 Norte</h3>
+          <p>Subió a 28 ppm y podría seguir subiendo. Visto por Carlos Pinzón.</p>
+          <div class="alert-item__actions"><a class="btn" href="aviso.html">Ver detalle</a></div>
+        </article>
+        <article class="alert-item">
+          <div class="alert-item__top"><span class="status status--sindatos"><i data-icon="circle-dashed"></i>Sin datos</span><time datetime="10:21">hace 14 min</time></div>
+          <h3>Frente 4 Sur sin señal</h3>
+          <p>El sensor de oxígeno no envía datos. Revisa la conexión o la batería.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel__body" style="display:grid;gap:12px">
+        <h3>Turno de la mañana</h3>
+        <dl class="readings" style="grid-template-columns:1fr 1fr">
+          <div><dt>Avisos hoy</dt><dd>3</dd></div>
+          <div><dt>Atendidos</dt><dd>1</dd></div>
+        </dl>
+        <p class="faint">Tiempo medio para marcar un aviso como visto: 3 min.</p>
+      </div>
+    </section>
+  </aside>
+</div>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html" aria-current="page"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

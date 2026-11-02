@@ -1,0 +1,110 @@
+[
+  {
+    "gas_code": "CH4",
+    "level": "vigilar",
+    "direction": "above",
+    "value": 0.5,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "CH4",
+    "level": "actuar",
+    "direction": "above",
+    "value": 1.0,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "CH4",
+    "level": "evacuar",
+    "direction": "above",
+    "value": 1.5,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "CO",
+    "level": "vigilar",
+    "direction": "above",
+    "value": 25.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "CO",
+    "level": "actuar",
+    "direction": "above",
+    "value": 50.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "CO",
+    "level": "evacuar",
+    "direction": "above",
+    "value": 100.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "H2S",
+    "level": "vigilar",
+    "direction": "above",
+    "value": 1.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "H2S",
+    "level": "actuar",
+    "direction": "above",
+    "value": 5.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "H2S",
+    "level": "evacuar",
+    "direction": "above",
+    "value": 10.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "O2",
+    "level": "vigilar",
+    "direction": "below",
+    "value": 19.5,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "O2",
+    "level": "actuar",
+    "direction": "below",
+    "value": 19.0,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  },
+  {
+    "gas_code": "O2",
+    "level": "evacuar",
+    "direction": "below",
+    "value": 17.0,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
+    "verified": false
+  }
+]

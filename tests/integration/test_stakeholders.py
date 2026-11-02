@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 
-from app.core.database import SessionLocal
 from app.core.security import hash_password
 from app.modules.alerts.models import Alert
 from app.modules.alerts.service import evaluate_and_create_alert
-from app.modules.ml_training.models import ModelRegistry
-from app.modules.predictions.models import Prediction
 from app.modules.roles_permissions.models import Role
 from app.modules.sensors_ingestion.models import GasReading, Sensor, Site
 from app.modules.stakeholders.models import AlertNotification, Stakeholder
@@ -20,21 +18,19 @@ from app.modules.users.models import User
 from scripts.seed_roles_permissions import seed
 
 
-def test_stakeholder_crud_and_recipients(client: TestClient, admin_user: tuple[User, str]) -> None:
+def test_stakeholder_crud_and_recipients(
+    client: TestClient, admin_user: tuple[User, str], db: Session
+) -> None:
     admin, password = admin_user
     assert client.post("/auth/login", json={"email": admin.email, "password": password}).status_code == 200
 
-    db = SessionLocal()
-    try:
-        site = db.query(Site).filter(Site.name == "Mina Norte").first()
-        if site is None:
-            site = Site(name="Mina Norte", description="Sitio de prueba")
-            db.add(site)
-            db.commit()
-            db.refresh(site)
-        site_id = site.id
-    finally:
-        db.close()
+    site = db.query(Site).filter(Site.name == "Mina Norte").first()
+    if site is None:
+        site = Site(name="Mina Norte", description="Sitio de prueba")
+        db.add(site)
+        db.commit()
+        db.refresh(site)
+    site_id = site.id
 
     create = client.post(
         "/api/stakeholders",
@@ -51,11 +47,10 @@ def test_stakeholder_crud_and_recipients(client: TestClient, admin_user: tuple[U
 
     sub = client.post(
         f"/api/stakeholders/{stake_id}/subscriptions",
-        json={"site_id": site_id, "min_level": "CRITICO"},
+        json={"site_id": site_id, "min_level": "ALERTA"},
     )
     assert sub.status_code == 201, sub.text
 
-    db = SessionLocal()
     try:
         site = db.query(Site).filter(Site.id == site_id).one()
         sensor = (
@@ -76,29 +71,7 @@ def test_stakeholder_crud_and_recipients(client: TestClient, admin_user: tuple[U
         )
         db.add(reading)
         db.flush()
-        model = db.query(ModelRegistry).first()
-        if model is None:
-            model = ModelRegistry(
-                name="m",
-                version="1",
-                algorithm="rf",
-                params={},
-                metrics={},
-                status="staging",
-                scope="global",
-            )
-            db.add(model)
-            db.flush()
-        pred_crit = Prediction(
-            gas_reading_id=reading.id,
-            model_registry_id=model.id,
-            probability=0.95,
-            predicted_label=1,
-            risk_level="CRITICO",
-        )
-        db.add(pred_crit)
-        db.flush()
-        alert_crit = evaluate_and_create_alert(db, pred_crit, reading)
+        alert_crit = evaluate_and_create_alert(db, reading)
         db.commit()
         assert alert_crit is not None
 
@@ -109,25 +82,15 @@ def test_stakeholder_crud_and_recipients(client: TestClient, admin_user: tuple[U
         reading2 = GasReading(
             sensor_id=sensor.id,
             leyendo=1.0,
-            tiempo_inicio=datetime.now(timezone.utc),
+            tiempo_inicio=datetime.now(timezone.utc) + timedelta(seconds=2),
             is_synthetic=False,
         )
         db.add(reading2)
         db.flush()
-        pred_low = Prediction(
-            gas_reading_id=reading2.id,
-            model_registry_id=model.id,
-            probability=0.4,
-            predicted_label=0,
-            risk_level="PRECAUCION",
-        )
-        db.add(pred_low)
-        db.flush()
-        # Forzar alerta PRECAUCION vía hard alarm false — crear alerta manual
         alert_low = Alert(
-            prediction_id=pred_low.id,
             gas_reading_id=reading2.id,
             sensor_id=sensor.id,
+            kind="confirmado",
             level="PRECAUCION",
             message="precaucion",
             recommendation="monitorear",
@@ -146,17 +109,18 @@ def test_stakeholder_crud_and_recipients(client: TestClient, admin_user: tuple[U
         assert len(notifs) >= 1
         assert all(n.status == "enviado" for n in notifs)
     finally:
-        db.close()
+        pass
 
 
-def test_interesado_sees_only_subscribed_alerts(client: TestClient, admin_user: tuple) -> None:
+def test_interesado_sees_only_subscribed_alerts(
+    client: TestClient, admin_user: tuple, db: Session
+) -> None:
     admin, admin_pass = admin_user
     assert client.post("/auth/login", json={"email": admin.email, "password": admin_pass}).status_code == 200
 
-    db = SessionLocal()
     try:
         seed(db)
-        role = db.query(Role).filter(Role.name == "interesado").one()
+        role = db.query(Role).filter(Role.name == "gerencia").one()
         email = "portal.interesado@example.com"
         password = "InteresadoPass123!"
         user = db.query(User).filter(User.email == email).first()
@@ -186,7 +150,7 @@ def test_interesado_sees_only_subscribed_alerts(client: TestClient, admin_user: 
             db.commit()
             db.refresh(site)
     finally:
-        db.close()
+        pass
 
     create = client.post(
         "/api/stakeholders",
@@ -200,12 +164,8 @@ def test_interesado_sees_only_subscribed_alerts(client: TestClient, admin_user: 
     )
     assert create.status_code == 201
     stake_id = create.json()["id"]
-    db = SessionLocal()
-    try:
-        site = db.query(Site).filter(Site.name == "Mina Norte").one()
-        site_id = site.id
-    finally:
-        db.close()
+    site = db.query(Site).filter(Site.name == "Mina Norte").one()
+    site_id = site.id
     assert (
         client.post(
             f"/api/stakeholders/{stake_id}/subscriptions",
@@ -226,4 +186,4 @@ def test_interesado_sees_only_subscribed_alerts(client: TestClient, admin_user: 
 
     page = client.get("/executive")
     assert page.status_code == 200
-    assert "Resumen ejecutivo" in page.text or "ejecutivo" in page.text.lower()
+    assert "Resumen" in page.text or "gerencia" in page.text.lower()

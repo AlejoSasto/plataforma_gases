@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header, status_badge %}
+{% block page_title %}Límites{% endblock %}
+{% block content %}
+{{ page_header("Ajustes de seguridad", "Límites por gas, con su fuente y si ya están verificados.") }}
+<div class="card">
+  <table>
+    <thead><tr><th>Gas</th><th>Nivel</th><th>Límite</th><th>Fuente</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for row in limits %}
+      <tr>
+        <td>{{ row.gas }}</td>
+        <td>{{ status_badge(row.status_key) }}</td>
+        <td class="num">{{ row.value }}</td>
+        <td class="help">{{ row.source }}</td>
+        <td>{{ row.verified_label }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">Aún no hay límites cargados</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

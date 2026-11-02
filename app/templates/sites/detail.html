@@ -1,37 +1,14 @@
 {% extends "base.html" %}
+{% from "components/macros.html" import page_header, zone_card, empty_state %}
 {% block page_title %}{{ site.name }}{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">{{ site.description or "Sensores del sitio" }}</p>
-  </div>
-  <div class="page-header-actions">
-    <a href="/sites" class="btn btn-outline-secondary btn-sm">Volver a sitios</a>
-  </div>
-</div>
+{{ page_header(site.name, site.description or "Sensores de la zona") }}
+<p><a href="/zonas">Volver a zonas</a></p>
 {% if not cards %}
-  {% with title="Este sitio aún no tiene sensores" %}{% include "partials/_empty_state.html" %}{% endwith %}
+  {{ empty_state("circle-dashed", "Esta zona aún no tiene sensores", "Cuando haya lecturas, el estado aparecerá aquí.") }}
 {% else %}
-<div class="row g-4">
-  {% for c in cards %}
-  <div class="col-12 col-md-6 col-xl-4">
-    <a href="/sensors/{{ c.sensor_id }}" class="text-decoration-none text-reset">
-      <article class="sensor-card risk-{{ c.risk_level }}">
-        <div class="sensor-card-head">
-          <div class="sensor-card-identity">
-            <div class="sensor-card-title" title="{{ c.sensor_code }}">{{ c.sensor_code }}</div>
-            <div class="sensor-card-sub">{{ c.gas_type }}{% if c.unit %} · {{ c.unit }}{% endif %}</div>
-          </div>
-          {% with level=c.risk_level %}{% include "partials/_risk_badge.html" %}{% endwith %}
-        </div>
-        <div class="sensor-card-value">
-          {{ c.last_value if c.last_value is not none else "—" }}{% if c.unit %}<span class="unit">{{ c.unit }}</span>{% endif %}
-        </div>
-        {% if c.last_at %}<div class="sensor-card-meta">{{ c.last_at }}</div>{% endif %}
-      </article>
-    </a>
-  </div>
-  {% endfor %}
+<div class="zone-grid">
+  {% for c in cards %}{{ zone_card(c) }}{% endfor %}
 </div>
 {% endif %}
 {% endblock %}

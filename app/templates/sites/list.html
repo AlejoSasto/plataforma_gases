@@ -1,27 +1,18 @@
 {% extends "base.html" %}
-{% block page_title %}Sitios y sensores{% endblock %}
+{% from "components/macros.html" import page_header, empty_state %}
+{% block page_title %}Zonas{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Explora sitios configurados y sus sensores.</p>
-  </div>
-</div>
+{{ page_header("Zonas y sensores", "Cada zona muestra el estado de sus sensores.") }}
 {% if not sites %}
-  {% with title="Aún no hay sitios registrados", message="Carga datos mediante ingesta ETL para crear sitios y sensores." %}
-  {% include "partials/_empty_state.html" %}
-  {% endwith %}
+  {{ empty_state("map", copy.EMPTY_SENSORS_TITLE, copy.EMPTY_SENSORS_TEXT) }}
 {% else %}
-<div class="row g-4">
+<div class="zone-grid">
   {% for s in sites %}
-  <div class="col-md-4">
-    <a href="/sites/{{ s.id }}" class="text-decoration-none text-reset">
-      <div class="panel h-100">
-        <div class="fw-semibold fs-5">{{ s.name }}</div>
-        <div class="small text-secondary mt-2">{{ s.description or "Sin descripción" }}</div>
-        <div class="mt-3 small text-secondary">{{ s.sensors_count }} sensor(es)</div>
-      </div>
-    </a>
-  </div>
+  <a class="card" href="/zonas/{{ s.id }}">
+    <h2>{{ s.name }}</h2>
+    <p class="muted">{{ s.description or "Sin descripción" }}</p>
+    <p class="help">{{ s.sensors_count }} sensor(es)</p>
+  </a>
   {% endfor %}
 </div>
 {% endif %}

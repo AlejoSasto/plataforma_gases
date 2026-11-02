@@ -1,4 +1,4 @@
-"""Seed de permisos base y roles RBAC.
+"""Seed de permisos y roles v2 (Plan 19).
 
 Uso:
   python scripts/seed_roles_permissions.py
@@ -17,88 +17,59 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.modules.roles_permissions.models import Permission, Role
-from app.modules.users import models as users_models  # noqa: F401 — registra user_roles
+from app.modules.users import models as users_models  # noqa: F401
+from app.shared.access import PERMISSIONS, ROLE_LABELS, grants_for
 
-BASE_PERMISSIONS: list[tuple[str, str]] = [
-    ("users.manage", "Gestionar usuarios"),
-    ("roles.manage", "Gestionar roles y permisos"),
-    ("sensors.manage", "Gestionar sensores e ingesta"),
-    ("models.train", "Entrenar modelos ML"),
-    ("models.promote", "Promover modelos a producción"),
-    ("predictions.view", "Ver predicciones"),
-    ("alerts.view", "Ver alertas"),
-    ("alerts.resolve", "Resolver alertas"),
-    ("stakeholders.manage", "Gestionar stakeholders"),
-    ("reports.export", "Exportar reportes"),
-    ("dashboard.view_all_sites", "Ver dashboard de todos los sitios"),
-    ("audit.view", "Ver auditoría"),
-]
-
-# name -> list of permission codes (empty list means none; "*" means all)
-ROLE_DEFINITIONS: dict[str, tuple[str, list[str] | str]] = {
-    "admin": ("Administrador del sistema", "*"),
-    "ingeniero_datos": (
-        "Ingeniero de datos / ML",
-        [
-            "sensors.manage",
-            "models.train",
-            "models.promote",
-            "predictions.view",
-            "alerts.view",
-            "reports.export",
-        ],
-    ),
-    "operador_mina": (
-        "Operador de mina",
-        ["alerts.view", "alerts.resolve", "predictions.view"],
-    ),
-    "interesado": (
-        "Parte interesada",
-        ["alerts.view", "reports.export"],
-    ),
-    "auditor": (
-        "Auditor (solo lectura)",
-        [
-            "predictions.view",
-            "alerts.view",
-            "reports.export",
-            "dashboard.view_all_sites",
-            "audit.view",
-        ],
-    ),
+PERM_HELP: dict[str, str] = {
+    "status.view": "Ver Hoy y zonas",
+    "alerts.view": "Ver avisos",
+    "alerts.acknowledge": "Marcar aviso como visto",
+    "alerts.resolve": "Cerrar avisos",
+    "history.view": "Ver historial",
+    "reliability.view": "Ver confiabilidad",
+    "reports.export": "Generar informes",
+    "thresholds.manage": "Definir límites",
+    "stakeholders.manage": "Gestionar contactos de aviso",
+    "data.upload": "Cargar datos",
+    "data.quality.view": "Ver calidad de los datos",
+    "models.train": "Entrenar en el laboratorio",
+    "models.promote": "Activar un cambio del laboratorio",
+    "users.manage": "Gestionar equipo",
+    "roles.manage": "Gestionar roles",
+    "kiosk.manage": "Gestionar pantallas de sala",
+    "audit.view": "Ver bitácora",
+    "predictions.view": "Ver estado (compatibilidad)",
+    "sensors.manage": "Cargar datos (compatibilidad)",
+    "dashboard.view_all_sites": "Ver todas las zonas (compatibilidad)",
 }
 
 
 def seed(db: Session) -> None:
+    needed = list(PERMISSIONS) + ["predictions.view", "sensors.manage", "dashboard.view_all_sites"]
     perms_by_code: dict[str, Permission] = {}
-    for code, description in BASE_PERMISSIONS:
+    for code in needed:
         existing = db.query(Permission).filter(Permission.code == code).first()
         if existing is None:
-            existing = Permission(code=code, description=description)
+            existing = Permission(code=code, description=PERM_HELP.get(code, code))
             db.add(existing)
             db.flush()
         else:
-            existing.description = description
+            existing.description = PERM_HELP.get(code, existing.description)
         perms_by_code[code] = existing
 
-    all_perms = list(perms_by_code.values())
-
-    for name, (description, perm_spec) in ROLE_DEFINITIONS.items():
+    for name, label in ROLE_LABELS.items():
         role = db.query(Role).filter(Role.name == name).first()
         if role is None:
-            role = Role(name=name, description=description)
+            role = Role(name=name, description=label)
             db.add(role)
             db.flush()
         else:
-            role.description = description
-
-        if perm_spec == "*":
-            role.permissions = list(all_perms)
-        else:
-            role.permissions = [perms_by_code[c] for c in perm_spec]  # type: ignore[index]
+            role.description = label
+        codes = grants_for(name)
+        role.permissions = [perms_by_code[c] for c in sorted(codes) if c in perms_by_code]
 
     db.commit()
-    print(f"Seed OK: {len(perms_by_code)} permisos, {len(ROLE_DEFINITIONS)} roles.")
+    print(f"Seed OK: {len(perms_by_code)} permisos, {len(ROLE_LABELS)} roles.")
 
 
 def main() -> None:

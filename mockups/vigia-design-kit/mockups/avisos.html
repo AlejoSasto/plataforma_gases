@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avisos | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html" aria-current="page"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">AR</div><div class="rail__who"><strong>Ana Rojas</strong><span>Supervisora de seguridad</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<div class="page-head">
+  <div class="page-head__text"><h1>Avisos</h1><p>Aquí aparecen los avisos que el sistema emite antes de que un gas llegue a su límite y cuando un sensor ya lo superó.</p></div>
+  <div class="page-head__actions"><button class="btn"><i data-icon="download"></i>Descargar</button></div>
+</div>
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true">Abiertos <span class="count">3</span></button>
+  <button class="tab" role="tab" aria-selected="false">Vistos <span class="count">5</span></button>
+  <button class="tab" role="tab" aria-selected="false">Cerrados <span class="count">41</span></button>
+</div>
+<div class="filters">
+  <select class="select" aria-label="Zona"><option>Todas las zonas</option></select>
+  <select class="select" aria-label="Gas"><option>Todos los gases</option></select>
+  <select class="select" aria-label="Nivel"><option>Todos los niveles</option></select>
+</div>
+<section class="panel panel--flush"><div class="alert-list">
+  <article class="alert-item alert-item--actuar">
+        <div class="alert-item__top"><span class="status status--actuar"><i data-icon="triangle-alert"></i>Actuar ya</span><span class="kind"><i data-icon="clock"></i>Anticipado</span><time>hace 2 min</time></div>
+        <h3>Metano en Frente 3 Sur</h3><p>Se espera que llegue al límite en unos 7 minutos. Ahora 0,72 %, límite 1,0 %.</p>
+        <div class="alert-item__actions"><a class="btn btn--primary" href="aviso.html">Ver qué hacer</a><button class="btn">Ya lo vi</button></div></article>
+  <article class="alert-item alert-item--vigilar">
+        <div class="alert-item__top"><span class="status status--vigilar"><i data-icon="eye"></i>Vigilar</span><span class="kind"><i data-icon="clock"></i>Anticipado</span><time>hace 14 min</time></div>
+        <h3>Monóxido en Frente 1 Norte</h3><p>Subió a 28 ppm y podría seguir subiendo durante la próxima media hora. Visto por Carlos Pinzón.</p>
+        <div class="alert-item__actions"><a class="btn btn--primary" href="aviso.html">Ver qué hacer</a><button class="btn">Ya lo vi</button></div></article>
+  <article class="alert-item"><div class="alert-item__top"><span class="status status--sindatos"><i data-icon="circle-dashed"></i>Sin datos</span><time>hace 14 min</time></div>
+    <h3>Frente 4 Sur sin señal</h3><p>El sensor de oxígeno no envía datos desde las 10:21. Revisa la conexión o la batería.</p></article>
+</div></section>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html" aria-current="page"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

@@ -120,3 +120,25 @@ def normalize_site_name(raw: Optional[str]) -> str:
 
 def thesis_priority_gases() -> list[str]:
     return [g.code for g in GAS_CATALOG.values() if g.thesis_priority]
+
+
+def apply_db_catalog(rows: list[object]) -> None:
+    """Sustituye el catálogo en memoria con filas de `gas_types` (Plan 16)."""
+    global GAS_CATALOG
+    if not rows:
+        return
+    updated: dict[str, GasInfo] = dict(GAS_CATALOG)
+    for row in rows:
+        code = str(getattr(row, "code", "")).upper()
+        if not code:
+            continue
+        unit = str(getattr(row, "canonical_unit", "") or "")
+        name = str(getattr(row, "display_name", "") or code)
+        priority = int(getattr(row, "priority", 99) or 99)
+        updated[code] = GasInfo(
+            code=code,
+            label=f"{name} ({code})",
+            unit_default=unit,
+            thesis_priority=priority <= 3,
+        )
+    GAS_CATALOG = updated

@@ -10,8 +10,9 @@ from sqlalchemy.orm import Session
 
 from app.modules.alerts.models import Alert
 from app.modules.alerts import service as alerts_service
+from app.modules.forecasting.models import Forecast
+from app.modules.forecasting import repository as forecast_repo
 from app.modules.ml_training.models import ModelRegistry, TrainingJob
-from app.modules.predictions.models import Prediction
 from app.modules.sensors_ingestion.models import EtlRun, GasReading, Sensor, Site
 from app.modules.stakeholders.models import AlertNotification
 from app.modules.stakeholders.service import alert_ids_visible_to_user
@@ -24,13 +25,15 @@ from app.shared.formatting import (
     format_reading_value,
 )
 from app.shared.gas_catalog import canonicalize_gas_type, thesis_priority_gases
-from app.modules.predictions import service as pred_service
 
 LEVEL_RANK = {"NORMAL": 0, "PRECAUCION": 1, "ALERTA": 2, "CRITICO": 3}
 
 
-def list_sites(db: Session) -> list[dict[str, Any]]:
+def list_sites(db: Session, user=None) -> list[dict[str, Any]]:
+    from app.shared.access import scoped_site_ids
+
     sites = db.query(Site).order_by(Site.name.asc()).all()
+    scope = scoped_site_ids(db, user) if user is not None else None
     return [
         {
             "id": s.id,
@@ -39,6 +42,7 @@ def list_sites(db: Session) -> list[dict[str, Any]]:
             "sensors_count": len(s.sensors or []),
         }
         for s in sites
+        if scope is None or s.id in scope
     ]
 
 
@@ -56,10 +60,15 @@ def get_sensor(db: Session, sensor_id: int) -> Sensor:
     return sensor
 
 
-def semaforo(db: Session, *, site_id: Optional[int] = None) -> list[dict[str, Any]]:
+def semaforo(db: Session, *, site_id: Optional[int] = None, user=None) -> list[dict[str, Any]]:
+    from app.shared.access import scoped_site_ids
+
     q = db.query(Sensor, Site).join(Site, Sensor.site_id == Site.id)
     if site_id is not None:
         q = q.filter(Sensor.site_id == site_id)
+    scope = scoped_site_ids(db, user) if user is not None else None
+    if scope is not None:
+        q = q.filter(Sensor.site_id.in_(scope or {-1}))
     rows = q.order_by(Site.name.asc(), Sensor.code.asc()).all()
     result: list[dict[str, Any]] = []
     for sensor, site in rows:
@@ -69,14 +78,7 @@ def semaforo(db: Session, *, site_id: Optional[int] = None) -> list[dict[str, An
             .order_by(GasReading.tiempo_inicio.desc())
             .first()
         )
-        last_pred = None
-        if last_reading is not None:
-            last_pred = (
-                db.query(Prediction)
-                .filter(Prediction.gas_reading_id == last_reading.id)
-                .order_by(Prediction.created_at.desc())
-                .first()
-            )
+        last_fc = forecast_repo.latest_for_sensor(db, sensor.id)
         open_alert = (
             db.query(Alert)
             .filter(
@@ -89,8 +91,8 @@ def semaforo(db: Session, *, site_id: Optional[int] = None) -> list[dict[str, An
         risk = "NORMAL"
         if open_alert is not None:
             risk = open_alert.level
-        elif last_pred is not None and last_pred.risk_level:
-            risk = last_pred.risk_level
+        elif last_fc is not None and last_fc.status_level:
+            risk = last_fc.status_level.upper() if last_fc.status_level in {"vigilar", "actuar", "evacuar", "normal"} else last_fc.status_level
         result.append(
             {
                 "sensor_id": sensor.id,
@@ -107,11 +109,9 @@ def semaforo(db: Session, *, site_id: Optional[int] = None) -> list[dict[str, An
                 "last_at": format_datetime_short(last_reading.tiempo_inicio)
                 if last_reading
                 else None,
-                "probability": last_pred.probability if last_pred else None,
-                "predicted_concentration": (
-                    last_pred.predicted_concentration if last_pred else None
-                ),
-                "horizon_minutes": last_pred.horizon_minutes if last_pred else None,
+                "probability": None,
+                "predicted_concentration": forecast_repo.q50_for(last_fc) if last_fc else None,
+                "horizon_minutes": None,
                 "open_alert_id": open_alert.id if open_alert else None,
             }
         )
@@ -168,7 +168,7 @@ def forecast_by_gas(
     """Series históricas + proyección de concentración agrupadas por gas canónico."""
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
     priority = thesis_priority_gases()
-    forecast_available = pred_service.has_sequence_production(db)
+    forecast_available = db.query(Forecast.id).first() is not None
 
     q = (
         db.query(GasReading, Sensor)
@@ -224,13 +224,6 @@ def forecast_by_gas(
                 last_by_sensor[sensor.id] = reading
 
     gases_payload: list[dict[str, Any]] = []
-    model_bundle = None
-    if forecast_available:
-        try:
-            model_bundle = pred_service._load_production_model(db, scope="global")
-        except Exception:  # noqa: BLE001
-            forecast_available = False
-            model_bundle = None
 
     gas_codes = list(priority)
     for code in hist_buckets:
@@ -253,39 +246,22 @@ def forecast_by_gas(
             )
 
         forecast_points: list[dict[str, Any]] = []
-        if forecast_available and model_bundle is not None:
+        if forecast_available:
             sensor_ids = sensors_by_gas.get(code) or set()
             concs: list[float] = []
             base_ts = None
+            h = horizon_minutes
             for sid in sensor_ids:
-                reading = last_by_sensor.get(sid)
-                if reading is None:
+                fc = forecast_repo.latest_for_sensor(db, sid)
+                if fc is None:
                     continue
-                # Preferir predicción persistida
-                pred = (
-                    db.query(Prediction)
-                    .filter(Prediction.gas_reading_id == reading.id)
-                    .order_by(Prediction.created_at.desc())
-                    .first()
-                )
-                conc = pred.predicted_concentration if pred else None
-                h = (
-                    pred.horizon_minutes
-                    if pred and pred.horizon_minutes
-                    else horizon_minutes
-                )
-                if conc is None:
-                    conc = pred_service.forecast_concentration_for_reading(
-                        db, reading, model_bundle=model_bundle
-                    )
+                conc = forecast_repo.q50_for(fc)
                 if conc is not None:
                     concs.append(float(conc))
-                    if base_ts is None or reading.tiempo_inicio > base_ts:
-                        base_ts = reading.tiempo_inicio
-
+                    if base_ts is None or fc.issued_at > base_ts:
+                        base_ts = fc.issued_at
             if concs and base_ts is not None:
                 avg_conc = sum(concs) / len(concs)
-                # Anclar: último real → proyección a t+h
                 last_real = historical[-1]["value"] if historical else avg_conc
                 last_t = (
                     datetime.fromisoformat(historical[-1]["t"].replace("Z", "+00:00"))
@@ -503,30 +479,12 @@ def recent_readings(db: Session, sensor_id: int, *, limit: int = 50) -> list[dic
     ]
 
 
-def recent_predictions_for_sensor(
+def recent_forecasts_for_sensor(
     db: Session, sensor_id: int, *, limit: int = 20
 ) -> list[dict[str, Any]]:
-    rows = (
-        db.query(Prediction)
-        .join(GasReading, Prediction.gas_reading_id == GasReading.id)
-        .filter(GasReading.sensor_id == sensor_id)
-        .order_by(Prediction.created_at.desc())
-        .limit(limit)
-        .all()
-    )
-    return [
-        {
-            "id": p.id,
-            "probability": format_reading_value(p.probability, decimals=3),
-            "risk_level": p.risk_level,
-            "predicted_label": p.predicted_label,
-            "predicted_concentration": format_reading_value(p.predicted_concentration),
-            "horizon_minutes": p.horizon_minutes,
-            "created_at": format_datetime_short(p.created_at),
-            "model_registry_id": p.model_registry_id,
-        }
-        for p in rows
-    ]
+    from app.modules.forecasting.service import recent_for_sensor as _recent
+
+    return _recent(db, sensor_id, limit=limit)
 
 
 def notifications_for_alert(db: Session, alert_id: int) -> list[dict[str, Any]]:

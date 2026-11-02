@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
-from app.core.database import SessionLocal
+from sqlalchemy.orm import Session
+
 from app.modules.ml_training import service as ml_service
 from app.modules.users.models import User
 
@@ -26,7 +28,12 @@ def test_ml_train_forbidden_for_operador(
 def test_ml_train_promote_flow(
     client: TestClient,
     admin_user: tuple[User, str],
+    db: Session,
 ) -> None:
+    from app.modules.sensors_ingestion.models import GasReading
+
+    if db.query(GasReading).count() < 80:
+        pytest.skip("el entrenamiento necesita lecturas reales en la DB de pruebas")
     MLRUNS.mkdir(exist_ok=True)
     tracking = f"file:{MLRUNS.as_posix()}"
     user, password = admin_user
@@ -80,10 +87,5 @@ def test_ml_train_promote_flow(
     assert len(production) == 1
     assert production[0]["id"] == other
     assert any(m["id"] == best_id for m in archived)
-
-    db = SessionLocal()
-    try:
-        model = ml_service.get_active_model(db, scope="global")
-        assert model is not None
-    finally:
-        db.close()
+    model = ml_service.get_active_model(db, scope="global")
+    assert model is not None

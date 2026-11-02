@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import status_banner, status_badge, zone_card %}
+{% block title %}Sala de control{% endblock %}
+{% block sala %}
+{{ status_banner(banner, banner_level) }}
+<div id="sala-alerts" class="stack" style="margin: var(--space-4) 0">
+  {% for a in alerts %}
+  <div class="card">{{ status_badge(a.status_key) }} <strong>{{ a.title }}</strong> — {{ a.headline }}</div>
+  {% endfor %}
+</div>
+<div class="zone-grid" id="sala-zones">
+  {% for c in cards %}{{ zone_card(c) }}{% endfor %}
+</div>
+<p class="help">Pantalla de sala. Las zonas rotan cada 20 s.</p>
+<button class="btn btn-ghost" type="button" id="sound-toggle" data-sala-evacuar="{{ 'true' if banner_level == 'evacuar' else 'false' }}">Sonido para Evacuar (opcional)</button>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/sala.js"></script>
+{% endblock %}

@@ -173,6 +173,20 @@ def compare_models(db: Session) -> list[dict[str, Any]]:
     return [_model_to_dict(m) for m in repo.list_models(db)]
 
 
+def propose_production(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
+    """Propone ganador. La promoción sigue siendo explícita (`models.promote`)."""
+    from ml_core.experiments.select import select_production_model
+
+    result = select_production_model(evaluations)
+    return {
+        "winner": result.winner,
+        "eligible": result.eligible,
+        "score": result.score,
+        "reason": result.reason,
+        "ranking": result.ranking,
+    }
+
+
 def model_catalog() -> list[dict[str, Any]]:
     return catalog_public()
 
@@ -207,7 +221,7 @@ def promote_model(
 
 
 def get_active_model(db: Session, scope: str = "global", task: str = "classification") -> Any:
-    """Carga el modelo production (sklearn/xgb via mlflow pyfunc). Preferir predictions.service."""
+    """Carga el modelo production (sklearn/xgb via mlflow pyfunc)."""
     row = repo.get_production_model(db, scope=scope, task=task)
     if row is None:
         row = repo.get_production_model(db, scope=scope, task=None)

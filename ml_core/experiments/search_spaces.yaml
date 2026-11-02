@@ -1,0 +1,28 @@
+# Espacios Optuna (30 ensayos por modelo, dentro del train de cada pliegue).
+persistencia: {}
+ets:
+  alpha: [0.1, 0.9]
+  beta: [0.01, 0.4]
+lgbm_q:
+  n_estimators: [20, 200]
+  min_child_samples: [4, 32]
+  learning_rate: [0.01, 0.2]
+lstm:
+  hidden: [8, 64]
+  epochs: [8, 40]
+  lr: [0.001, 0.05]
+tft:
+  hidden: [8, 64]
+  epochs: [8, 40]
+patchtst:
+  hidden: [8, 64]
+  heads: [1, 4]
+itransformer:
+  hidden: [8, 64]
+chronos2:
+  mode: [zero_shot, fine_tune]
+timesfm:
+  mode: [zero_shot]
+ttm:
+  hidden: [8, 32]
+  epochs: [8, 40]

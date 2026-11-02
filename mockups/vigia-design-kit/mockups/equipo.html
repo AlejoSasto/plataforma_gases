@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipo | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html" aria-current="page"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">JD</div><div class="rail__who"><strong>Juan Díaz</strong><span>Administrador</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<div class="page-head">
+  <div class="page-head__text"><h1>Equipo</h1><p>Quién puede entrar a Vigía, qué puede hacer y qué zonas ve. Las personas se invitan por correo y crean su propia contraseña.</p></div>
+  <div class="page-head__actions"><button class="btn"><i data-icon="monitor"></i>Pantallas de sala</button><button class="btn btn--primary"><i data-icon="user-plus"></i>Invitar persona</button></div>
+</div>
+<div class="filters"><input class="input" placeholder="Buscar por nombre o correo" aria-label="Buscar"><select class="select" aria-label="Rol"><option>Todos los roles</option></select></div>
+<section class="panel panel--flush" style="overflow-x:auto">
+  <table class="table"><thead><tr><th>Persona</th><th>Rol</th><th>Zonas que ve</th><th>Último ingreso</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody><tr><td><div class="person"><div class="avatar">AR</div><div><strong>Ana Rojas</strong><span>ana.rojas@mina.co</span></div></div></td><td><span class="tag tag--role">Supervisora de seguridad</span></td><td><span class="tag">Todas</span></td><td class="faint">Hoy 06:02</td><td><span class="faint">Activa</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Ana Rojas">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">CP</div><div><strong>Carlos Pinzón</strong><span>carlos.pinzon@mina.co</span></div></div></td><td><span class="tag tag--role">Operador de sala</span></td><td><span class="tag">Frente 1 Norte</span><span class="tag">Frente 2 Norte</span></td><td class="faint">Hoy 05:58</td><td><span class="faint">Activo</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Carlos Pinzón">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">LM</div><div><strong>Luisa Mahecha</strong><span>luisa.mahecha@mina.co</span></div></div></td><td><span class="tag tag--role">Operadora de sala</span></td><td><span class="tag">Frente 3 Sur</span><span class="tag">Frente 4 Sur</span></td><td class="faint">Ayer 21:40</td><td><span class="faint">Activa</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Luisa Mahecha">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">GM</div><div><strong>Gloria Moreno</strong><span>gloria.moreno@mina.co</span></div></div></td><td><span class="tag tag--role">Gerencia</span></td><td><span class="tag">Todas</span></td><td class="faint">Hace 3 días</td><td><span class="faint">Activa</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Gloria Moreno">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">FS</div><div><strong>Fabio Sastoque</strong><span>fabio.sastoque@mina.co</span></div></div></td><td><span class="tag tag--role">Analista de datos</span></td><td><span class="tag">Todas</span></td><td class="faint">Hoy 08:15</td><td><span class="faint">Activo</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Fabio Sastoque">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">JD</div><div><strong>Juan Díaz</strong><span>juan.diaz@mina.co</span></div></div></td><td><span class="tag tag--role">Administrador</span></td><td><span class="tag">Todas</span></td><td class="faint">Hoy 07:30</td><td><span class="faint">Activo</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Juan Díaz">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">MT</div><div><strong>Mario Torres</strong><span>mario.torres@mina.co</span></div></div></td><td><span class="tag tag--role">Operador de sala</span></td><td><span class="tag">Bocamina</span></td><td class="faint">—</td><td><span class="status status--vigilar">Invitado</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Mario Torres">Editar</button></td></tr><tr><td><div class="person"><div class="avatar">PR</div><div><strong>Pedro Ruiz</strong><span>pedro.ruiz@mina.co</span></div></div></td><td><span class="tag tag--role">Auditor</span></td><td><span class="tag">Todas</span></td><td class="faint">Hace 2 semanas</td><td><span class="status status--sindatos">Bloqueado 15 min</span></td><td><button class="btn btn--quiet" aria-label="Opciones de Pedro Ruiz">Editar</button></td></tr></tbody></table>
+</section>
+<div class="toast" role="status"><i data-icon="check"></i>Invitación enviada a mario.torres@mina.co</div>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

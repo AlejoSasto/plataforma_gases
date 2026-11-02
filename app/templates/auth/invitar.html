@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Crea tu contraseña{% endblock %}
+{% block body %}
+<div class="auth-shell">
+  <section class="auth-hero" aria-hidden="true">
+    <img src="/static/img/login-hero.svg" alt="">
+  </section>
+  <section class="auth-panel">
+    <div class="login-card stack">
+      <h1>Crea tu nueva contraseña</h1>
+      <p>Mínimo 12 caracteres. Evita tu nombre y las contraseñas demasiado comunes.</p>
+      <form id="inv-form" class="stack" data-token="{{ token }}">
+        <input type="password" id="password" minlength="12" required>
+        <button class="btn" type="submit">Entrar</button>
+        <p id="msg" class="help"></p>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/invitar.js"></script>
+{% endblock %}

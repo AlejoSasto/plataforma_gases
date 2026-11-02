@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2733"/><stop offset="1" stop-color="#2A3A48"/></linearGradient>
+    <radialGradient id="lamp" r=".5"><stop offset="0" stop-color="#FFE3A1" stop-opacity=".95"/><stop offset=".35" stop-color="#FFE3A1" stop-opacity=".35"/><stop offset="1" stop-color="#FFE3A1" stop-opacity="0"/></radialGradient>
+    <radialGradient id="ping" r=".5"><stop offset="0" stop-color="#7FB2E5" stop-opacity=".5"/><stop offset="1" stop-color="#7FB2E5" stop-opacity="0"/></radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#13171C" stop-opacity="0"/><stop offset=".55" stop-color="#13171C" stop-opacity=".1"/><stop offset="1" stop-color="#13171C" stop-opacity=".88"/></linearGradient>
+    <pattern id="grain" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#fff" opacity=".05"/><circle cx="4" cy="4" r=".5" fill="#000" opacity=".2"/></pattern>
+  </defs>
+  <!-- cielo y superficie (páramo de Cundinamarca) -->
+  <rect width="1200" height="260" fill="url(#sky)"/>
+  <path d="M0 210 C150 170 260 190 380 160 C520 125 640 175 780 150 C930 122 1060 165 1200 140 V260 H0Z" fill="#26313B"/>
+  <path d="M0 238 C200 214 360 232 560 214 C760 196 960 230 1200 206 V270 H0Z" fill="#303B45"/>
+  <!-- castillete / bocamina -->
+  <g fill="none" stroke="#9AA6B3" stroke-width="5" stroke-linejoin="round">
+    <path d="M820 248 L850 120 L880 248 M832 200 H868 M840 160 H860"/>
+    <circle cx="850" cy="118" r="14"/>
+  </g>
+  <rect x="790" y="236" width="120" height="22" fill="#3A4652"/>
+  <!-- estratos -->
+  <path d="M0 262 H1200 V380 C900 395 400 370 0 388Z" fill="#4A4339"/>
+  <path d="M0 388 C400 370 900 395 1200 380 V430 C850 446 380 420 0 440Z" fill="#0B0C0E"/>
+  <path d="M0 440 C380 420 850 446 1200 430 V600 C820 620 360 590 0 612Z" fill="#3B3F45"/>
+  <path d="M0 612 C360 590 820 620 1200 600 V672 C820 690 360 660 0 684Z" fill="#090A0C"/>
+  <path d="M0 684 C360 660 820 690 1200 672 V900 C800 920 380 885 0 905Z" fill="#33373D"/>
+  <path d="M0 905 C380 885 800 920 1200 900 V990 C800 1010 380 975 0 995Z" fill="#08090A"/>
+  <path d="M0 995 C380 975 800 1010 1200 990 V1400 H0Z" fill="#2B2F35"/>
+  <rect y="262" width="1200" height="1138" fill="url(#grain)"/>
+  <!-- brillo de vetas -->
+  <g stroke="#5E6672" stroke-width="1.2" opacity=".55" fill="none">
+    <path d="M0 400 C400 382 900 406 1200 392"/><path d="M0 625 C360 604 820 633 1200 614"/><path d="M0 918 C380 899 800 932 1200 913"/>
+  </g>
+  <!-- pozo inclinado principal y galerías -->
+  <g stroke="#1A1E24" stroke-width="26" stroke-linecap="round" fill="none">
+    <path d="M850 258 L700 420 L560 650 L440 950"/>
+    <path d="M700 414 H1080"/><path d="M700 414 H330"/>
+    <path d="M560 646 H1010"/><path d="M560 646 H200"/>
+    <path d="M440 948 H880"/><path d="M440 948 H160"/>
+  </g>
+  <g stroke="#262B33" stroke-width="16" stroke-linecap="round" fill="none">
+    <path d="M850 258 L700 420 L560 650 L440 950"/>
+    <path d="M330 414 H1080"/><path d="M200 646 H1010"/><path d="M160 948 H880"/>
+  </g>
+  <!-- ventilación: aire fresco (azul) entra, retorno (rojo) sale -->
+  <g stroke-width="3" fill="none" stroke-linecap="round" opacity=".85">
+    <path d="M780 330 l-26 30 m0 0 l2 -12 m-2 12 l12 -3" stroke="#7FB2E5"/>
+    <path d="M860 414 h50 m0 0 l-10 -7 m10 7 l-10 7" stroke="#7FB2E5"/>
+    <path d="M760 646 h50 m0 0 l-10 -7 m10 7 l-10 7" stroke="#7FB2E5"/>
+    <path d="M420 414 h-50 m0 0 l10 -7 m-10 7 l10 7" stroke="#C0604F"/>
+    <path d="M320 646 h-50 m0 0 l10 -7 m-10 7 l10 7" stroke="#C0604F"/>
+  </g>
+  <!-- lámparas en los frentes -->
+  <g>
+    <circle cx="1060" cy="414" r="46" fill="url(#lamp)"/><circle cx="1060" cy="414" r="5" fill="#FFF3D1"/>
+    <circle cx="990" cy="646" r="46" fill="url(#lamp)"/><circle cx="990" cy="646" r="5" fill="#FFF3D1"/>
+    <circle cx="230" cy="646" r="40" fill="url(#lamp)"/><circle cx="230" cy="646" r="4.5" fill="#FFF3D1"/>
+    <circle cx="860" cy="948" r="46" fill="url(#lamp)"/><circle cx="860" cy="948" r="5" fill="#FFF3D1"/>
+  </g>
+  <!-- sensores vigilando -->
+  <g fill="none" stroke="#7FB2E5" stroke-width="2">
+    <circle cx="960" cy="400" r="34" fill="url(#ping)" stroke="none"/><circle cx="960" cy="400" r="7" fill="#7FB2E5"/><circle cx="960" cy="400" r="16" opacity=".6"/><circle cx="960" cy="400" r="26" opacity=".3"/>
+    <circle cx="880" cy="632" r="7" fill="#7FB2E5"/><circle cx="880" cy="632" r="16" opacity=".6"/>
+    <circle cx="420" cy="400" r="7" fill="#7FB2E5"/><circle cx="420" cy="400" r="16" opacity=".5"/>
+    <circle cx="700" cy="934" r="7" fill="#7FB2E5"/><circle cx="700" cy="934" r="16" opacity=".6"/><circle cx="700" cy="934" r="26" opacity=".3"/>
+    <circle cx="340" cy="632" r="7" fill="#7FB2E5"/><circle cx="340" cy="632" r="16" opacity=".5"/>
+  </g>
+  <rect width="1200" height="1400" fill="url(#fade)"/>
+</svg>

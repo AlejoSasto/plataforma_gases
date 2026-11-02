@@ -5,14 +5,18 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.core.config import settings
+from app.core.config import get_settings
 from app.core.database import Base
+
+get_settings.cache_clear()
+settings = get_settings()
 
 # Importar modelos para que Base.metadata los registre (autogenerate).
 from app.modules.alerts import models as alerts_models  # noqa: F401
 from app.modules.audit import models as audit_models  # noqa: F401
+from app.modules.catalog import models as catalog_models  # noqa: F401
+from app.modules.forecasting import models as forecasting_models  # noqa: F401
 from app.modules.ml_training import models as ml_models  # noqa: F401
-from app.modules.predictions import models as predictions_models  # noqa: F401
 from app.modules.roles_permissions import models as roles_models  # noqa: F401
 from app.modules.sensors_ingestion import models as sensors_models  # noqa: F401
 from app.modules.stakeholders import models as stakeholders_models  # noqa: F401

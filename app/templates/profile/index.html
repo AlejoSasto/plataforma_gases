@@ -1,40 +1,63 @@
 {% extends "base.html" %}
-{% block page_title %}Mi perfil{% endblock %}
+{% from "components/macros.html" import page_header %}
+{% block page_title %}Mi cuenta{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Datos de cuenta y seguridad.</p>
+{{ page_header("Mi cuenta", "Datos, contraseña, verificación en dos pasos y sesiones.") }}
+{% if current_user.must_change_password %}
+<p class="error-box">Crea tu nueva contraseña para seguir.</p>
+{% endif %}
+{% if totp_required %}
+<p class="error-box">Activa la verificación en dos pasos. Es obligatoria para tu rol.</p>
+{% endif %}
+<div class="layout-2">
+  <div class="card stack">
+    <div><span class="muted">Nombre</span><div>{{ current_user.full_name }}</div></div>
+    <div><span class="muted">Correo</span><div>{{ current_user.email }}</div></div>
+    <div><span class="muted">Roles</span><div>{{ role_labels|join(", ") }}</div></div>
+    <button class="btn btn-ghost" type="button" id="logout-btn">Cerrar sesión</button>
+  </div>
+  <div class="card">
+    <h2>Cambiar contraseña</h2>
+    {% if flash %}<p class="help">{{ flash }}</p>{% endif %}
+    {% if error %}<p class="error-box">{{ error }}</p>{% endif %}
+    <form method="post" action="/mi-cuenta/contrasena" class="stack">
+      <label for="current_password">Contraseña actual</label>
+      <input type="password" name="current_password" id="current_password" required>
+      <label for="new_password">Nueva contraseña</label>
+      <input type="password" name="new_password" id="new_password" minlength="12" required>
+      <p class="help">Al menos 12 caracteres. Evita tu nombre y las claves demasiado comunes.</p>
+      <button class="btn" type="submit">Actualizar</button>
+    </form>
   </div>
 </div>
-<div class="row g-4" style="max-width:720px">
-  <div class="col-md-6">
-    <div class="panel">
-      <div class="kpi-label">Nombre</div>
-      <div class="fw-semibold fs-5">{{ current_user.full_name }}</div>
-      <div class="kpi-label mt-3">Email</div>
-      <div>{{ current_user.email }}</div>
-      <div class="kpi-label mt-3">Roles</div>
-      <div class="small">{{ roles|list|join(", ") }}</div>
-      <button class="btn btn-outline-danger btn-sm mt-4" type="button" onclick="PG.logout()">Cerrar sesión</button>
+<div class="layout-2" style="margin-top: var(--space-5)">
+  <div class="card stack">
+    <h2>Verificación en dos pasos</h2>
+    {% if totp_on %}
+    <p>Ya está activa. Guarda los códigos de respaldo en un lugar seguro.</p>
+    {% else %}
+    <p class="help">Usa una aplicación de autenticación. Te pediremos un código de 6 dígitos al ingresar.</p>
+    <button class="btn" type="button" id="totp-start">Activar</button>
+    <div id="totp-box" class="stack hidden">
+      <p class="help" id="totp-uri"></p>
+      <label for="totp-code">Código actual</label>
+      <input id="totp-code" maxlength="6" inputmode="numeric">
+      <button class="btn" type="button" id="totp-ok">Confirmar</button>
+      <p class="help" id="totp-msg"></p>
+    </div>
+    {% endif %}
+    <div id="backup-box" class="hidden">
+      <p>Códigos de respaldo (un solo uso):</p>
+      <pre id="backup-codes"></pre>
     </div>
   </div>
-  <div class="col-md-6">
-    <div class="panel">
-      <h2 class="section-title mb-3">Cambiar contraseña</h2>
-      {% if flash %}<div class="alert alert-success py-2">{{ flash }}</div>{% endif %}
-      {% if error %}<div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
-      <form method="post" action="/profile/password" class="vstack gap-3">
-        <div>
-          <label class="form-label" for="current_password">Contraseña actual</label>
-          <input class="form-control" type="password" name="current_password" id="current_password" required>
-        </div>
-        <div>
-          <label class="form-label" for="new_password">Nueva contraseña</label>
-          <input class="form-control" type="password" name="new_password" id="new_password" minlength="8" required>
-        </div>
-        <button class="btn btn-primary" type="submit">Actualizar</button>
-      </form>
-    </div>
+  <div class="card stack">
+    <h2>Sesiones activas</h2>
+    <ul id="sessions" class="timeline"></ul>
+    <button class="btn btn-ghost" type="button" id="close-all">Cerrar todas</button>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/pages/profile.js"></script>
 {% endblock %}

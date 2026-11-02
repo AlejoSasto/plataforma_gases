@@ -1,0 +1,36 @@
+{% from "components/macros.html" import status_banner, zone_card, alert_card, empty_state, chart %}
+{{ status_banner(banner, banner_level) }}
+<p class="help">{{ copy.ahead_minutes(horizon) }}</p>
+
+<div class="home-grid">
+  <div class="stack">
+    {% if not cards %}
+      {{ empty_state("circle-dashed", copy.EMPTY_SENSORS_TITLE, copy.EMPTY_SENSORS_TEXT, "/datos/cargar" if can_manage_sensors else "", copy.NAV.cargar if can_manage_sensors else "") }}
+    {% else %}
+      <div class="zone-grid">
+        {% for c in cards %}
+          {{ zone_card(c) }}
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div style="margin-top: var(--space-5)">
+      <h2>Ahora y lo que viene</h2>
+      {% if chart_payload %}
+        {{ chart("now", data_json=chart_payload) }}
+      {% else %}
+        <p class="muted">{{ copy.NO_MODEL }}</p>
+      {% endif %}
+    </div>
+  </div>
+  <aside class="stack">
+    <h2>Avisos abiertos</h2>
+    {% if alerts %}
+      {% for a in alerts %}
+        {{ alert_card(a, can_resolve) }}
+      {% endfor %}
+      <a href="/avisos">Ver todos</a>
+    {% else %}
+      {{ empty_state("circle-check", copy.EMPTY_ALERTS_TITLE, copy.EMPTY_ALERTS_TEXT) }}
+    {% endif %}
+  </aside>
+</div>

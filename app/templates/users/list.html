@@ -1,106 +1,77 @@
 {% extends "base.html" %}
-{% block page_title %}Usuarios{% endblock %}
+{% from "components/macros.html" import page_header %}
+{% block page_title %}Equipo{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Administración de cuentas y roles.</p>
-  </div>
-  <div class="page-header-actions">
-    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#userModal">Nuevo usuario</button>
-  </div>
-</div>
-<div class="panel panel-flush">
-  <div class="table-responsive-wrap">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light"><tr><th>Nombre</th><th>Email</th><th>Roles</th><th>Estado</th><th></th></tr></thead>
-      <tbody>
+{{ page_header("Equipo", "Quién entra a la plataforma y con qué rol.") }}
+<div class="card" style="overflow:auto">
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Nombre</th><th>Correo</th><th>Rol</th><th>Zonas</th><th>Último ingreso</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
       {% for u in users %}
-        <tr>
-          <td>{{ u.full_name }}</td>
-          <td>{{ u.email }}</td>
-          <td class="small">{{ u.roles|join(", ") }}</td>
-          <td>{% if u.is_active %}<span class="badge text-bg-success">activo</span>{% else %}<span class="badge text-bg-secondary">inactivo</span>{% endif %}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary" type="button"
-              data-roles-user="{{ u.id }}"
-              data-roles='{{ u.roles|tojson }}'>Roles</button>
-          </td>
-        </tr>
-      {% else %}
-        <tr><td colspan="5" class="text-secondary text-center py-5">Sin usuarios</td></tr>
+      <tr>
+        <td>{{ u.full_name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.role_labels }}</td>
+        <td>{{ u.site_label }}</td>
+        <td>{{ u.last_login_label }}</td>
+        <td>{{ u.status }}</td>
+        <td class="row-flex">
+          <button class="btn btn-ghost" type="button" data-role="{{ u.id }}">Rol</button>
+          <button class="btn btn-ghost" type="button" data-zones="{{ u.id }}">Zonas</button>
+          {% if u.locked %}<button class="btn btn-ghost" type="button" data-unlock="{{ u.id }}">Desbloquear</button>{% endif %}
+          <button class="btn btn-ghost" type="button" data-force="{{ u.id }}">Pedir contraseña</button>
+          {% if u.is_active %}<button class="btn btn-ghost" type="button" data-off="{{ u.id }}">Desactivar</button>{% endif %}
+        </td>
+      </tr>
       {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    </tbody>
+  </table>
 </div>
-
-<div class="modal fade" id="userModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form class="modal-content" id="create-user-form">
-      <div class="modal-header"><h5 class="modal-title">Nuevo usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body vstack gap-2">
-        <input class="form-control" id="cu-name" placeholder="Nombre completo" required>
-        <input class="form-control" type="email" id="cu-email" placeholder="Email" required>
-        <input class="form-control" type="password" id="cu-pass" placeholder="Contraseña" minlength="8" required>
-        <select class="form-select" id="cu-roles" multiple size="5">
-          {% for r in roles %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
-        </select>
-        <div class="form-text">Mantén Ctrl/Cmd para seleccionar varios roles.</div>
-      </div>
-      <div class="modal-footer"><button class="btn btn-primary" type="submit">Crear</button></div>
+<div class="layout-2" style="margin-top: var(--space-5)">
+  <div class="card stack">
+    <h2>Invitar</h2>
+    <p class="help">La persona recibe un enlace para crear su contraseña. No se inventan claves a mano.</p>
+    <form id="invite-form" class="stack">
+      <label for="inv-name">Nombre</label>
+      <input id="inv-name" required>
+      <label for="inv-email">Correo</label>
+      <input type="email" id="inv-email" required>
+      <label for="inv-roles">Rol</label>
+      <select id="inv-roles" multiple size="6">
+        {% for r in roles %}<option value="{{ r.id }}">{{ r.label or r.name }}</option>{% endfor %}
+      </select>
+      <label for="inv-sites">Zonas</label>
+      <select id="inv-sites" multiple size="4">
+        {% for s in sites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+      </select>
+      <button class="btn" type="submit">Enviar invitación</button>
+      <p class="help" id="inv-msg"></p>
     </form>
   </div>
-</div>
-
-<div class="modal fade" id="rolesModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form class="modal-content" id="roles-form">
-      <div class="modal-header"><h5 class="modal-title">Asignar roles</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <input type="hidden" id="ru-id">
-        <select class="form-select" id="ru-roles" multiple size="5">
-          {% for r in roles %}<option value="{{ r.id }}" data-name="{{ r.name }}">{{ r.name }}</option>{% endfor %}
-        </select>
-      </div>
-      <div class="modal-footer"><button class="btn btn-primary" type="submit">Guardar</button></div>
+  <div class="card stack">
+    <h2>Cambiar rol o zonas</h2>
+    <p class="help">Elige a la persona en la tabla. Los cambios quedan en la bitácora.</p>
+    <form id="role-form" class="stack hidden">
+      <input type="hidden" id="role-uid">
+      <select id="role-ids" multiple size="6">
+        {% for r in roles %}<option value="{{ r.id }}">{{ r.label or r.name }}</option>{% endfor %}
+      </select>
+      <button class="btn" type="submit">Guardar rol</button>
+    </form>
+    <form id="zone-form" class="stack hidden">
+      <input type="hidden" id="zone-uid">
+      <select id="zone-ids" multiple size="6">
+        {% for s in sites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+      </select>
+      <button class="btn" type="submit">Guardar zonas</button>
     </form>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-  document.getElementById("create-user-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const roleIds = Array.from(document.getElementById("cu-roles").selectedOptions).map((o) => Number(o.value));
-    await PG.api("/api/users", {
-      method: "POST",
-      body: {
-        full_name: document.getElementById("cu-name").value,
-        email: document.getElementById("cu-email").value,
-        password: document.getElementById("cu-pass").value,
-        role_ids: roleIds,
-      },
-    });
-    location.reload();
-  });
-
-  document.querySelectorAll("[data-roles-user]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.getElementById("ru-id").value = btn.dataset.rolesUser;
-      const names = JSON.parse(btn.dataset.roles || "[]");
-      Array.from(document.getElementById("ru-roles").options).forEach((o) => {
-        o.selected = names.includes(o.dataset.name);
-      });
-      new bootstrap.Modal(document.getElementById("rolesModal")).show();
-    });
-  });
-
-  document.getElementById("roles-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const id = document.getElementById("ru-id").value;
-    const roleIds = Array.from(document.getElementById("ru-roles").selectedOptions).map((o) => Number(o.value));
-    await PG.api(`/api/users/${id}/roles`, { method: "POST", body: { role_ids: roleIds } });
-    location.reload();
-  });
-</script>
+<script src="/static/js/pages/users.js"></script>
 {% endblock %}

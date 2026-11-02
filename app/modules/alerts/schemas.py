@@ -10,7 +10,8 @@ from pydantic import BaseModel, Field
 
 class AlertResponse(BaseModel):
     id: int
-    prediction_id: Optional[int] = None
+    forecast_id: Optional[int] = None
+    kind: Optional[str] = None
     gas_reading_id: Optional[int] = None
     sensor_id: int
     sensor_code: Optional[str] = None

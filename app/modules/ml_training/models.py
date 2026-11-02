@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -21,8 +21,14 @@ class ModelRegistry(Base):
     name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     version: Mapped[str] = mapped_column(String(64), nullable=False)
     algorithm: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    family: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="tabular", server_default="tabular", index=True
+    )
     params: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     metrics: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    problem_spec: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    calibration: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    selection_score: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     mlflow_run_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     artifact_uri: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(
@@ -59,3 +65,21 @@ class TrainingJob(Base):
     )
     params: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     log: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+
+class ModelEvaluation(Base):
+    __tablename__ = "model_evaluations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    model_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("model_registry.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    fold_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    fold_spec: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    gas_code: Mapped[str] = mapped_column(String(10), nullable=False, index=True)
+    horizon_min: Mapped[int] = mapped_column(Integer, nullable=False)
+    forecast_metrics: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    event_metrics: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    is_final_test: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )

@@ -1,0 +1,16 @@
+# Dependencias del zoo de pronóstico (Plan 17). La imagen app lleva torch CPU.
+# Instalar aparte: pip install -r requirements-ml.txt
+# Los adaptadores no asumen que estén presentes: si falta la librería usan
+# un backend documentado (torch-lite o fallback-conformal).
+
+neuralforecast>=1.7.0,<3
+statsforecast>=1.7.0,<3
+mlforecast>=0.13.0,<2
+lightgbm>=4.3.0,<5
+optuna>=3.6.0,<5
+captum>=0.7.0,<1
+shap>=0.45.0,<1
+# Fundacionales (pesos grandes; se descargan en scripts/fetch_foundation_weights.py)
+chronos-forecasting>=1.4.0,<3
+# timesfm>=1.2.0
+# granite-tsfm>=0.2.0

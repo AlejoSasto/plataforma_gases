@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header, chart, filter_bar %}
+{% block page_title %}Historial{% endblock %}
+{% block content %}
+{{ page_header("Historial", "Lecturas de las últimas horas y periodos con aviso.") }}
+{% call filter_bar() %}
+<form method="get" class="row-flex">
+  <div>
+    <label for="site_id">Zona</label>
+    <select name="site_id" id="site_id">
+      <option value="">Todas</option>
+      {% for s in sites %}
+      <option value="{{ s.id }}" {% if site_id|string == s.id|string %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="hours">Ventana</label>
+    <select name="hours" id="hours">
+      <option value="24" {% if hours == 24 %}selected{% endif %}>24 horas</option>
+      <option value="168" {% if hours == 168 %}selected{% endif %}>7 días</option>
+    </select>
+  </div>
+  <button class="btn" type="submit">Ver</button>
+</form>
+{% endcall %}
+{% if chart_payload %}
+  {{ chart("history", data_json=chart_payload) }}
+{% else %}
+  <p class="muted">Elige una zona para ver su historial.</p>
+{% endif %}
+{% endblock %}

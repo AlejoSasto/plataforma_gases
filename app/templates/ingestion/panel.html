@@ -1,91 +1,36 @@
 {% extends "base.html" %}
-{% block page_title %}Ingesta / ETL{% endblock %}
+{% from "components/macros.html" import page_header %}
+{% block page_title %}Cargar datos{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div>
-    <p class="page-subtitle mb-0">Sube archivos y revisa el historial de corridas.</p>
+{{ page_header("Cargar datos", "Arrastra un Excel. Te diremos cómo va, paso a paso.") }}
+<div class="card stack">
+  <div class="dropzone" id="dropzone">
+    <p>Suelta el archivo aquí o elige uno</p>
+    <input type="file" id="etl-files" multiple accept=".xlsx,.xls,.csv">
   </div>
+  <div class="progress hidden" id="etl-progress"><span></span></div>
+  <p id="etl-msg" class="help"></p>
+  <button class="btn" type="button" id="etl-upload" data-stages='{{ stages | tojson }}'>Cargar</button>
 </div>
-
-<div class="panel mb-4">
-  <h2 class="section-title mb-3">Subir archivo(s)</h2>
-  <label class="form-label" for="etl-files">Excel / CSV</label>
-  <input class="form-control" type="file" id="etl-files" multiple accept=".xlsx,.xls,.csv">
-  <div class="progress mt-3 d-none" id="etl-progress">
-    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%">Procesando…</div>
-  </div>
-  <div id="etl-msg" class="small mt-2"></div>
-  <button class="btn btn-primary mt-3" type="button" id="etl-upload">Subir</button>
-</div>
-
-<div class="panel panel-flush">
-  <div class="panel-body"><h2 class="section-title mb-0">Corridas recientes</h2></div>
-  <div class="table-responsive-wrap">
-    <table class="table table-hover align-middle mb-0" id="runs-table">
-      <thead class="table-light">
-        <tr><th>ID</th><th>Estado</th><th>Ingestadas</th><th>Rechazadas</th><th>Inicio</th><th>Fin</th><th></th></tr>
-      </thead>
-      <tbody>
-      {% for r in runs %}
-        <tr>
-          <td>{{ r.id }}</td>
-          <td>{{ r.status }}</td>
-          <td>{{ r.rows_ingested }}</td>
-          <td>{{ r.rows_rejected }}</td>
-          <td class="small text-secondary">{{ r.started_at }}</td>
-          <td class="small text-secondary">{{ r.finished_at or "—" }}</td>
-          <td><button class="btn btn-sm btn-outline-secondary" type="button" data-run="{{ r.id }}">Detalle</button></td>
-        </tr>
-      {% else %}
-        <tr><td colspan="7" class="text-secondary text-center py-5">Aún no hay corridas ETL</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="modal fade" id="runModal" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Detalle de corrida</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body"><pre class="small mb-0" id="run-log" style="white-space:pre-wrap"></pre></div>
-    </div>
-  </div>
+<div class="card" style="margin-top: var(--space-5)">
+  <h2>Cargas recientes</h2>
+  <table>
+    <thead><tr><th>Estado</th><th>Leídas</th><th>Con problemas</th><th>Inicio</th></tr></thead>
+    <tbody>
+    {% for r in runs %}
+      <tr>
+        <td>{{ r.status }}</td>
+        <td class="num">{{ r.rows_ingested }}</td>
+        <td class="num">{{ r.rows_rejected }}</td>
+        <td class="help">{{ r.started_at }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="muted">Aún no hay cargas</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-  document.getElementById("etl-upload").addEventListener("click", async () => {
-    const files = document.getElementById("etl-files").files;
-    const msg = document.getElementById("etl-msg");
-    const prog = document.getElementById("etl-progress");
-    if (!files.length) { msg.textContent = "Selecciona al menos un archivo"; return; }
-    const fd = new FormData();
-    for (const f of files) fd.append("files", f);
-    prog.classList.remove("d-none");
-    msg.textContent = "";
-    try {
-      const res = await fetch("/api/ingestion/upload", { method: "POST", body: fd, credentials: "same-origin" });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || "Error al subir");
-      msg.textContent = `Corrida #${data.id} · estado ${data.status} · ${data.rows_ingested} filas`;
-      msg.className = "small mt-2 text-success";
-      setTimeout(() => location.reload(), 800);
-    } catch (e) {
-      msg.textContent = e.message;
-      msg.className = "small mt-2 text-danger";
-    } finally {
-      prog.classList.add("d-none");
-    }
-  });
-
-  document.querySelectorAll("[data-run]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const data = await PG.api(`/api/ingestion/runs/${btn.dataset.run}`);
-      const log = data.log || data.source_files || data;
-      document.getElementById("run-log").textContent = typeof log === "string" ? log : JSON.stringify(log, null, 2);
-      new bootstrap.Modal(document.getElementById("runModal")).show();
-    });
-  });
-</script>
+<script src="/static/js/pages/ingestion.js"></script>
 {% endblock %}

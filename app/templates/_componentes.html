@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import status_badge, status_banner, gas_tile, alert_card, metric_big, empty_state, chart, toast, page_header %}
+{% block page_title %}Componentes{% endblock %}
+{% block content %}
+{{ page_header("Catálogo de componentes", "Solo visible en entorno local.") }}
+<h2>Estados</h2>
+<div class="row-flex">
+  {{ status_badge("normal") }}
+  {{ status_badge("vigilar") }}
+  {{ status_badge("actuar") }}
+  {{ status_badge("evacuar") }}
+  {{ status_badge("sin_datos") }}
+</div>
+<div style="margin-top: var(--space-4)">
+  {{ status_banner("Todo normal", "normal") }}
+</div>
+<div style="margin-top: var(--space-3)">
+  {{ status_banner("2 zonas requieren atención", "actuar") }}
+</div>
+<h2>Cifra y gas</h2>
+{{ gas_tile("Metano", "0,72 %", "Se espera alrededor de 0,8 %") }}
+{{ metric_big("9", "Avisó a tiempo", "De cada 10 situaciones peligrosas") }}
+<h2>Aviso</h2>
+{{ alert_card(sample_alert) }}
+<h2>Vacío</h2>
+{{ empty_state("circle-dashed", copy.EMPTY_SENSORS_TITLE, copy.EMPTY_SENSORS_TEXT) }}
+<h2>Gráfico</h2>
+{{ chart("now", data_json=sample_chart) }}
+{% endblock %}

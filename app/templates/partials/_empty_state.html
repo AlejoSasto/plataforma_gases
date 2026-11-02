@@ -1,7 +1,2 @@
-<div class="empty-state">
-  <p class="mb-2 fw-medium">{{ title or "Sin datos" }}</p>
-  {% if message %}<p class="mb-3 small mx-auto" style="max-width: 28rem;">{{ message }}</p>{% endif %}
-  {% if action_href and action_label %}
-  <a href="{{ action_href }}" class="btn btn-primary btn-sm">{{ action_label }}</a>
-  {% endif %}
-</div>
+{% from "components/macros.html" import empty_state %}
+{{ empty_state("circle-dashed", title, message or "", action_href or "", action_label or "") }}

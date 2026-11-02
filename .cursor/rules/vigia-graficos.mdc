@@ -1,0 +1,15 @@
+---
+description: Convenciones de gráficos ECharts en Vigía.
+globs: app/static/js/charts.js, app/templates/**/*.html, app/modules/**/router.py
+alwaysApply: false
+---
+# Gráficos
+
+- ECharts 5 local (`static/vendor/echarts.min.js`), renderizador SVG, sin animación de entrada.
+- Una función por tipo en `app/static/js/charts.js` (`chartNowNext`, `chartMonthly`, `chartLab`, `sparkline`). Ningún template configura ECharts a mano: usa el macro `chart(kind, url)`.
+- Colores siempre desde variables CSS (`--chart-measured`, `--chart-expected`, `--chart-band`, `--chart-grid`, `--st-*`), para que el modo sala funcione solo.
+- "Ahora y lo que viene": medido sólido antracita, esperado punteado azul, banda q10–q90, línea vertical "Ahora", límites horizontales del color de su estado con etiqueta directa ("Actuar ya 1,0 %"). Leyenda debajo, en frases.
+- Tooltips en frase completa ("A las 10:42 se espera alrededor de 1,05 %").
+- Si no hay pronóstico (`has_forecast=false`), mostrar solo lo medido y la nota `copy.NO_FORECAST`.
+- Contrato JSON del gráfico: `design/docs/22_MOCKUPS_Y_GUIA_DE_IMPLEMENTACION.md` §4.
+- El área técnica (Laboratorio) puede usar etiquetas técnicas y Plex Mono.

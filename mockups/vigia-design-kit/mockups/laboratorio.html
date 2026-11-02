@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="app">
+<nav class="rail" aria-label="Navegación principal">
+  <a class="rail__brand" href="hoy.html"><img src="assets/img/isotipo.svg" alt=""><div><strong>Vigía</strong><span>Gases en la mina</span></div></a>
+  <div class="rail__strata" aria-hidden="true"></div>
+  <div class="rail__group"><div class="rail__group-title">Operación</div><a class="rail__link" href="hoy.html"><i data-icon="house"></i>Hoy</a><a class="rail__link" href="avisos.html"><i data-icon="bell"></i>Avisos<span class="rail__count" aria-label="2 avisos abiertos">2</span></a><a class="rail__link" href="#"><i data-icon="map-pinned"></i>Zonas y sensores</a><a class="rail__link" href="#"><i data-icon="history"></i>Historial</a></div><div class="rail__group"><div class="rail__group-title">Seguimiento</div><a class="rail__link" href="#"><i data-icon="file-text"></i>Informes</a><a class="rail__link" href="confiabilidad.html"><i data-icon="gauge"></i>Confiabilidad</a></div><div class="rail__group"><div class="rail__group-title">Administración</div><a class="rail__link" href="equipo.html"><i data-icon="users"></i>Equipo</a><a class="rail__link" href="#"><i data-icon="sliders-horizontal"></i>Límites de seguridad</a><a class="rail__link" href="#"><i data-icon="upload"></i>Cargar datos</a><a class="rail__link" href="laboratorio.html" aria-current="page"><i data-icon="flask-conical"></i>Laboratorio<span class="rail__tech">Técnico</span></a></div>
+  <div class="rail__foot"><div class="avatar">FS</div><div class="rail__who"><strong>Fabio Sastoque</strong><span>Analista de datos</span></div></div>
+</nav>
+<div class="main">
+<header class="topbar">
+  <div class="topbar__site"><i data-icon="map-pinned" class="ico ico-sm"></i>Mina caso de estudio, Cundinamarca</div>
+  <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día, última lectura hace 40 s</div>
+  <div class="topbar__spacer"></div>
+  <button class="icon-btn" aria-label="Buscar"><i data-icon="search"></i></button>
+  <button class="icon-btn" aria-label="2 avisos abiertos"><i data-icon="bell"></i><span class="badge-dot"></span></button>
+  <button class="icon-btn" aria-label="Salir"><i data-icon="log-out"></i></button>
+</header>
+<main class="content" id="contenido">
+
+<div class="tech-banner"><i data-icon="flask-conical" class="ico ico-sm"></i>Área técnica. Lo que se ve aquí no aparece en las vistas de operación ni de gerencia.</div>
+<div class="page-head">
+  <div class="page-head__text"><h1>Laboratorio de modelos</h1><p>Validación walk-forward con purga y embargo, 5 pliegues, solo datos reales. Metano, horizonte de 10 min, nivel Actuar ya.</p></div>
+  <div class="page-head__actions"><button class="btn"><i data-icon="database"></i>Calidad de los datos</button><button class="btn btn--primary">Correr comparación</button></div>
+</div>
+<div class="stack">
+  <section class="panel panel--flush" style="overflow-x:auto">
+    <div class="panel__head"><h2>Comparación del zoo</h2><span class="faint">Media de los pliegues</span></div>
+    <table class="table"><thead><tr><th>Modelo</th><th>Familia</th><th class="num">MASE</th><th class="num">RMSE % vol</th><th class="num">Recall evento</th><th class="num">Precisión evento</th><th class="num">Falsas / turno</th><th class="num">Anticipación p50</th></tr></thead><tbody><tr><td><strong class="reading" style="font-size:.9rem">tft</strong> <span class="prod-mark">Activo</span></td><td class="faint">Transformer</td><td class="num">0,74</td><td class="num"><span class="gate gate--ok">0,031</span></td><td class="num"><span class="gate gate--no">0,94</span></td><td class="num"><span class="gate gate--ok">0,91</span></td><td class="num">0,6</td><td class="num">7,2</td></tr><tr><td><strong class="reading" style="font-size:.9rem">chronos2</strong></td><td class="faint">Fundacional</td><td class="num">0,77</td><td class="num"><span class="gate gate--ok">0,034</span></td><td class="num"><span class="gate gate--no">0,91</span></td><td class="num"><span class="gate gate--no">0,89</span></td><td class="num">0,8</td><td class="num">6,5</td></tr><tr><td><strong class="reading" style="font-size:.9rem">patchtst</strong></td><td class="faint">Transformer</td><td class="num">0,79</td><td class="num"><span class="gate gate--ok">0,036</span></td><td class="num"><span class="gate gate--no">0,88</span></td><td class="num"><span class="gate gate--ok">0,90</span></td><td class="num">0,7</td><td class="num">6,1</td></tr><tr><td><strong class="reading" style="font-size:.9rem">timesfm</strong></td><td class="faint">Fundacional</td><td class="num">0,80</td><td class="num"><span class="gate gate--ok">0,037</span></td><td class="num"><span class="gate gate--no">0,88</span></td><td class="num"><span class="gate gate--no">0,86</span></td><td class="num">0,9</td><td class="num">6,0</td></tr><tr><td><strong class="reading" style="font-size:.9rem">itransformer</strong></td><td class="faint">Transformer</td><td class="num">0,81</td><td class="num"><span class="gate gate--ok">0,037</span></td><td class="num"><span class="gate gate--no">0,85</span></td><td class="num"><span class="gate gate--no">0,87</span></td><td class="num">0,8</td><td class="num">5,8</td></tr><tr><td><strong class="reading" style="font-size:.9rem">ttm</strong></td><td class="faint">Fundacional</td><td class="num">0,82</td><td class="num"><span class="gate gate--ok">0,038</span></td><td class="num"><span class="gate gate--no">0,85</span></td><td class="num"><span class="gate gate--no">0,84</span></td><td class="num">1,1</td><td class="num">5,4</td></tr><tr><td><strong class="reading" style="font-size:.9rem">lgbm_q</strong></td><td class="faint">Tabular</td><td class="num">0,84</td><td class="num"><span class="gate gate--ok">0,040</span></td><td class="num"><span class="gate gate--no">0,82</span></td><td class="num"><span class="gate gate--no">0,85</span></td><td class="num">0,9</td><td class="num">4,9</td></tr><tr><td><strong class="reading" style="font-size:.9rem">lstm</strong></td><td class="faint">Recurrente</td><td class="num">0,86</td><td class="num"><span class="gate gate--ok">0,041</span></td><td class="num"><span class="gate gate--no">0,79</span></td><td class="num"><span class="gate gate--no">0,83</span></td><td class="num">1,2</td><td class="num">4,6</td></tr><tr><td><strong class="reading" style="font-size:.9rem">ets</strong></td><td class="faint">Referencia</td><td class="num">0,97</td><td class="num"><span class="gate gate--ok">0,049</span></td><td class="num"><span class="gate gate--no">0,62</span></td><td class="num"><span class="gate gate--no">0,74</span></td><td class="num">1,8</td><td class="num">2,9</td></tr><tr><td><strong class="reading" style="font-size:.9rem">persistencia</strong></td><td class="faint">Referencia</td><td class="num">1,00</td><td class="num"><span class="gate gate--no">0,052</span></td><td class="num"><span class="gate gate--no">0,41</span></td><td class="num"><span class="gate gate--no">0,68</span></td><td class="num">2,4</td><td class="num">1,5</td></tr></tbody></table>
+  </section>
+  <aside class="lab-aside">
+    <section class="panel"><div class="panel__head"><h3>MASE frente a persistencia</h3></div><div class="chart" data-chart="lab" style="height:340px"></div></section>
+    <section class="panel"><div class="panel__body" style="display:grid;gap:8px"><h3>Metas de la tesis</h3>
+      <ul class="faint" style="margin:0;padding-left:1.1em"><li>Recall por evento ≥ 0,95</li><li>Precisión por evento ≥ 0,90</li><li>RMSE CH₄ ≤ 0,05 % vol</li><li>Anticipación p50 ≥ 5 min</li></ul>
+      <p class="muted">Ningún modelo cumple todas las metas todavía. Se reporta tal cual en la tesis.</p></div></section>
+  </aside>
+</div>
+</main></div></div>
+<nav class="mobile-nav" aria-label="Navegación">
+  <a href="hoy.html"><i data-icon="house"></i>Hoy</a>
+  <a href="avisos.html"><i data-icon="bell"></i>Avisos</a>
+  <a href="#"><i data-icon="map-pinned"></i>Zonas</a>
+  <a href="#"><i data-icon="users"></i>Más</a>
+</nav>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

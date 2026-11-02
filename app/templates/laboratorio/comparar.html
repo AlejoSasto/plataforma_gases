@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "partials/_metric_gate.html" import gate_badge %}
+{% block page_title %}Comparativa{% endblock %}
+{% block content %}
+<div class="lab-banner">{{ copy.LAB_BADGE }}</div>
+<h1>Comparativa de modelos</h1>
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Algoritmo</th><th>Familia</th><th>F1</th><th>Recall</th><th>Precisión</th>
+        <th>FN%</th><th>RMSE</th><th>Thesis</th><th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for m in compare %}
+      {% set g = (m.metrics or {}).get('gates') or {} %}
+      <tr>
+        <td><a href="/laboratorio/modelos/{{ m.id }}">{{ m.algorithm }}</a></td>
+        <td>{{ m.family or "—" }}</td>
+        <td>{{ "%.3f"|format(m.metrics.f1) if m.metrics.get('f1') is not none else "—" }}</td>
+        <td>{{ "%.3f"|format(m.metrics.recall) if m.metrics.get('recall') is not none else "—" }}</td>
+        <td>{{ "%.3f"|format(m.metrics.precision) if m.metrics.get('precision') is not none else "—" }}</td>
+        <td>{{ "%.1f%%"|format((m.metrics.false_negative_rate or 0)*100) if m.metrics.get('false_negative_rate') is not none else "—" }}</td>
+        <td>{{ "%.4f"|format(m.metrics.rmse) if m.metrics.get('rmse') is not none else "—" }}</td>
+        <td>{{ gate_badge(g.get('meets_thesis')) }}</td>
+        <td>{{ m.status }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="9" class="muted">Sin modelos para comparar</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

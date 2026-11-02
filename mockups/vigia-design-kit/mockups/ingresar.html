@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingresar | Vigía</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<main class="login">
+  <section class="login__art" aria-label="Vigía">
+    <img class="hero" src="assets/img/login-hero.svg" alt="">
+    <div class="login__brand"><img src="assets/img/isotipo.svg" alt=""><strong>Vigía</strong></div>
+    <p class="login__claim">Saber a tiempo qué está pasando con los gases en la mina.</p>
+    <div class="login__status"><span class="dot-live" aria-hidden="true"></span>El sistema está funcionando y recibe datos</div>
+  </section>
+  <section class="login__form">
+    <form class="login__box" onsubmit="return false">
+      <div>
+        <h1>Ingresar</h1>
+        <p class="muted" style="margin-top:6px">Usa el correo con el que te invitaron.</p>
+      </div>
+      <div class="form-error" role="alert"><i data-icon="info" class="ico"></i><span>El correo o la contraseña no coinciden. Revisa e intenta de nuevo.</span></div>
+      <div class="field"><label for="correo">Correo</label><input class="input" id="correo" type="email" autocomplete="username" value="ana.rojas@mina.co"></div>
+      <div class="field"><label for="clave">Contraseña</label>
+        <div class="field__pw"><input class="input" id="clave" type="password" autocomplete="current-password" value="contraseña segura"><button type="button" class="btn btn--quiet">Mostrar</button></div>
+      </div>
+      <label class="check"><input type="checkbox" checked> Mantener la sesión durante mi turno</label>
+      <button class="btn btn--primary btn--lg btn--block" type="submit">Ingresar</button>
+      <a href="#" style="justify-self:center">¿Olvidaste tu contraseña?</a>
+      <p class="micro" style="text-align:center">Si necesitas acceso, pídeselo al administrador de la plataforma.</p>
+    </form>
+  </section>
+</main>
+<script src="assets/js/echarts.min.js"></script>
+<script src="assets/js/vigia.js"></script>
+</body>
+</html>

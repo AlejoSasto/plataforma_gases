@@ -1,111 +1,51 @@
 {% extends "base.html" %}
-{% block page_title %}Alerta #{{ alert.id }}{% endblock %}
+{% from "components/macros.html" import page_header, status_badge, explain_block, action_block, chart %}
+{% block page_title %}Aviso{% endblock %}
 {% block content %}
-<div class="page-header">
-  <div class="d-flex flex-wrap gap-2 align-items-center">
-    {% with level=alert.level %}{% include "partials/_risk_badge.html" %}{% endwith %}
-    <span class="badge text-bg-light border fw-normal">{{ alert.status }}</span>
-    <span class="meta-chip">{{ alert.created_at }}</span>
-  </div>
-  {% if can_resolve and alert.status != 'resuelta' %}
-  <div class="page-header-actions">
-    {% if alert.status == 'abierta' %}
-    <button class="btn btn-outline-primary btn-sm" id="btn-ack" type="button">Reconocer</button>
+{{ page_header(alert.title, alert.headline) }}
+<div class="row-flex" style="margin-bottom: var(--space-4)">
+  {{ status_badge(alert.status_key) }}
+  <span class="muted">{{ alert.status_ui }} · {{ alert.created_at }}</span>
+</div>
+
+{% if chart_payload %}
+<h2>Ahora y lo que viene</h2>
+{{ chart("now", data_json=chart_payload) }}
+{% endif %}
+
+<div class="layout-2" style="margin-top: var(--space-5)">
+  <div class="card stack">
+    <p class="num">{{ alert.now }} · {{ alert.expected }} · {{ alert.limit }}</p>
+    {{ explain_block(alert.why) }}
+    {{ action_block(alert.action) }}
+    {% if can_resolve and alert.status != 'resuelta' %}
+    <div class="row-flex">
+      {% if alert.status == 'abierta' %}
+      <button class="btn" type="button" data-ack="{{ alert.id }}">{{ copy.ACK }}</button>
+      {% endif %}
+      <button class="btn btn-ghost" type="button" id="open-resolve">{{ copy.RESOLVE }}</button>
+    </div>
+    <dialog id="resolve-dialog">
+      <h2>{{ copy.RESOLVE }}</h2>
+      <label for="resolve-note">Nota</label>
+      <textarea id="resolve-note" rows="3"></textarea>
+      <div class="row-flex" style="margin-top:12px">
+        <button class="btn btn-ghost" type="button" id="cancel-resolve">Cancelar</button>
+        <button class="btn" type="button" data-resolve="{{ alert.id }}">{{ copy.RESOLVE }}</button>
+      </div>
+    </dialog>
     {% endif %}
-    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#resolveModal">Resolver</button>
   </div>
-  {% endif %}
-</div>
-
-<div class="row g-4">
-  <div class="col-lg-7">
-    <div class="panel mb-4">
-      <h2 class="section-title mb-3">Detalle</h2>
-      <dl class="row mb-0 gy-2">
-        <dt class="col-sm-3 text-secondary fw-normal">Sitio</dt><dd class="col-sm-9 mb-0">{{ alert.site_name or "—" }}</dd>
-        <dt class="col-sm-3 text-secondary fw-normal">Sensor</dt><dd class="col-sm-9 mb-0">{{ alert.sensor_code }} · {{ alert.gas_type }}</dd>
-        <dt class="col-sm-3 text-secondary fw-normal">Mensaje</dt><dd class="col-sm-9 mb-0">{{ alert.message }}</dd>
-        <dt class="col-sm-3 text-secondary fw-normal">Recomendación</dt><dd class="col-sm-9 mb-0">{{ alert.recommendation }}</dd>
-        <dt class="col-sm-3 text-secondary fw-normal">Predicción</dt><dd class="col-sm-9 mb-0">#{{ alert.prediction_id or "—" }} · lectura #{{ alert.gas_reading_id or "—" }}</dd>
-      </dl>
-    </div>
-    <div class="panel">
-      <h2 class="section-title mb-3">Historial de estado</h2>
-      <ul class="timeline">
-        <li><strong>Creada</strong><div class="small text-secondary">{{ alert.created_at }}</div></li>
-        {% if alert.acknowledged_at %}
-        <li><strong>Reconocida</strong> por usuario #{{ alert.acknowledged_by }}
-          <div class="small text-secondary">{{ alert.acknowledged_at }}</div>
-        </li>
-        {% endif %}
-        {% if alert.resolved_at %}
-        <li><strong>Resuelta</strong>
-          <div class="small text-secondary">{{ alert.resolved_at }}</div>
-          {% if alert.resolution_note %}<div class="mt-1">{{ alert.resolution_note }}</div>{% endif %}
-        </li>
-        {% endif %}
-      </ul>
-    </div>
-  </div>
-  <div class="col-lg-5">
-    <div class="panel panel-flush">
-      <div class="panel-body">
-        <h2 class="section-title mb-3">Notificaciones enviadas</h2>
-      </div>
-      <div class="table-responsive-wrap">
-        <table class="table align-middle mb-0">
-          <thead class="table-light"><tr><th>Canal</th><th>Stakeholder</th><th>Estado</th></tr></thead>
-          <tbody>
-          {% for n in notifications %}
-            <tr>
-              <td>{{ n.channel }}</td>
-              <td>#{{ n.stakeholder_id }}</td>
-              <td>{{ n.status }}{% if n.error %} <span class="text-danger small">{{ n.error }}</span>{% endif %}</td>
-            </tr>
-          {% else %}
-            <tr><td colspan="3" class="text-secondary text-center py-4">Sin notificaciones registradas</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="resolveModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Resolver alerta</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <label class="form-label" for="note">Nota de resolución</label>
-        <textarea class="form-control" id="note" rows="3"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" id="btn-resolve" type="button">Confirmar</button>
-      </div>
-    </div>
+  <div class="card">
+    <h2>Línea de tiempo</h2>
+    <ul class="timeline">
+      <li>Creado · {{ alert.created_at }}</li>
+      {% if alert.acknowledged_at %}<li>Visto por {{ alert.acknowledged_name or "alguien del equipo" }} · {{ alert.acknowledged_at }}</li>{% endif %}
+      {% if alert.resolved_at %}<li>Cerrado · {{ alert.resolved_at }}{% if alert.resolution_note %} · {{ alert.resolution_note }}{% endif %}</li>{% endif %}
+    </ul>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-  const alertId = {{ alert.id }};
-  const ackBtn = document.getElementById("btn-ack");
-  if (ackBtn) {
-    ackBtn.addEventListener("click", async () => {
-      await PG.api(`/api/alerts/${alertId}/acknowledge`, { method: "POST", body: {} });
-      location.reload();
-    });
-  }
-  const resolveBtn = document.getElementById("btn-resolve");
-  if (resolveBtn) {
-    resolveBtn.addEventListener("click", async () => {
-      await PG.api(`/api/alerts/${alertId}/resolve`, {
-        method: "POST",
-        body: { resolution_note: document.getElementById("note").value || null },
-      });
-      location.reload();
-    });
-  }
-</script>
+<script src="/static/js/pages/alerts-detail.js"></script>
 {% endblock %}
