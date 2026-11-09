@@ -3,8 +3,8 @@
 {% block page_title %}Límites de seguridad{% endblock %}
 {% block content %}
 {{ page_header("Límites de seguridad", "Solo lo que dice el Decreto 1886, con su artículo. Lo demás queda sin definir.") }}
-<div class="card">
-  <table>
+<div class="card table-wrap">
+  <table class="table">
     <thead><tr><th>Gas</th><th>Nivel</th><th>Valor</th><th>Cómo se mide</th><th>Artículo</th><th>Estado</th></tr></thead>
     <tbody>
     {% for row in limits %}

@@ -60,6 +60,7 @@
   --focus:         #2F7BD0;
   --rail-bg:       var(--c-antracita);
   --rail-text:     #C9D0D8;
+  --rail-muted:    #C5CED6;
   --rail-active:   #FFFFFF;
   --chart-measured: #1A1E24;
   --chart-expected: #1C5A8E;

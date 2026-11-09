@@ -8,7 +8,10 @@
   <h2>Métricas</h2>
   <pre class="help">{{ model.metrics }}</pre>
 </div>
-<p style="margin-top: var(--space-4)"><a href="/laboratorio">Volver al catálogo</a></p>
+<p class="row-flex" style="margin-top: var(--space-4)">
+  <a href="/laboratorio">Volver al catálogo</a>
+  <button class="btn btn--quiet" type="button" data-report="{{ model.id }}">Descargar informe técnico</button>
+</p>
 {% if can_promote and model.status != 'production' %}
 <button class="btn" type="button" data-promote="{{ model.id }}">Promover a production</button>
 {% endif %}

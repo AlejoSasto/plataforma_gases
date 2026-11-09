@@ -5,7 +5,8 @@
 {{ page_header("Contactos de aviso", "Quién recibe qué aviso y por qué canal.") }}
 <div class="layout-2">
   <div class="card">
-    <table>
+    <div class="table-wrap">
+    <table class="table">
       <thead><tr><th>Nombre</th><th>Tipo</th><th>Correo</th><th>Canales</th></tr></thead>
       <tbody>
       {% for s in stakeholders %}
@@ -20,6 +21,7 @@
       {% endfor %}
       </tbody>
     </table>
+    </div>
     <div id="subs-box" class="hidden" style="margin-top: var(--space-4)">
       <h2>Avisos de <span id="subs-name"></span></h2>
       <ul id="subs-list"></ul>

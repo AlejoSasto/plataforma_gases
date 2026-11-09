@@ -19,7 +19,7 @@ from app.modules.stakeholders.service import alert_ids_visible_to_user
 from app.modules.users.models import User
 from app.shared.exceptions import NotFoundError, PermissionDeniedError, ValidationError
 
-REPORT_TYPES = {"alertas_periodo", "desempeno_modelo", "resumen_ejecutivo"}
+REPORT_TYPES = {"alertas_periodo", "desempeno_modelo", "resumen_ejecutivo", "confiabilidad"}
 
 
 def _ensure_dir() -> Path:
@@ -158,26 +158,60 @@ def create_ejecutivo_report(
     start: date,
     end: date,
     stakeholder_id: Optional[int] = None,
+    formato: str = "pdf",
 ) -> dict[str, Any]:
     if end < start:
         raise ValidationError("end debe ser >= start")
+    if formato not in {"pdf", "xlsx"}:
+        raise ValidationError("El formato tiene que ser pdf o xlsx")
     if stakeholder_id is not None:
         _assert_interesado_owns_stakeholder(db, user, stakeholder_id)
-    content = gen.generate_resumen_ejecutivo(
-        db,
-        _date_to_dt(start),
-        _date_to_dt(end, end=True),
-        stakeholder_id=stakeholder_id,
-        user_id=user.id if "interesado" in user.role_names and "admin" not in user.role_names else None,
-    )
+    start_dt = _date_to_dt(start)
+    end_dt = _date_to_dt(end, end=True)
+    who = user.full_name or user.email
+    restricted = user.id if "interesado" in user.role_names and "admin" not in user.role_names else None
+    if formato == "xlsx":
+        content = gen.generate_resumen_ejecutivo(
+            db,
+            start_dt,
+            end_dt,
+            stakeholder_id=stakeholder_id,
+            user_id=restricted,
+        )
+        ext = "xlsx"
+    else:
+        content = gen.generate_resumen_pdf(
+            db,
+            start_dt,
+            end_dt,
+            stakeholder_id=stakeholder_id,
+            user_id=restricted,
+            who=who,
+        )
+        ext = "pdf"
     row = _save_bytes(
         db,
         report_type="resumen_ejecutivo",
         content=content,
-        ext="xlsx",
+        ext=ext,
         user=user,
-        period_start=_date_to_dt(start),
-        period_end=_date_to_dt(end, end=True),
+        period_start=start_dt,
+        period_end=end_dt,
+    )
+    return _to_response(row)
+
+
+def create_confiabilidad_report(db: Session, user: User) -> dict[str, Any]:
+    content = gen.generate_confiabilidad(db, who=user.full_name or user.email)
+    today = datetime.now(timezone.utc)
+    row = _save_bytes(
+        db,
+        report_type="confiabilidad",
+        content=content,
+        ext="pdf",
+        user=user,
+        period_start=today,
+        period_end=today,
     )
     return _to_response(row)
 

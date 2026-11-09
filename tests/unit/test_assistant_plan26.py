@@ -332,6 +332,7 @@ def test_report_pdf_from_assistant(db: Session, monkeypatch: pytest.MonkeyPatch,
     assert "Datos hasta" in text
     assert "Periodo" in text
     assert "Origen" in text
+    assert "Avisos del periodo" in text
 
 
 def test_manual_covers_screens() -> None:

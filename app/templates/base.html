@@ -28,7 +28,7 @@
       </a>
       <div class="rail__strata" aria-hidden="true"></div>
       <div class="rail__group">
-        <div class="rail__group-title">Operación</div>
+        <div class="rail__group-title">{{ copy.NAV_GROUP.operacion }}</div>
         <a class="rail__link" href="/" {% if active_nav == 'hoy' %}aria-current="page"{% endif %}>{{ icon("house") }} {{ copy.NAV.hoy }}</a>
         {% if 'alerts.view' in permissions %}
         <a class="rail__link" href="/avisos" {% if active_nav == 'avisos' %}aria-current="page"{% endif %}>{{ icon("bell") }} {{ copy.NAV.avisos }}</a>
@@ -40,17 +40,17 @@
       </div>
       {% if 'reports.export' in permissions or 'audit.view' in permissions or 'admin' in roles %}
       <div class="rail__group">
-        <div class="rail__group-title">Seguimiento</div>
+        <div class="rail__group-title">{{ copy.NAV_GROUP.seguimiento }}</div>
         {% if 'reports.export' in permissions %}
         <a class="rail__link" href="/informes" {% if active_nav == 'informes' %}aria-current="page"{% endif %}>{{ icon("file-text") }} {{ copy.NAV.informes }}</a>
         {% endif %}
         <a class="rail__link" href="/confiabilidad" {% if active_nav == 'confiabilidad' %}aria-current="page"{% endif %}>{{ icon("gauge") }} {{ copy.NAV.confiabilidad }}</a>
-        <a class="rail__link" href="/resumen" {% if active_nav == 'resumen' %}aria-current="page"{% endif %}>{{ icon("gauge") }} Resumen</a>
+        <a class="rail__link" href="/resumen" {% if active_nav == 'resumen' %}aria-current="page"{% endif %}>{{ icon("gauge") }} {{ copy.NAV.resumen }}</a>
       </div>
       {% endif %}
       {% if 'sensors.manage' in permissions or 'data.upload' in permissions or 'data.quality.view' in permissions or 'models.train' in permissions or 'thresholds.manage' in permissions %}
       <div class="rail__group">
-        <div class="rail__group-title">Datos</div>
+        <div class="rail__group-title">{{ copy.NAV_GROUP.datos }}</div>
         {% if 'sensors.manage' in permissions or 'data.upload' in permissions %}
         <a class="rail__link" href="/datos/cargar" {% if active_nav == 'cargar' %}aria-current="page"{% endif %}>{{ icon("upload") }} {{ copy.NAV.cargar }}</a>
         {% endif %}
@@ -67,12 +67,12 @@
       {% endif %}
       {% if 'users.manage' in permissions or 'stakeholders.manage' in permissions or 'audit.view' in permissions or 'kiosk.manage' in permissions %}
       <div class="rail__group">
-        <div class="rail__group-title">Administración</div>
+        <div class="rail__group-title">{{ copy.NAV_GROUP.admin }}</div>
         {% if 'users.manage' in permissions %}
         <a class="rail__link" href="/equipo" {% if active_nav == 'equipo' %}aria-current="page"{% endif %}>{{ icon("users") }} {{ copy.NAV.equipo }}</a>
         {% endif %}
         {% if 'kiosk.manage' in permissions %}
-        <a class="rail__link" href="/pantallas" {% if active_nav == 'pantallas' %}aria-current="page"{% endif %}>{{ icon("monitor") }} Pantallas</a>
+        <a class="rail__link" href="/pantallas" {% if active_nav == 'pantallas' %}aria-current="page"{% endif %}>{{ icon("monitor") }} {{ copy.NAV.pantallas }}</a>
         {% endif %}
         {% if 'stakeholders.manage' in permissions %}
         <a class="rail__link" href="/contactos" {% if active_nav == 'contactos' %}aria-current="page"{% endif %}>{{ icon("users") }} {{ copy.NAV.contactos }}</a>
@@ -91,9 +91,10 @@
         </a>
       </div>
     </nav>
+    <button class="rail-backdrop" type="button" id="rail-backdrop" aria-label="{{ copy.NAV.cerrar_menu }}"></button>
     <div class="main">
       <header class="topbar">
-        <button class="icon-btn" type="button" id="sidebar-toggle" aria-label="Abrir menú">{{ icon("sliders-horizontal") }}</button>
+        <button class="icon-btn" type="button" id="sidebar-toggle" aria-label="{{ copy.NAV.menu }}" aria-expanded="false" aria-controls="app-sidebar">{{ icon("sliders-horizontal") }}</button>
         <div class="topbar__site">{{ icon("map-pinned", 16) }} {{ copy.MINE_LABEL }}</div>
         <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>{{ data_as_of_label() }}</div>
         <div class="topbar__spacer"></div>
@@ -119,7 +120,7 @@
     {% if 'predictions.view' in permissions %}
     <a href="/zonas" {% if active_nav == 'zonas' %}aria-current="page"{% endif %}>{{ icon("map-pinned") }}{{ copy.NAV.zonas }}</a>
     {% endif %}
-    <a href="/mi-cuenta" {% if active_nav == 'cuenta' %}aria-current="page"{% endif %}>{{ icon("users") }}Más</a>
+    <button type="button" id="mobile-more">{{ icon("sliders-horizontal") }}{{ copy.NAV.mas }}</button>
   </nav>
   {% if assistant_on() %}
   {% include "assistant/panel.html" %}

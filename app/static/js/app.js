@@ -54,18 +54,29 @@
 
     const toggle = document.getElementById("sidebar-toggle");
     const sidebar = document.getElementById("app-sidebar");
-    function close() {
-      sidebar && sidebar.classList.remove("is-open");
-    }
-    function open() {
-      sidebar && sidebar.classList.add("is-open");
+    const backdrop = document.getElementById("rail-backdrop");
+    const more = document.getElementById("mobile-more");
+    function setRail(open) {
+      if (!sidebar) return;
+      sidebar.classList.toggle("is-open", open);
+      if (backdrop) backdrop.classList.toggle("is-open", open);
+      if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
     }
     if (toggle && sidebar) {
       toggle.addEventListener("click", function () {
-        if (sidebar.classList.contains("is-open")) close();
-        else open();
+        setRail(!sidebar.classList.contains("is-open"));
       });
     }
+    if (more) more.addEventListener("click", function () { setRail(true); });
+    if (backdrop) backdrop.addEventListener("click", function () { setRail(false); });
+    if (sidebar) {
+      sidebar.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () { setRail(false); });
+      });
+    }
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") setRail(false);
+    });
 
     document.querySelectorAll("[data-ack]").forEach((btn) => {
       btn.addEventListener("click", async () => {

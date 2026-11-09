@@ -9,47 +9,56 @@
   if (start) start.value = monthAgo;
   const rtype = document.getElementById("rtype");
   const periodFields = document.getElementById("period-fields");
-  const modelField = document.getElementById("model-field");
-  const modelPick = document.getElementById("model_pick");
-  if (modelPick) {
-    modelPick.addEventListener("change", () => {
-      if (modelPick.value) document.getElementById("model_id").value = modelPick.value;
-    });
-  }
+  const xlsxBtn = document.getElementById("report-xlsx");
+
   function syncType() {
-    const isModel = rtype.value === "modelo";
-    periodFields.classList.toggle("hidden", isModel);
-    modelField.classList.toggle("hidden", !isModel);
-    document.getElementById("start").required = !isModel;
-    document.getElementById("end").required = !isModel;
+    const needsPeriod = rtype.value !== "confiabilidad";
+    periodFields.classList.toggle("hidden", !needsPeriod);
+    document.getElementById("start").required = needsPeriod;
+    document.getElementById("end").required = needsPeriod;
+    if (xlsxBtn) xlsxBtn.classList.toggle("hidden", rtype.value !== "ejecutivo");
   }
   rtype.addEventListener("change", syncType);
   syncType();
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+
+  async function generate(formato) {
     const msg = document.getElementById("report-msg");
     msg.textContent = "Preparando el informe…";
+    let url;
+    let body = {};
+    if (rtype.value === "alertas") {
+      url = "/api/reports/alertas";
+      body = { start: start.value, end: end.value };
+    } else if (rtype.value === "ejecutivo") {
+      url = "/api/reports/ejecutivo";
+      body = { start: start.value, end: end.value, formato: formato || "pdf" };
+    } else {
+      url = "/api/reports/confiabilidad";
+    }
+    const data = await PG.api(url, { method: "POST", body });
+    const dl = data.report && data.report.download_url;
+    msg.textContent = "Listo. Descargando…";
+    if (dl) window.location.href = dl;
+    else location.reload();
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const msg = document.getElementById("report-msg");
     try {
-      let url, body;
-      if (rtype.value === "alertas") {
-        url = "/api/reports/alertas";
-        body = { start: document.getElementById("start").value, end: document.getElementById("end").value };
-      } else if (rtype.value === "ejecutivo") {
-        url = "/api/reports/ejecutivo";
-        body = { start: document.getElementById("start").value, end: document.getElementById("end").value };
-      } else {
-        const id = document.getElementById("model_id").value;
-        if (!id) throw new Error("Elige un registro del laboratorio");
-        url = `/api/reports/modelo/${id}`;
-        body = {};
-      }
-      const data = await PG.api(url, { method: "POST", body });
-      const dl = data.report && data.report.download_url;
-      msg.textContent = "Listo. Descargando…";
-      if (dl) window.location.href = dl;
-      else location.reload();
+      await generate("pdf");
     } catch (err) {
       msg.textContent = err.message || "No se pudo generar";
     }
   });
+  if (xlsxBtn) {
+    xlsxBtn.addEventListener("click", async () => {
+      const msg = document.getElementById("report-msg");
+      try {
+        await generate("xlsx");
+      } catch (err) {
+        msg.textContent = err.message || "No se pudo generar";
+      }
+    });
+  }
 })();

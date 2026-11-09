@@ -370,8 +370,12 @@ def informes_page(request: Request, db: DbSession, user: CurrentUser, _: CanRepo
         "alertas": "Avisos del periodo",
         "resumen_ejecutivo": "Resumen para gerencia",
         "ejecutivo": "Resumen para gerencia",
-        "desempeno_modelo": "Confiabilidad del sistema",
-        "modelo": "Confiabilidad del sistema",
+        "desempeno_modelo": "Informe técnico",
+        "modelo": "Informe técnico",
+        "confiabilidad": "Confiabilidad",
+        "avisos_periodo": "Avisos del periodo",
+        "resumen_gerencia": "Resumen para gerencia",
+        "comportamiento_gas": "Comportamiento del gas",
     }
 
     def _day(value: object) -> str:

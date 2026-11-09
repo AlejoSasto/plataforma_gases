@@ -35,7 +35,9 @@ def test_reports_alertas_ejecutivo_and_download(
     rid = body["report"]["id"]
     path = Path(body["report"]["file_path"])
     assert path.is_file()
-    assert path.read_bytes()[:4] == b"%PDF"
+    raw = path.read_bytes()
+    assert raw[:4] == b"%PDF"
+    assert "Avisos del periodo" in raw.decode("latin-1", errors="ignore")
 
     dl = client.get(f"/api/reports/{rid}/download")
     assert dl.status_code == 200
@@ -51,7 +53,23 @@ def test_reports_alertas_ejecutivo_and_download(
     assert ebody["report"]["type"] == "resumen_ejecutivo"
     epath = Path(ebody["report"]["file_path"])
     assert epath.is_file()
-    assert epath.read_bytes()[:2] == b"PK"  # zip/xlsx
+    epdf = epath.read_bytes()
+    assert epdf[:4] == b"%PDF"
+    assert "Resumen para gerencia" in epdf.decode("latin-1", errors="ignore")
+
+    excel = client.post(
+        "/api/reports/ejecutivo",
+        json={"start": start.isoformat(), "end": end.isoformat(), "formato": "xlsx"},
+    )
+    assert excel.status_code == 200, excel.text
+    assert Path(excel.json()["report"]["file_path"]).read_bytes()[:2] == b"PK"
+
+    confiabilidad = client.post("/api/reports/confiabilidad")
+    assert confiabilidad.status_code == 200, confiabilidad.text
+    cpath = Path(confiabilidad.json()["report"]["file_path"])
+    cblob = cpath.read_bytes()
+    assert cblob[:4] == b"%PDF"
+    assert "Confiabilidad" in cblob.decode("latin-1", errors="ignore")
 
     listed = client.get("/api/reports")
     assert listed.status_code == 200

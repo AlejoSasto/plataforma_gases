@@ -3,8 +3,8 @@
 {% block page_title %}Equipo{% endblock %}
 {% block content %}
 {{ page_header("Equipo", "Quién entra a la plataforma y con qué rol.") }}
-<div class="card" style="overflow:auto">
-  <table class="data">
+<div class="card table-wrap">
+  <table class="table">
     <thead>
       <tr>
         <th>Nombre</th><th>Correo</th><th>Rol</th><th>Zonas</th><th>Último ingreso</th><th>Estado</th><th></th>
@@ -19,7 +19,7 @@
         <td>{{ u.site_label }}</td>
         <td>{{ u.last_login_label }}</td>
         <td>{{ u.status }}</td>
-        <td class="row-flex">
+        <td class="actions">
           <button class="btn btn-ghost" type="button" data-role="{{ u.id }}">Rol</button>
           <button class="btn btn-ghost" type="button" data-zones="{{ u.id }}">Zonas</button>
           {% if u.locked %}<button class="btn btn-ghost" type="button" data-unlock="{{ u.id }}">Desbloquear</button>{% endif %}

@@ -157,10 +157,13 @@
 .input:focus, .select:focus { border-color: var(--accent); outline: 3px solid color-mix(in srgb, var(--focus) 30%, transparent); outline-offset: 0; }
 
 /* ---------- Tabla de datos ---------- */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.table-wrap > table { min-width: 640px; }
 .table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
 .table th { text-align: left; font-weight: 500; color: var(--text-3); font-size: var(--fs-small); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); background: var(--surface-2); white-space: nowrap; }
 .table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); vertical-align: middle; }
 .table tr:hover td { background: var(--surface-2); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); min-width: 10rem; }
 .person { display: flex; gap: var(--sp-3); align-items: center; }
 .person .avatar { background: var(--accent-soft); color: var(--accent); width: 32px; height: 32px; }
 .person strong { display: block; font-weight: 600; line-height: 1.2; }

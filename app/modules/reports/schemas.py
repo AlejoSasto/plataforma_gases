@@ -17,6 +17,7 @@ class EjecutivoRequest(BaseModel):
     start: date
     end: date
     stakeholder_id: Optional[int] = None
+    formato: str = "pdf"
 
 
 class ReportResponse(BaseModel):

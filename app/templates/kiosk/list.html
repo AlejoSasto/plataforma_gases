@@ -3,8 +3,8 @@
 {% block page_title %}Pantallas de sala{% endblock %}
 {% block content %}
 {{ page_header("Pantallas de sala", "Pantallas que muestran el estado sin una sesión personal.") }}
-<div class="card" style="overflow:auto">
-  <table class="data">
+<div class="card table-wrap">
+  <table class="table">
     <thead><tr><th>Nombre</th><th>Última vez vista</th><th>Estado</th><th></th></tr></thead>
     <tbody>
       {% for d in devices %}

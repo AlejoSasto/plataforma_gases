@@ -71,8 +71,16 @@ def post_ejecutivo(
     body: EjecutivoRequest, db: DbSession, user: CurrentUser, _: CanExport
 ) -> ReportCreateResponse:
     report = reports_service.create_ejecutivo_report(
-        db, user, body.start, body.end, body.stakeholder_id
+        db, user, body.start, body.end, body.stakeholder_id, body.formato
     )
+    return ReportCreateResponse(report=ReportResponse(**report))
+
+
+@router.post("/confiabilidad", response_model=ReportCreateResponse)
+def post_confiabilidad(
+    db: DbSession, user: CurrentUser, _: CanExport
+) -> ReportCreateResponse:
+    report = reports_service.create_confiabilidad_report(db, user)
     return ReportCreateResponse(report=ReportResponse(**report))
 
 

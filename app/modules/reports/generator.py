@@ -12,74 +12,18 @@ from typing import Any, Optional
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
-from reportlab.platypus import (
-    Paragraph,
-    SimpleDocTemplate,
-    Spacer,
-    Table,
-    TableStyle,
-)
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.modules.alerts import service as alerts_service
 from app.modules.alerts.models import Alert
 from app.modules.ml_training.repository import get_model, list_models
+from app.modules.reports import pdf_theme as theme
 from app.modules.sensors_ingestion.models import GasReading, Sensor
 from app.modules.stakeholders.service import alert_ids_visible_to_user
-
-PRIMARY = colors.HexColor("#1E3A5F")
-INFO = colors.HexColor("#3B82F6")
-TEXT = colors.HexColor("#14181F")
-MUTED = colors.HexColor("#5A6472")
-HEADER_BG = colors.HexColor("#E8EEF6")
-RISK_COLORS = {
-    "NORMAL": colors.HexColor("#16A34A"),
-    "PRECAUCION": colors.HexColor("#F59E0B"),
-    "ALERTA": colors.HexColor("#EA580C"),
-    "CRITICO": colors.HexColor("#DC2626"),
-}
-
-
-def _styles() -> dict[str, ParagraphStyle]:
-    base = getSampleStyleSheet()
-    return {
-        "title": ParagraphStyle(
-            "TitlePG",
-            parent=base["Heading1"],
-            fontName="Helvetica-Bold",
-            fontSize=16,
-            textColor=PRIMARY,
-            spaceAfter=8,
-        ),
-        "h2": ParagraphStyle(
-            "H2PG",
-            parent=base["Heading2"],
-            fontName="Helvetica-Bold",
-            fontSize=12,
-            textColor=TEXT,
-            spaceBefore=10,
-            spaceAfter=6,
-        ),
-        "body": ParagraphStyle(
-            "BodyPG",
-            parent=base["Normal"],
-            fontName="Helvetica",
-            fontSize=9,
-            textColor=TEXT,
-            leading=12,
-        ),
-        "muted": ParagraphStyle(
-            "MutedPG",
-            parent=base["Normal"],
-            fontName="Helvetica",
-            fontSize=8,
-            textColor=MUTED,
-        ),
-    }
+from app.shared import copy
+from app.shared.present import reliability_snapshot
 
 
 def _period_bounds(start: datetime, end: datetime) -> tuple[datetime, datetime]:
@@ -119,21 +63,114 @@ def _avg_resolution_hours(alerts: list[Alert]) -> Optional[float]:
     return round(sum(deltas) / len(deltas), 2)
 
 
-def _table_style() -> TableStyle:
-    return TableStyle(
-        [
-            ("BACKGROUND", (0, 0), (-1, 0), HEADER_BG),
-            ("TEXTCOLOR", (0, 0), (-1, 0), PRIMARY),
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 8),
-            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#E5E7EB")),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("LEFTPADDING", (0, 0), (-1, -1), 4),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-            ("TOPPADDING", (0, 0), (-1, -1), 3),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-        ]
+def _level_pairs(levels: list[str]) -> list[tuple[str, int]]:
+    order = ["evacuar", "actuar", "vigilar", "normal"]
+    counts = {copy.status_word(key): 0 for key in order}
+    for level in levels:
+        word = copy.status_word(copy.status_key(level))
+        counts[word] = counts.get(word, 0) + 1
+    return [(copy.status_word(key), counts[copy.status_word(key)]) for key in order]
+
+
+def _site_pairs(names: list[str], limit: int = 8) -> list[tuple[str, int]]:
+    counts: dict[str, int] = {}
+    for name in names:
+        label = name or "Sin zona"
+        counts[label] = counts.get(label, 0) + 1
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    return ranked[:limit]
+
+
+def _when(value: Any) -> str:
+    if hasattr(value, "strftime"):
+        return value.strftime("%d/%m/%Y %H:%M")
+    return str(value or "")[:16]
+
+
+def _footer(start: datetime, end: datetime, who: str, *, origin: str | None = None) -> str:
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    text = (
+        f"Periodo {start.date().isoformat()} a {end.date().isoformat()}. "
+        f"Datos hasta {generated}."
     )
+    if origin:
+        text += f" Origen: {origin}."
+    return f"{text} Generado por {who}."
+
+
+def _story_avisos(
+    rows: list[dict[str, Any]],
+    start: datetime,
+    end: datetime,
+    *,
+    zone_heading: str = copy.PDF_BY_ZONE,
+) -> list[Any]:
+    levels = _level_pairs([str(row.get("level") or "") for row in rows])
+    sites = _site_pairs([str(row.get("site") or "Sin zona") for row in rows])
+    closed = [row["hours"] for row in rows if isinstance(row.get("hours"), (int, float))]
+    avg_h = round(sum(closed) / len(closed), 2) if closed else None
+    lead = copy.PDF_AVISOS_COUNT.format(n=len(rows)) if rows else copy.PDF_AVISOS_EMPTY
+    story: list[Any] = [
+        theme.paragraph(copy.PDF_AVISOS_TITLE, "title"),
+        theme.paragraph(lead),
+        theme.paragraph(f"{start.strftime('%d/%m/%Y')} - {end.strftime('%d/%m/%Y')}", "muted"),
+        theme.spacer(8),
+        theme.kpis(
+            [
+                (copy.PDF_TOTAL, str(len(rows))),
+                (
+                    copy.PDF_CLOSE_TIME,
+                    copy.PDF_HOURS.format(n=copy.number_es(avg_h, 1)) if avg_h is not None else copy.PDF_NO_CLOSE,
+                ),
+                (zone_heading, str(len(sites))),
+            ]
+        ),
+        theme.paragraph(copy.PDF_BY_LEVEL, "h2"),
+    ]
+    chart = theme.bars(levels, fills=theme.status_fills([label for label, _count in levels]), unit="Avisos")
+    if chart is not None:
+        story.append(chart)
+    if sites:
+        story.append(theme.paragraph(zone_heading, "h2"))
+        zone_chart = theme.bars(sites, unit="Avisos")
+        if zone_chart is not None:
+            story.append(zone_chart)
+    story.append(theme.paragraph(copy.PDF_DETAIL, "h2"))
+    table = [["Fecha", "Zona", "Equipo", "Nivel", "Estado"]]
+    for row in rows[:500]:
+        table.append(
+            [
+                row.get("when") or "—",
+                row.get("site") or "—",
+                row.get("sensor") or "—",
+                copy.status_word(copy.status_key(str(row.get("level") or ""))),
+                theme.state_word(row.get("status")),
+            ]
+        )
+    if len(table) == 1:
+        table.append(["—", "—", "—", "—", copy.PDF_AVISOS_EMPTY])
+    story.append(theme.data_table(table, [3.1 * cm, 3.6 * cm, 3.4 * cm, 2.8 * cm, 4.5 * cm]))
+    return story
+
+
+def _alert_rows(db: Session, alerts: list[Alert]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for alert in alerts:
+        data = alerts_service.alert_to_dict(db, alert)
+        hours = None
+        if alert.resolved_at and alert.created_at:
+            hours = (alert.resolved_at - alert.created_at).total_seconds() / 3600.0
+        rows.append(
+            {
+                "level": data.get("level"),
+                "site": data.get("site_name") or "Sin zona",
+                "sensor": data.get("sensor_code") or "",
+                "status": data.get("status"),
+                "when": _when(data.get("created_at")),
+                "hours": hours,
+            }
+        )
+    return rows
 
 
 def generate_alertas_periodo(
@@ -142,78 +179,118 @@ def generate_alertas_periodo(
     end: datetime,
     *,
     visible_ids: Optional[set[int]] = None,
+    who: str = "Vigía",
 ) -> bytes:
-    styles = _styles()
     alerts = _query_alerts(db, start, end, visible_ids=visible_ids)
-    by_level: dict[str, int] = {}
-    for a in alerts:
-        by_level[a.level] = by_level.get(a.level, 0) + 1
-    avg_h = _avg_resolution_hours(alerts)
+    story = _story_avisos(_alert_rows(db, alerts), start, end)
+    return theme.render(story, title=copy.PDF_AVISOS_TITLE, footer=_footer(start, end, who))
 
-    buf = BytesIO()
-    doc = SimpleDocTemplate(
-        buf,
-        pagesize=landscape(A4),
-        leftMargin=1.5 * cm,
-        rightMargin=1.5 * cm,
-        topMargin=1.5 * cm,
-        bottomMargin=1.5 * cm,
-        title="Reporte de alertas",
-    )
-    story: list[Any] = []
-    story.append(Paragraph("Plataforma Gases — Alertas por periodo", styles["title"]))
-    story.append(
-        Paragraph(
-            f"Periodo: {start.date().isoformat()} → {end.date().isoformat()} · "
-            f"Generado: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
-            styles["muted"],
-        )
-    )
-    story.append(Spacer(1, 8))
-    story.append(Paragraph("Resumen", styles["h2"]))
-    summary_rows = [
-        ["Total alertas", str(len(alerts))],
-        ["Tiempo medio resolución (h)", str(avg_h) if avg_h is not None else "N/D"],
+
+def generate_confiabilidad(db: Session, *, who: str = "Vigía") -> bytes:
+    snap = reliability_snapshot(db)
+    pairs = [
+        (copy.PDF_ON_TIME, int(snap.get("timely") or 0)),
+        (copy.PDF_MISSED, int(snap.get("missed") or 0)),
+        (copy.PDF_UNNECESSARY, int(snap.get("unnecessary") or 0)),
     ]
-    for level in ("CRITICO", "ALERTA", "PRECAUCION", "NORMAL"):
-        if level in by_level:
-            summary_rows.append([f"Nivel {level}", str(by_level[level])])
-    t_sum = Table(summary_rows, colWidths=[8 * cm, 4 * cm])
-    t_sum.setStyle(_table_style())
-    story.append(t_sum)
-    story.append(Paragraph("Detalle", styles["h2"]))
-
-    header = ["ID", "Nivel", "Sitio", "Sensor", "Estado", "Fecha", "Mensaje"]
-    data = [header]
-    for a in alerts[:500]:
-        d = alerts_service.alert_to_dict(db, a)
-        data.append(
+    today = datetime.now(timezone.utc)
+    story: list[Any] = [
+        theme.paragraph(copy.PDF_CONFIABILIDAD_TITLE, "title"),
+        theme.paragraph(copy.PDF_CONFIABILIDAD_LEAD),
+        theme.spacer(8),
+        theme.kpis(
             [
-                str(d["id"]),
-                d["level"],
-                (d.get("site_name") or "—")[:24],
-                (d.get("sensor_code") or str(d["sensor_id"]))[:18],
-                d["status"],
-                d["created_at"].strftime("%Y-%m-%d %H:%M")
-                if hasattr(d["created_at"], "strftime")
-                else str(d["created_at"])[:16],
-                Paragraph((d.get("message") or "")[:120], styles["body"]),
+                (copy.PDF_SAMPLE, str(snap.get("total") or 0)),
+                (copy.PDF_ON_TIME, str(snap.get("timely") or 0)),
+                (copy.PDF_MISSED, str(snap.get("missed") or 0)),
             ]
-        )
-    if len(data) == 1:
-        data.append(["—", "—", "—", "—", "—", "—", "Sin alertas en el periodo"])
-    t = Table(
-        data,
-        colWidths=[1.2 * cm, 2.2 * cm, 3.5 * cm, 3 * cm, 2.2 * cm, 3 * cm, 10 * cm],
+        ),
+        theme.paragraph(snap.get("recall_phrase") or "", ),
+        theme.paragraph(snap.get("lead_phrase") or ""),
+        theme.paragraph(snap.get("fa_phrase") or ""),
+        theme.paragraph(copy.PDF_BY_LEVEL, "h2"),
+    ]
+    chart = theme.bars(
+        pairs,
+        fills=[theme.STATUS_COLOR["normal"], theme.STATUS_COLOR["evacuar"], theme.STATUS_COLOR["vigilar"]],
+        unit="Avisos",
     )
-    t.setStyle(_table_style())
-    story.append(t)
-    doc.build(story)
-    return buf.getvalue()
+    if chart is not None:
+        story.append(chart)
+    return theme.render(
+        story,
+        title=copy.PDF_CONFIABILIDAD_TITLE,
+        footer=_footer(today, today, who, origin="avisos ya evaluados"),
+    )
+
+
+def _gas_counts(db: Session, start: datetime, end: datetime) -> list[tuple[str, int]]:
+    from app.shared.gas_catalog import display_gas
+
+    start_b, end_b = _period_bounds(start, end)
+    rows = (
+        db.query(Sensor.gas_type, func.count(GasReading.id))
+        .join(GasReading, GasReading.sensor_id == Sensor.id)
+        .filter(GasReading.tiempo_inicio >= start_b, GasReading.tiempo_inicio <= end_b)
+        .group_by(Sensor.gas_type)
+        .all()
+    )
+    return [(display_gas(gas), int(count)) for gas, count in rows]
+
+
+def generate_resumen_pdf(
+    db: Session,
+    start: datetime,
+    end: datetime,
+    *,
+    stakeholder_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    who: str = "Vigía",
+) -> bytes:
+    alerts = _alerts_for_resumen(db, start, end, stakeholder_id=stakeholder_id, user_id=user_id)
+    rows = _alert_rows(db, alerts)
+    snap = reliability_snapshot(db)
+    gases = _gas_counts(db, start, end)
+    story = _story_avisos(rows, start, end)
+    story[0] = theme.paragraph(copy.PDF_GERENCIA_TITLE, "title")
+    story.insert(
+        1,
+        theme.paragraph(
+            copy.PDF_GERENCIA_LEAD.format(inicio=start.strftime("%d/%m/%Y"), fin=end.strftime("%d/%m/%Y"))
+        ),
+    )
+    extra: list[Any] = [
+        theme.paragraph(snap.get("recall_phrase") or ""),
+        theme.paragraph(snap.get("lead_phrase") or ""),
+        theme.paragraph(copy.PDF_BY_GAS, "h2"),
+    ]
+    gas_chart = theme.bars(gases, unit="Lecturas") if gases else None
+    extra.append(gas_chart if gas_chart is not None else theme.paragraph("Sin lecturas en el periodo.", "muted"))
+    story = story[:-2] + extra + story[-2:]
+    return theme.render(story, title=copy.PDF_GERENCIA_TITLE, footer=_footer(start, end, who))
+
+
+def _metric_value(value: Any) -> str:
+    if isinstance(value, float):
+        return f"{value:.4f}"
+    return str(value)
+
+
+def _matrix_rows(data: Any) -> list[list[str]]:
+    if isinstance(data, list) and data and isinstance(data[0], list):
+        width = max(len(row) for row in data)
+        header = [" "] + [str(index) for index in range(width)]
+        body = []
+        for index, row in enumerate(data):
+            cells = [str(cell) for cell in row] + [""] * (width - len(row))
+            body.append([str(index), *cells])
+        return [header, *body]
+    if isinstance(data, dict):
+        return [["Clave", "Valor"], *[[str(key), str(value)] for key, value in data.items()]]
+    return [["Valor"], [str(data)]]
 
 
 def generate_desempeno_modelo(db: Session, model_registry_id: int) -> bytes:
-    styles = _styles()
     model = get_model(db, model_registry_id)
     if model is None:
         raise ValueError("Modelo no encontrado")
@@ -226,113 +303,128 @@ def generate_desempeno_modelo(db: Session, model_registry_id: int) -> bytes:
     prev = others[0] if others else None
 
     metrics = model.metrics or {}
-    buf = BytesIO()
-    doc = SimpleDocTemplate(
-        buf,
-        pagesize=A4,
-        leftMargin=2 * cm,
-        rightMargin=2 * cm,
-        topMargin=2 * cm,
-        bottomMargin=2 * cm,
-        title=f"Desempeño modelo {model.name}",
-    )
-    story: list[Any] = []
-    story.append(Paragraph("Plataforma Gases — Desempeño de modelo", styles["title"]))
-    story.append(
-        Paragraph(
-            f"{model.name} v{model.version} · {model.algorithm} · estado {model.status}",
-            styles["body"],
-        )
-    )
-    story.append(
-        Paragraph(
-            f"Entrenado: {model.trained_at.isoformat() if model.trained_at else 'N/D'}",
-            styles["muted"],
-        )
-    )
-    story.append(Paragraph("Métricas", styles["h2"]))
-    rows = [["Métrica", "Valor"]]
-    for key in (
+    metric_keys = (
         "precision",
         "recall",
         "f1",
+        "f1_score",
         "false_negative_rate",
         "rmse",
         "mae",
-        "lead_time_hit_rate",
-        "lead_time_minutes_mean",
-        "f1_score",
         "accuracy",
         "roc_auc",
-    ):
-        if key in metrics and metrics[key] is not None:
-            val = metrics[key]
-            rows.append(
-                [
-                    key,
-                    f"{val:.4f}" if isinstance(val, float) else str(val),
-                ]
-            )
+        "lead_time_hit_rate",
+    )
+    rows = [["Métrica", "Valor"]]
+    chart_pairs: list[tuple[str, float]] = []
+    for key in metric_keys:
+        if key in metrics and isinstance(metrics[key], (int, float)):
+            rows.append([key, _metric_value(metrics[key])])
+            chart_pairs.append((key, float(metrics[key])))
+    if len(rows) == 1:
+        for key, value in metrics.items():
+            if key in ("gates", "thresholds", "confusion_matrix", "confusion"):
+                continue
+            rows.append([str(key), _metric_value(value)])
+    trained = model.trained_at.isoformat() if model.trained_at else "sin fecha"
+    story: list[Any] = [
+        theme.paragraph("Informe técnico del registro", "title"),
+        theme.paragraph(f"{model.name} v{model.version} · {model.algorithm} · {model.status}"),
+        theme.paragraph(f"Entrenado: {trained}", "muted"),
+        theme.paragraph("Métricas", "h2"),
+    ]
+    chart = theme.bars(chart_pairs, unit="Valor") if chart_pairs else None
+    if chart is not None:
+        story.append(chart)
+    story.append(theme.data_table(rows, [9 * cm, 8 * cm]))
     gates = metrics.get("gates") or {}
     if gates:
-        story.append(Paragraph("Gates thesis", styles["h2"]))
-        grow = [["Gate", "Cumple"]]
-        for k, v in gates.items():
-            grow.append([k, "Sí" if v else ("N/A" if v is None else "No")])
-        gt = Table(grow, colWidths=[8 * cm, 6 * cm])
-        gt.setStyle(_table_style())
-        story.append(gt)
-    if len(rows) == 1:
-        for k, v in metrics.items():
-            if k in ("gates", "thresholds", "confusion_matrix"):
-                continue
-            rows.append([str(k), str(v)])
-    t = Table(rows, colWidths=[8 * cm, 6 * cm])
-    t.setStyle(_table_style())
-    story.append(t)
-
-    cm_data = metrics.get("confusion_matrix") or metrics.get("confusion")
-    if cm_data:
-        story.append(Paragraph("Matriz de confusión", styles["h2"]))
-        story.append(Paragraph(str(cm_data), styles["body"]))
+        story.append(theme.paragraph("Criterios", "h2"))
+        gate_rows = [["Criterio", "Cumple"]]
+        for key, value in gates.items():
+            gate_rows.append([str(key), "Sí" if value else ("N/A" if value is None else "No")])
+        story.append(theme.data_table(gate_rows, [9 * cm, 8 * cm]))
+    matrix = metrics.get("confusion_matrix") or metrics.get("confusion")
+    story.append(theme.paragraph("Matriz de confusión", "h2"))
+    if matrix:
+        matrix_rows = _matrix_rows(matrix)
+        width = 17 / max(len(matrix_rows[0]), 1)
+        story.append(theme.data_table(matrix_rows, [width * cm] * len(matrix_rows[0])))
     else:
-        story.append(
-            Paragraph(
-                "Matriz de confusión: no persistida en el registro del modelo.",
-                styles["muted"],
-            )
-        )
-
-    story.append(Paragraph("Comparación con modelo anterior", styles["h2"]))
+        story.append(theme.paragraph("No está guardada en este registro.", "muted"))
+    story.append(theme.paragraph("Comparación con el registro anterior", "h2"))
     if prev is None:
-        story.append(Paragraph("No hay otro modelo en el mismo scope para comparar.", styles["body"]))
+        story.append(theme.paragraph("No hay otro registro con el mismo alcance."))
     else:
-        prev_m = prev.metrics or {}
-        cmp_rows = [["Métrica", "Actual", f"Anterior #{prev.id}"]]
+        prev_metrics = prev.metrics or {}
+        compare = [["Métrica", "Actual", "Anterior"]]
         for key in ("precision", "recall", "f1", "f1_score"):
-            a = metrics.get(key)
-            b = prev_m.get(key)
-            if a is None and b is None:
+            current = metrics.get(key)
+            previous = prev_metrics.get(key)
+            if current is None and previous is None:
                 continue
-            cmp_rows.append(
+            compare.append(
                 [
                     key,
-                    f"{a:.4f}" if isinstance(a, float) else str(a or "—"),
-                    f"{b:.4f}" if isinstance(b, float) else str(b or "—"),
+                    _metric_value(current) if current is not None else "—",
+                    _metric_value(previous) if previous is not None else "—",
                 ]
             )
-        ct = Table(cmp_rows, colWidths=[5 * cm, 5 * cm, 5 * cm])
-        ct.setStyle(_table_style())
-        story.append(ct)
+        if len(compare) == 1:
+            compare.append(["—", "—", "—"])
+        story.append(theme.data_table(compare, [5.6 * cm, 5.7 * cm, 5.7 * cm]))
         story.append(
-            Paragraph(
-                f"Anterior: {prev.name} v{prev.version} ({prev.algorithm}) · {prev.status}",
-                styles["muted"],
+            theme.paragraph(
+                f"Anterior: {prev.name} v{prev.version} · {prev.algorithm} · {prev.status}",
+                "muted",
             )
         )
+    today = datetime.now(timezone.utc)
+    return theme.render(
+        story,
+        title="Informe técnico del registro",
+        footer=_footer(today, today, "Área técnica"),
+    )
 
-    doc.build(story)
-    return buf.getvalue()
+
+def _alerts_for_resumen(
+    db: Session,
+    start: datetime,
+    end: datetime,
+    *,
+    stakeholder_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+) -> list[Alert]:
+    visible: Optional[set[int]] = None
+    if user_id is not None:
+        visible = alert_ids_visible_to_user(db, user_id)
+    alerts = _query_alerts(db, start, end, visible_ids=visible)
+    if stakeholder_id is None:
+        return alerts
+    from app.modules.stakeholders.models import StakeholderSubscription
+    from app.modules.stakeholders.service import LEVEL_RANK
+
+    subs = (
+        db.query(StakeholderSubscription)
+        .filter(StakeholderSubscription.stakeholder_id == stakeholder_id)
+        .all()
+    )
+    if not subs:
+        return []
+    filtered: list[Alert] = []
+    for alert in alerts:
+        sensor = db.query(Sensor).filter(Sensor.id == alert.sensor_id).first()
+        site_id = sensor.site_id if sensor else None
+        for sub in subs:
+            if LEVEL_RANK.get(alert.level, 0) < LEVEL_RANK.get(sub.min_level, 0):
+                continue
+            if sub.sensor_id and sub.sensor_id != alert.sensor_id:
+                continue
+            if sub.site_id and sub.site_id != site_id:
+                continue
+            filtered.append(alert)
+            break
+    return filtered
 
 
 def generate_resumen_ejecutivo(
@@ -343,40 +435,8 @@ def generate_resumen_ejecutivo(
     stakeholder_id: Optional[int] = None,
     user_id: Optional[int] = None,
 ) -> bytes:
-    """Excel con alertas por sitio, tendencia y recomendaciones."""
-    visible: Optional[set[int]] = None
-    if user_id is not None:
-        visible = alert_ids_visible_to_user(db, user_id)
-    alerts = _query_alerts(db, start, end, visible_ids=visible)
-
-    # Si stakeholder_id explícito, filtrar por suscripciones del stakeholder
-    if stakeholder_id is not None:
-        from app.modules.stakeholders.models import StakeholderSubscription
-        from app.modules.stakeholders.service import LEVEL_RANK
-
-        subs = (
-            db.query(StakeholderSubscription)
-            .filter(StakeholderSubscription.stakeholder_id == stakeholder_id)
-            .all()
-        )
-        if not subs:
-            alerts = []
-        else:
-            filtered = []
-            for a in alerts:
-                d = alerts_service.alert_to_dict(db, a)
-                sensor = db.query(Sensor).filter(Sensor.id == a.sensor_id).first()
-                site_id = sensor.site_id if sensor else None
-                for sub in subs:
-                    if LEVEL_RANK.get(a.level, 0) < LEVEL_RANK.get(sub.min_level, 0):
-                        continue
-                    if sub.sensor_id and sub.sensor_id != a.sensor_id:
-                        continue
-                    if sub.site_id and sub.site_id != site_id:
-                        continue
-                    filtered.append(a)
-                    break
-            alerts = filtered
+    """Excel con avisos por sitio, tendencia y recomendaciones."""
+    alerts = _alerts_for_resumen(db, start, end, stakeholder_id=stakeholder_id, user_id=user_id)
 
     wb = Workbook()
     # Hoja resumen

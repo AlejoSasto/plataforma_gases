@@ -72,7 +72,42 @@ NAV = {
     "cargar": "Cargar datos",
     "calidad": "Calidad de los datos",
     "ayuda": "Ayuda",
+    "mas": "Más",
+    "pantallas": "Pantallas",
+    "resumen": "Resumen",
+    "menu": "Abrir menú",
+    "cerrar_menu": "Cerrar menú",
 }
+
+NAV_GROUP = {
+    "operacion": "Operación",
+    "seguimiento": "Seguimiento",
+    "datos": "Datos",
+    "admin": "Administración",
+}
+
+PDF_AVISOS_TITLE = "Avisos del periodo"
+PDF_AVISOS_EMPTY = "En este periodo no hubo avisos."
+PDF_AVISOS_COUNT = "En este periodo hubo {n} avisos."
+PDF_GERENCIA_TITLE = "Resumen para gerencia"
+PDF_GERENCIA_LEAD = "Así estuvo la mina entre {inicio} y {fin}."
+PDF_CONFIABILIDAD_TITLE = "Confiabilidad"
+PDF_CONFIABILIDAD_LEAD = "Estas cifras salen de los avisos ya evaluados. No reemplazan el criterio del turno."
+PDF_GAS_TITLE = "Comportamiento de {gas}"
+PDF_BY_LEVEL = "Avisos por nivel"
+PDF_BY_ZONE = "Avisos por zona"
+PDF_BY_EQUIPO = "Avisos por equipo"
+PDF_BY_GAS = "Lecturas por gas"
+PDF_DETAIL = "Detalle"
+PDF_CLOSE_TIME = "Tiempo medio de cierre"
+PDF_TOTAL = "Total de avisos"
+PDF_NO_CLOSE = "Sin cierres en el periodo"
+PDF_SERIES = "Serie del periodo"
+PDF_ON_TIME = "A tiempo"
+PDF_MISSED = "Omitidos"
+PDF_UNNECESSARY = "Innecesarios"
+PDF_SAMPLE = "Avisos evaluados"
+PDF_HOURS = "{n} h"
 
 BRAND = "Vigía"
 BRAND_SUB = "Gases en la mina"
