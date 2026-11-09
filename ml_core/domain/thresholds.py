@@ -1,7 +1,7 @@
-"""Umbrales normativos semilla (verified=false hasta confirmar el artículo).
+"""Umbrales del Decreto 1886 que el Plan 25 sí cita con artículo.
 
-Valores iniciales del Plan 15 F4. Decreto 1886 de 2015 — a verificar
-con el artículo exacto antes de usarlos en la tesis.
+Lo que la norma no define no se siembra. verified sigue en false hasta que
+una persona confirme el artículo en la pantalla de límites.
 """
 
 from __future__ import annotations
@@ -11,6 +11,15 @@ from typing import Literal
 
 ThresholdLevel = Literal["vigilar", "actuar", "evacuar"]
 Direction = Literal["above", "below"]
+Metric = Literal["instantaneo", "twa_8h", "stel_15min"]
+SiteKind = Literal["frente", "retorno_tajo", "cualquiera"]
+ThresholdKind = Literal["normativo", "politica_empresa"]
+
+METRIC_PLAIN = {
+    "instantaneo": "lectura del momento",
+    "twa_8h": "promedio de 8 horas",
+    "stel_15min": "promedio de 15 minutos",
+}
 
 
 @dataclass(frozen=True)
@@ -22,23 +31,62 @@ class ThresholdSpec:
     unit: str
     source_reference: str
     verified: bool = False
+    metric: Metric = "instantaneo"
+    site_kind: SiteKind = "cualquiera"
+    kind: ThresholdKind = "normativo"
+    article: str = ""
 
 
-_DECRETO = "Decreto 1886 de 2015 (artículo a confirmar; verified=false)"
+def _spec(
+    gas: str,
+    level: ThresholdLevel,
+    direction: Direction,
+    value: float,
+    unit: str,
+    article: str,
+    *,
+    metric: Metric = "instantaneo",
+    site_kind: SiteKind = "cualquiera",
+) -> ThresholdSpec:
+    return ThresholdSpec(
+        gas,
+        level,
+        direction,
+        value,
+        unit,
+        f"Decreto 1886 de 2015, {article}",
+        False,
+        metric,
+        site_kind,
+        "normativo",
+        article,
+    )
+
 
 THRESHOLD_SEED: tuple[ThresholdSpec, ...] = (
-    ThresholdSpec("CH4", "vigilar", "above", 0.5, "%vol", _DECRETO),
-    ThresholdSpec("CH4", "actuar", "above", 1.0, "%vol", _DECRETO),
-    ThresholdSpec("CH4", "evacuar", "above", 1.5, "%vol", _DECRETO),
-    ThresholdSpec("CO", "vigilar", "above", 25.0, "ppm", _DECRETO),
-    ThresholdSpec("CO", "actuar", "above", 50.0, "ppm", _DECRETO),
-    ThresholdSpec("CO", "evacuar", "above", 100.0, "ppm", _DECRETO),
-    ThresholdSpec("H2S", "vigilar", "above", 1.0, "ppm", _DECRETO),
-    ThresholdSpec("H2S", "actuar", "above", 5.0, "ppm", _DECRETO),
-    ThresholdSpec("H2S", "evacuar", "above", 10.0, "ppm", _DECRETO),
-    ThresholdSpec("O2", "vigilar", "below", 19.5, "%vol", _DECRETO),
-    ThresholdSpec("O2", "actuar", "below", 19.0, "%vol", _DECRETO),
-    ThresholdSpec("O2", "evacuar", "below", 17.0, "%vol", _DECRETO),
+    _spec("CH4", "vigilar", "above", 0.5, "%vol", "Art. 162 (prohíbe voladura) y art. 53 par. 2"),
+    _spec(
+        "CH4",
+        "evacuar",
+        "above",
+        1.0,
+        "%vol",
+        "Art. 53 (máximo en frentes) y art. 183 (corte de energía)",
+    ),
+    _spec("O2", "evacuar", "below", 19.5, "%vol", "Art. 38"),
+    _spec("O2", "evacuar", "above", 23.5, "%vol", "Art. 38"),
+    _spec("CO", "actuar", "above", 25.0, "ppm", "Art. 39", metric="twa_8h"),
+    _spec("H2S", "actuar", "above", 1.0, "ppm", "Art. 39", metric="twa_8h"),
+    _spec("H2S", "actuar", "above", 5.0, "ppm", "Art. 39", metric="stel_15min"),
+    _spec("CO2", "actuar", "above", 5000.0, "ppm", "Art. 39", metric="twa_8h"),
+    _spec("CO2", "actuar", "above", 30000.0, "ppm", "Art. 39", metric="stel_15min"),
+    _spec("NO2", "actuar", "above", 0.2, "ppm", "Art. 39", metric="twa_8h"),
+)
+
+# Cuando hay sitio: art. 53 distingue frente (1,0 %) y retorno de tajo (1,5 %).
+SITE_METHANE: tuple[ThresholdSpec, ...] = (
+    _spec("CH4", "evacuar", "above", 1.0, "%vol", "Art. 53", site_kind="frente"),
+    _spec("CH4", "evacuar", "above", 1.5, "%vol", "Art. 53", site_kind="retorno_tajo"),
 )
 
 PHYSICAL_MAX: dict[str, float] = {
@@ -77,9 +125,38 @@ def seed_as_records() -> list[dict[str, object]]:
             "unit": t.unit,
             "source_reference": t.source_reference,
             "verified": t.verified,
+            "metric": t.metric,
+            "site_kind": t.site_kind,
+            "kind": t.kind,
+            "article": t.article,
         }
         for t in THRESHOLD_SEED
     ]
+
+
+def seed_key(spec: ThresholdSpec) -> tuple[str, str, str, str, str]:
+    return (spec.gas_code, spec.level, spec.metric, spec.direction, spec.site_kind)
+
+
+def undefined_levels(defined: set[tuple[str, str]] | None = None) -> list[dict[str, str]]:
+    """Niveles que la norma no fija. La interfaz los muestra como no definidos."""
+    gases = ("CH4", "CO", "H2S", "O2", "CO2", "NO2")
+    levels = ("vigilar", "actuar", "evacuar")
+    have = defined
+    if have is None:
+        have = {(t.gas_code, t.level) for t in THRESHOLD_SEED}
+    missing = []
+    for gas in gases:
+        for level in levels:
+            if (gas, level) not in have:
+                missing.append(
+                    {
+                        "gas_code": gas,
+                        "level": level,
+                        "note": "No definido por la norma. La empresa puede definirlo",
+                    }
+                )
+    return missing
 
 
 def is_violation(value: float, spec: ThresholdSpec) -> bool:

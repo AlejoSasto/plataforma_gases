@@ -45,6 +45,16 @@ class Settings(BaseSettings):
     # Reportes (Plan 08)
     reports_dir: str = "storage/reports"
     # Metas thesis: `app_settings.thesis_targets` (Plan 16/23). Lookback/horizontes: ProblemSpec / G0.
+    # Asistente (Plan 26). La clave no se escribe en documentos ni en el navegador.
+    assistant_provider: Literal["gemini", "ollama", "off"] = "off"
+    gemini_api_key: Optional[str] = None
+    assistant_gemini_models: str = "gemini-2.5-flash,gemini-2.5-pro,gemini-2.0-flash"
+    assistant_ollama_url: str = "http://127.0.0.1:11434"
+    assistant_ollama_model: str = "qwen2.5:7b-instruct"
+    assistant_call_timeout_s: int = 30
+    assistant_turn_timeout_s: int = 60
+    assistant_database_url: Optional[str] = None
+    assistant_retention_days: int = 90
 
 
 @lru_cache

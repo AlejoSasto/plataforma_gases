@@ -1,7 +1,6 @@
 # Dependencias del zoo de pronóstico (Plan 17). La imagen app lleva torch CPU.
 # Instalar aparte: pip install -r requirements-ml.txt
-# Los adaptadores no asumen que estén presentes: si falta la librería usan
-# un backend documentado (torch-lite o fallback-conformal).
+# Los adaptadores no sustituyen un modelo faltante: lanzan ModelUnavailableError.
 
 neuralforecast>=1.7.0,<3
 statsforecast>=1.7.0,<3

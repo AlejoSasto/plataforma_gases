@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% from "components/macros.html" import page_header, empty_state %}
-{% block page_title %}Zonas{% endblock %}
+{% block page_title %}Equipos{% endblock %}
 {% block content %}
-{{ page_header("Zonas y sensores", "Cada zona muestra el estado de sus sensores.") }}
-{% if not sites %}
-  {{ empty_state("map", copy.EMPTY_SENSORS_TITLE, copy.EMPTY_SENSORS_TEXT) }}
-{% else %}
+{{ page_header("Equipos", "Cada detector con los gases que mide. No hay zonas hasta que la mina las ubique.") }}
+{% if instruments %}
 <div class="zone-grid">
-  {% for s in sites %}
-  <a class="card" href="/zonas/{{ s.id }}">
-    <h2>{{ s.name }}</h2>
-    <p class="muted">{{ s.description or "Sin descripción" }}</p>
-    <p class="help">{{ s.sensors_count }} sensor(es)</p>
+  {% for item in instruments %}
+  <a class="card" href="/equipos/{{ item.id }}">
+    <h2>Detector {{ item.serial }}</h2>
+    <p class="help">{{ item.gases or "Sin gases" }}</p>
+    <p class="muted">{{ item.last_seen or "Sin lecturas" }}</p>
   </a>
   {% endfor %}
 </div>
+{% else %}
+  {{ empty_state("map", copy.EMPTY_SENSORS_TITLE, copy.EMPTY_SENSORS_TEXT) }}
 {% endif %}
 {% endblock %}

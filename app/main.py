@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.logging import setup_logging
 from app.modules.alerts.router import router as alerts_router
+from app.modules.assistant.router import router as assistant_router
 from app.modules.audit.router import router as audit_router
 from app.modules.auth.router import router as auth_router
 from app.modules.dashboard.api_router import router as dashboard_api_router
@@ -51,6 +52,7 @@ app.include_router(ml_router)
 app.include_router(forecasting_router)
 app.include_router(catalog_router)
 app.include_router(alerts_router)
+app.include_router(assistant_router)
 app.include_router(stakeholders_router)
 app.include_router(audit_router)
 app.include_router(reports_router)
@@ -70,6 +72,12 @@ def _startup() -> None:
         finally:
             db.close()
     except Exception:  # noqa: BLE001 — arranque no depende del catálogo en DB
+        pass
+    try:
+        from app.modules.assistant.manual_index import rebuild
+
+        rebuild()
+    except Exception:  # noqa: BLE001
         pass
 
 

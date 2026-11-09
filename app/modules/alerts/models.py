@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -59,6 +59,13 @@ class Alert(Base):
         DateTime(timezone=True), nullable=True
     )
     resolution_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    origin: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="en_vivo", server_default="en_vivo", index=True
+    )
+    human_handled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default="true"
+    )
+    closed_by: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
 
     outcome: Mapped[Optional["AlertOutcome"]] = relationship(
         back_populates="alert", uselist=False, cascade="all, delete-orphan"

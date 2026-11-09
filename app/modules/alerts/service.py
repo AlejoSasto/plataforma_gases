@@ -131,6 +131,7 @@ def list_alerts(
     site_id: int | None = None,
     site_ids: set[int] | None = None,
     visible_ids: set[int] | None = None,
+    origin: str | None = None,
 ) -> tuple[list[Alert], int]:
     q = db.query(Alert)
     if visible_ids is not None:
@@ -139,6 +140,8 @@ def list_alerts(
         q = q.filter(Alert.id.in_(visible_ids))
     if status:
         q = q.filter(Alert.status == status)
+    if origin:
+        q = q.filter(Alert.origin == origin)
     if level:
         q = q.filter(Alert.level == level)
     if site_id is not None or site_ids is not None:
@@ -152,6 +155,122 @@ def list_alerts(
     total = q.count()
     items = q.order_by(Alert.created_at.desc()).offset(offset).limit(limit).all()
     return items, total
+
+
+def _source_file(db: Session, alert: Alert) -> str | None:
+    if alert.gas_reading_id is None:
+        return None
+    from app.modules.sensors_ingestion.models import GasReading
+
+    reading = db.get(GasReading, alert.gas_reading_id)
+    return reading.source_file if reading else None
+
+
+def search_for_assistant(
+    db: Session,
+    *,
+    sensor_ids: list[int],
+    start: datetime | None,
+    end: datetime | None,
+    gas: str | None,
+    nivel: str | None,
+    origin: str | None,
+    status: str | None,
+    limit: int,
+) -> list[dict[str, Any]]:
+    """Lista corta de avisos para el asistente. Sin correos ni rutas de archivo."""
+    from app.shared.access import canonical_role
+    from app.shared.gas_catalog import canonicalize_gas_type
+
+    del canonical_role
+    if not sensor_ids:
+        return []
+    query = db.query(Alert).join(Sensor, Sensor.id == Alert.sensor_id)
+    query = query.filter(Alert.sensor_id.in_(sensor_ids))
+    if start is not None:
+        query = query.filter(Alert.created_at >= start)
+    if end is not None:
+        query = query.filter(Alert.created_at <= end)
+    if origin:
+        query = query.filter(Alert.origin == origin)
+    if status:
+        query = query.filter(Alert.status == status)
+    if nivel:
+        query = query.filter(Alert.level.in_(_level_aliases(nivel)))
+    rows = query.order_by(Alert.created_at.desc()).limit(max(limit * 4, limit)).all()
+    gas_code = canonicalize_gas_type(gas) if gas else None
+    items: list[dict[str, Any]] = []
+    for alert in rows:
+        sensor = db.query(Sensor).filter(Sensor.id == alert.sensor_id).first()
+        if sensor is None:
+            continue
+        if gas_code and canonicalize_gas_type(sensor.gas_type) != gas_code:
+            continue
+        outcome = alert.outcome.outcome if alert.outcome is not None else "pendiente"
+        items.append(
+            {
+                "aviso": alert.id,
+                "fecha": alert.created_at.isoformat() if alert.created_at else None,
+                "gas": display_gas(sensor.gas_type),
+                "gas_code": canonicalize_gas_type(sensor.gas_type),
+                "equipo": display_sensor_code(sensor.code),
+                "nivel": alert.level,
+                "tipo": "anticipado" if alert.kind != "confirmado" else "confirmado",
+                "resultado": outcome,
+                "origen": alert.origin,
+                "estado": alert.status,
+                "que_hacer": alert.plain_recommendation or alert.recommendation,
+                "mensaje": alert.plain_message or alert.message,
+            }
+        )
+        if len(items) >= limit:
+            break
+    return items
+
+
+def detail_for_assistant(db: Session, alert_id: int, *, include_lineage: bool) -> dict[str, Any] | None:
+    alert = get_alert(db, alert_id)
+    if alert is None:
+        return None
+    data = alert_to_dict(db, alert)
+    reading = None
+    if alert.gas_reading_id is not None:
+        reading = db.get(GasReading, alert.gas_reading_id)
+    outcome = alert.outcome.outcome if alert.outcome is not None else "pendiente"
+    payload = {
+        "aviso": alert.id,
+        "fecha": data.get("created_at").isoformat() if data.get("created_at") else None,
+        "gas": data.get("gas_type"),
+        "equipo": data.get("sensor_code"),
+        "nivel": alert.level,
+        "tipo": "anticipado" if alert.kind != "confirmado" else "confirmado",
+        "origen": alert.origin,
+        "estado": alert.status,
+        "mensaje": alert.plain_message or alert.message,
+        "por_que": alert.plain_message or alert.message,
+        "que_hacer": alert.plain_recommendation or alert.recommendation,
+        "nota_cierre": alert.resolution_note,
+        "resultado": outcome,
+        "lectura": float(reading.leyendo) if reading is not None else None,
+        "lectura_en": reading.tiempo_inicio.isoformat() if reading is not None else None,
+    }
+    if include_lineage:
+        payload["linaje"] = "El origen del aviso está en la ficha, sin rutas internas."
+    return payload
+
+
+def _level_aliases(nivel: str) -> list[str]:
+    key = nivel.strip().casefold()
+    groups = {
+        "vigilar": ["vigilar", "PRECAUCION", "precaucion", "Vigilar"],
+        "actuar": ["actuar", "ALERTA", "alerta", "Actuar ya"],
+        "evacuar": ["evacuar", "CRITICO", "critico", "Evacuar"],
+        "normal": ["normal", "NORMAL", "Normal"],
+        "precaucion": ["vigilar", "PRECAUCION", "precaucion"],
+        "alerta": ["actuar", "ALERTA", "alerta"],
+        "critico": ["evacuar", "CRITICO", "critico"],
+    }
+    return groups.get(key, [nivel])
 
 
 def alert_to_dict(db: Session, alert: Alert) -> dict[str, Any]:
@@ -186,4 +305,8 @@ def alert_to_dict(db: Session, alert: Alert) -> dict[str, Any]:
         "acknowledged_at": alert.acknowledged_at,
         "resolved_at": alert.resolved_at,
         "resolution_note": alert.resolution_note,
+        "origin": alert.origin,
+        "human_handled": alert.human_handled,
+        "closed_by": alert.closed_by,
+        "source_file": _source_file(db, alert),
     }

@@ -289,6 +289,36 @@ def list_models(db: Session) -> list[dict[str, Any]]:
     return [_model_to_dict(m) for m in repo.list_models(db)]
 
 
+def benchmark_for_assistant(
+    db: Session,
+    *,
+    run_id: int | None,
+    gas: str,
+    horizonte: int | None,
+) -> dict[str, Any]:
+    """Resumen de una corrida. Sin rutas ni identificadores de archivos."""
+    from app.modules.forecasting.models import BenchmarkRun
+    from app.shared.gas_catalog import canonicalize_gas_type, display_gas
+
+    query = db.query(BenchmarkRun).order_by(BenchmarkRun.created_at.desc())
+    if run_id is not None:
+        query = db.query(BenchmarkRun).filter(BenchmarkRun.id == run_id)
+    row = query.first()
+    if row is None:
+        return {"error": "Todavía no hay una corrida de resultados para consultar."}
+    report = row.selection_report or ""
+    if len(report) > 1200:
+        report = report[:1200]
+    return {
+        "corrida": row.id,
+        "gas": display_gas(canonicalize_gas_type(gas)),
+        "horizonte_min": horizonte,
+        "metodo_elegido": row.promoted_algorithm,
+        "por_que": report or "La corrida no dejó una explicación escrita.",
+        "creada": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
 def compare_models(db: Session) -> list[dict[str, Any]]:
     return [_model_to_dict(m) for m in repo.list_models(db)]
 

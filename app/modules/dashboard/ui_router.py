@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from typing import Annotated, Optional
+import json
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -149,16 +151,45 @@ def hoy_fragment(request: Request, db: DbSession, user: CurrentUser) -> HTMLResp
     return _render(request, "dashboard/_hoy_inner.html", user, title="Hoy", active_nav="hoy", **ctx)
 
 
-# ---- Zonas / sensores ----
+# ---- Equipos ----
+def _instrument_cards(db, user: CurrentUser) -> list[dict]:
+    from app.modules.sensors_ingestion.models import Instrument, Sensor
+    from app.modules.users.models import UserInstrumentScope
+    from app.shared.formatting import format_datetime_short
+
+    query = db.query(Instrument)
+    scopes = (
+        db.query(UserInstrumentScope.instrument_id)
+        .filter(UserInstrumentScope.user_id == user.id)
+        .all()
+    )
+    roles = set(user.role_names)
+    if scopes and "admin" not in roles:
+        query = query.filter(Instrument.id.in_([row[0] for row in scopes]))
+    cards = []
+    for row in query.order_by(Instrument.serial.asc()).all():
+        gases = sorted({s.gas_type for s in db.query(Sensor).filter(Sensor.instrument_id == row.id).all()})
+        cards.append(
+            {
+                "id": row.id,
+                "serial": row.serial,
+                "gases": ", ".join(gases),
+                "last_seen": format_datetime_short(row.last_seen) if row.last_seen else "",
+            }
+        )
+    return cards
+
+
 @router.get("/zonas", response_class=HTMLResponse)
+@router.get("/equipos", response_class=HTMLResponse)
 def zonas_list(request: Request, db: DbSession, user: CurrentUser, _: CanPred) -> HTMLResponse:
     return _render(
         request,
         "sites/list.html",
         user,
-        title="Zonas y sensores",
+        title="Equipos",
         active_nav="zonas",
-        sites=dash_service.list_sites(db, user=user),
+        instruments=_instrument_cards(db, user),
     )
 
 
@@ -235,6 +266,7 @@ def avisos_page(
     status: Optional[str] = "abierta",
     level: Optional[str] = None,
     site_id: Optional[int] = None,
+    origin: Optional[str] = None,
 ) -> HTMLResponse:
     from app.shared.access import scoped_site_ids
 
@@ -250,6 +282,7 @@ def avisos_page(
         site_id=site_id,
         site_ids=scope,
         visible_ids=visible,
+        origin=origin,
     )
     alerts = [present.present_alert(alerts_service.alert_to_dict(db, a)) for a in items]
     return _render(
@@ -265,6 +298,7 @@ def avisos_page(
         status=status or "abierta",
         level=level or "",
         site_id=site_id or "",
+        origin=origin or "",
         sites=dash_service.list_sites(db, user=user),
         can_resolve="alerts.resolve" in user.permission_codes,
     )
@@ -325,22 +359,36 @@ def historial_page(
 def informes_page(request: Request, db: DbSession, user: CurrentUser, _: CanReports) -> HTMLResponse:
     from app.modules.reports import service as reports_service
 
+    from app.shared.formatting import format_datetime_short
+
     items, _ = reports_service.list_reports(db, user, offset=0, limit=50)
     models = []
     if "models.train" in user.permission_codes:
         models = ml_service.list_models(db)
     type_label = {
+        "alertas_periodo": "Avisos del periodo",
         "alertas": "Avisos del periodo",
+        "resumen_ejecutivo": "Resumen para gerencia",
         "ejecutivo": "Resumen para gerencia",
+        "desempeno_modelo": "Confiabilidad del sistema",
         "modelo": "Confiabilidad del sistema",
     }
-    report_rows = [
-        [
-            type_label.get(r.get("type"), r.get("type")),
-            f"{r.get('period_start') or '—'} → {r.get('period_end') or '—'}",
-            r.get("created_at") or "",
-            f"<a href='{r.get('download_url')}'>Descargar</a>" if r.get("download_url") else "",
-        ]
+
+    def _day(value: object) -> str:
+        if value is None or value == "":
+            return "—"
+        if hasattr(value, "strftime"):
+            return value.strftime("%d/%m/%Y")
+        shown = format_datetime_short(str(value))
+        return (shown or "—").split(" ")[0]
+
+    generated = [
+        {
+            "type_label": type_label.get(r.get("type"), r.get("type") or "—"),
+            "period": f"{_day(r.get('period_start'))} → {_day(r.get('period_end'))}",
+            "created": format_datetime_short(r.get("created_at")) or "—",
+            "download_url": r.get("download_url") or "",
+        }
         for r in items
     ]
     return _render(
@@ -351,7 +399,7 @@ def informes_page(request: Request, db: DbSession, user: CurrentUser, _: CanRepo
         active_nav="informes",
         reports=items,
         models=models,
-        report_rows=report_rows,
+        generated=generated,
     )
 
 
@@ -426,6 +474,10 @@ def calidad_datos(request: Request, db: DbSession, user: CurrentUser, _: CanQual
     quality = present.data_quality(db)
     coverage_rows = [[c["sensor"], c["readings_24h"]] for c in quality["coverage"]]
     issue_rows = [[i["code"], i["severity"], i["when"] or ""] for i in quality["issues"]]
+    g1 = {}
+    g1_path = Path(__file__).resolve().parents[3] / "reports" / "diagnostico" / "diagnostico_g1.json"
+    if g1_path.exists():
+        g1 = json.loads(g1_path.read_text(encoding="utf-8"))
     return _render(
         request,
         "datos/calidad.html",
@@ -435,18 +487,33 @@ def calidad_datos(request: Request, db: DbSession, user: CurrentUser, _: CanQual
         quality=quality,
         coverage_rows=coverage_rows,
         issue_rows=issue_rows,
+        g1=g1,
     )
 
 
 @router.get("/ajustes/limites", response_class=HTMLResponse)
 def ajustes_limites(request: Request, db: DbSession, user: CurrentUser, _: CanThresholds) -> HTMLResponse:
+    from ml_core.domain.thresholds import undefined_levels
+
+    from app.modules.catalog.models import NormativeThreshold
+    from app.shared.gas_catalog import display_gas
+
+    defined = {
+        (row.gas_code, row.level)
+        for row in db.query(NormativeThreshold).filter(NormativeThreshold.kind == "normativo").all()
+    }
+    missing = [
+        {"gas": display_gas(row["gas_code"]), "level": copy.status_word(row["level"]), "note": row["note"]}
+        for row in undefined_levels(defined)
+    ]
     return _render(
         request,
         "ajustes/limites.html",
         user,
-        title="Límites",
+        title="Límites de seguridad",
         active_nav="ajustes",
         limits=present.list_limits(db),
+        undefined=missing,
     )
 
 
@@ -743,6 +810,94 @@ def componentes_page(
         active_nav="",
         sample_alert=sample_alert,
         sample_chart=sample_chart,
+    )
+
+
+def _lab_page(request, db, user, title: str, body: str) -> HTMLResponse:
+    from app.modules.forecasting.models import BenchmarkRun
+    from app.modules.ml_training.models import ModelRegistry
+
+    runs = db.query(BenchmarkRun).order_by(BenchmarkRun.id.desc()).limit(20).all()
+    active = (
+        db.query(ModelRegistry)
+        .filter(ModelRegistry.status == "production")
+        .order_by(ModelRegistry.trained_at.desc())
+        .first()
+    )
+    beats = True
+    if active is not None and active.algorithm == "persistencia":
+        beats = False
+    report = runs[0].selection_report if runs else ""
+    return _render(
+        request,
+        "laboratorio/resultados.html",
+        user,
+        title=title,
+        active_nav="laboratorio",
+        body=body,
+        runs=runs,
+        report=report or "Todavía no hay una corrida comparada.",
+        active_model=active.algorithm if active else "sin modelo activo",
+        beats_persistence=beats,
+        can_promote="models.promote" in user.permission_codes,
+    )
+
+
+@router.get("/laboratorio/resultados", response_class=HTMLResponse)
+def laboratorio_resultados(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Resultados", "Corridas comparadas con datos reales, fuera de muestra.")
+
+
+@router.get("/laboratorio/por-que-gano", response_class=HTMLResponse)
+def laboratorio_porque(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Por qué ganó", "Criterio por criterio de la selección.")
+
+
+@router.get("/laboratorio/contra-realidad", response_class=HTMLResponse)
+def laboratorio_realidad(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Pronóstico contra realidad", "Lo medido y lo esperado, fuera de muestra.")
+
+
+@router.get("/laboratorio/curva", response_class=HTMLResponse)
+def laboratorio_curva(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Curva de decisión", "Avisos a tiempo frente a avisos innecesarios por turno.")
+
+
+@router.get("/laboratorio/calibracion", response_class=HTMLResponse)
+def laboratorio_calibracion(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Calibración", "Cobertura real frente a la cobertura pedida, por horizonte.")
+
+
+@router.get("/laboratorio/que-mira", response_class=HTMLResponse)
+def laboratorio_que_mira(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Qué mira el modelo", "Atribución del modelo activo, cuando el método existe.")
+
+
+@router.get("/laboratorio/ficha", response_class=HTMLResponse)
+def laboratorio_ficha(request: Request, db: DbSession, user: CurrentUser, _: CanTrain) -> HTMLResponse:
+    return _lab_page(request, db, user, "Ficha del modelo", "Librería, versión, pesos y limitaciones.")
+
+
+@router.get("/turno", response_class=HTMLResponse)
+def revisar_turno(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    _: CanPred,
+    day: Optional[str] = None,
+) -> HTMLResponse:
+    from app.modules.sensors_ingestion.models import GasReading
+    from sqlalchemy import func
+
+    latest = db.query(func.max(GasReading.tiempo_inicio)).scalar()
+    label = str(day or (latest.date() if latest else ""))
+    return _render(
+        request,
+        "operacion/turno.html",
+        user,
+        title="Revisar un turno",
+        active_nav="historial",
+        day_label=label or "sin fecha",
     )
 
 

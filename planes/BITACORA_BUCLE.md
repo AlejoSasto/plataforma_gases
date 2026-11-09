@@ -134,3 +134,48 @@
 - Docs: `planes/21_*.md`, `planes/22_*.md`; reglas `.cursor/rules/vigia-*.mdc`; kit en `mockups/vigia-design-kit/`.
 - verify: ✅ `--plan 18`, `--plan 19`. E2E login + aceptación: 8 passed.
 - Pendiente UI: corte esquemático de mina en Hoy; revisión visual vs `screenshots/`. Pendiente humano: SUS + G0 director.
+
+## 2026-11-07 · Plan 25 · Plataforma con los datos reales
+
+- Migración `d2e3f4a5b6c7`: equipos, alcance por equipo, umbrales con métrica/artículo, TWA/STEL en la rejilla, `benchmark_runs` y `backtest_forecasts`.
+- F0: archivado el modelo `transformer` que estaba en production. Contraseña de `.env` rotada y aplicada al superadmin; el valor no se copia aquí. `pass123` entró a la lista de contraseñas comunes. Contexto e índice alineados con el zoo vigente.
+- F1: `reports/diagnostico/diagnostico_g1.md`. Segmentos p50 = 2 pasos → `lookback_steps` = 12. Solo caben persistencia y ETS. El resto queda excluido con la razón escrita. Leyendo, sin STEL/TWA del instrumento para comparar, se trata como lectura del momento. Último bloque: 2025-12, reservado.
+- F2: 50 sensores con equipo. La lista operativa se llama Equipos. No se dibuja un corte de la mina.
+- F3: 10 límites del Decreto 1886 con artículo, `verified=false` hasta confirmación humana. Episodios desde lecturas canónicas: 153 (`rebuild_events.py --from-db --persist`).
+- F4: los adaptadores ya no sustituyen un modelo faltante (`ModelUnavailableError`). Corrida 1: 4.089 pronósticos de persistencia fuera de muestra. ETS, LightGBM, LSTM, TFT, Chronos y TimesFM no están instalados o no caben en la ventana. No se promovió (`--promote` no se pidió). El bloque final no se corrió.
+- F6: `python scripts/build_real_platform.py --confirm` terminó en verde. Informe abajo.
+- F7: pantallas de equipos, límites, calidad, resultados, turno y origen de avisos. Pruebas de render con el cliente de test: 19 passed (`plan25 and not e2e`). Lenguaje operativo: 14 passed.
+- `verify.py --dev-audit`: OK.
+- Bloquea el cierre de F10: el navegador de Playwright no está en este entorno (`chromium_headless_shell` ausente), así que `verify --plan 25` falla en las dos pruebas E2E de gráficas. `verify --full` no se corrió. La reproducción histórica todavía no escribe todos los avisos en `alerts`.
+
+```markdown
+# Informe de reconstrucción
+
+Generado: 2026-11-08T01:57:08.958040+00:00
+
+Pasos completados:
+
+- migraciones
+- semillas
+- superadmin
+- etl
+- eventos
+- equipos
+- diagnostico
+- benchmark filas=4089 run=1
+
+Promoción pedida: no.
+```
+
+## 2026-11-08 · Plan 26 · Asistente conversacional
+
+- Módulo `app/modules/assistant/`: 13 herramientas tipadas que llaman a los servicios existentes. El modelo no escribe SQL. Migración `e3f4a5b6c7d8` (`assistant_turns`, `assistant_feedback`) con downgrade.
+- Cifras: `grounding.py` rechaza un número que no está en la evidencia, reintenta una vez y, si sigue mal, usa una plantilla. Operación y gerencia pasan además por el verificador de lenguaje.
+- Emergencias (palabras en `app_settings.assistant_emergency_terms`) no llaman al proveedor. Sin proveedor o sin clave: 503 con el texto de `copy.ASK_OFFLINE`. Por defecto `ASSISTANT_PROVIDER=off`.
+- Manual en `docs/manual/` (14 temas), `/ayuda` con índice BM25 y PDF `docs/manual/manual_vigia.pdf` (ReportLab). Los gráficos del informe se redibujan con ReportLab desde los mismos agregados que la pantalla (`docs/informes_asistente.md`).
+- Proveedor Gemini: API `v1beta` `generateContent`, `tools.functionDeclarations` / `functionCall` / `functionResponse`. Cadena verificada el 2026-11-08 contra la referencia de Google: `gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.0-flash` (`ASSISTANT_GEMINI_MODELS`). Ollama queda opcional.
+- Conjunto dorado: 60/60 con el proveedor determinista. No se corrió Gemini: falta clave y autorización de la empresa (`docs/solicitudes_datos.md`).
+- Usuario de solo lectura: script `scripts/sql/vigia_assistant_ro.sql`. No se creó el rol en la base de esta sesión. Si se define `ASSISTANT_DATABASE_URL`, las lecturas deben ir por ese usuario; hoy las herramientas usan la sesión de la petición y `generar_informe` escribe por el módulo de reportes.
+- verify: `python scripts/verify.py --plan 26` → 16 passed. La prueba `@live_llm` queda fuera de ese marcador. `pytest -m plan18` → 10 passed.
+- Pendiente humano: capturas reales dentro del manual, autorización de la empresa o modelo local, y crear el rol `vigia_assistant_ro` en el servidor.
+

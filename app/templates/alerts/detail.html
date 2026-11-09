@@ -43,6 +43,10 @@
       {% if alert.acknowledged_at %}<li>Visto por {{ alert.acknowledged_name or "alguien del equipo" }} · {{ alert.acknowledged_at }}</li>{% endif %}
       {% if alert.resolved_at %}<li>Cerrado · {{ alert.resolved_at }}{% if alert.resolution_note %} · {{ alert.resolution_note }}{% endif %}</li>{% endif %}
     </ul>
+    {% if alert.source_file and ('analista' in roles or 'auditor' in roles or 'admin' in roles) %}
+    <h2>De dónde sale este aviso</h2>
+    <p>Archivo de origen: {{ alert.source_file }}</p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

@@ -5,62 +5,77 @@
     "direction": "above",
     "value": 0.5,
     "unit": "%vol",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
-  },
-  {
-    "gas_code": "CH4",
-    "level": "actuar",
-    "direction": "above",
-    "value": 1.0,
-    "unit": "%vol",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "source_reference": "Decreto 1886 de 2015, Art. 162 (prohíbe voladura) y art. 53 par. 2",
+    "verified": false,
+    "metric": "instantaneo",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 162 (prohíbe voladura) y art. 53 par. 2"
   },
   {
     "gas_code": "CH4",
     "level": "evacuar",
     "direction": "above",
-    "value": 1.5,
+    "value": 1.0,
     "unit": "%vol",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "source_reference": "Decreto 1886 de 2015, Art. 53 (máximo en frentes) y art. 183 (corte de energía)",
+    "verified": false,
+    "metric": "instantaneo",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 53 (máximo en frentes) y art. 183 (corte de energía)"
+  },
+  {
+    "gas_code": "O2",
+    "level": "evacuar",
+    "direction": "below",
+    "value": 19.5,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015, Art. 38",
+    "verified": false,
+    "metric": "instantaneo",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 38"
+  },
+  {
+    "gas_code": "O2",
+    "level": "evacuar",
+    "direction": "above",
+    "value": 23.5,
+    "unit": "%vol",
+    "source_reference": "Decreto 1886 de 2015, Art. 38",
+    "verified": false,
+    "metric": "instantaneo",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 38"
   },
   {
     "gas_code": "CO",
-    "level": "vigilar",
+    "level": "actuar",
     "direction": "above",
     "value": 25.0,
     "unit": "ppm",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
-  },
-  {
-    "gas_code": "CO",
-    "level": "actuar",
-    "direction": "above",
-    "value": 50.0,
-    "unit": "ppm",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
-  },
-  {
-    "gas_code": "CO",
-    "level": "evacuar",
-    "direction": "above",
-    "value": 100.0,
-    "unit": "ppm",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "source_reference": "Decreto 1886 de 2015, Art. 39",
+    "verified": false,
+    "metric": "twa_8h",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 39"
   },
   {
     "gas_code": "H2S",
-    "level": "vigilar",
+    "level": "actuar",
     "direction": "above",
     "value": 1.0,
     "unit": "ppm",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "source_reference": "Decreto 1886 de 2015, Art. 39",
+    "verified": false,
+    "metric": "twa_8h",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 39"
   },
   {
     "gas_code": "H2S",
@@ -68,43 +83,50 @@
     "direction": "above",
     "value": 5.0,
     "unit": "ppm",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "source_reference": "Decreto 1886 de 2015, Art. 39",
+    "verified": false,
+    "metric": "stel_15min",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 39"
   },
   {
-    "gas_code": "H2S",
-    "level": "evacuar",
-    "direction": "above",
-    "value": 10.0,
-    "unit": "ppm",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
-  },
-  {
-    "gas_code": "O2",
-    "level": "vigilar",
-    "direction": "below",
-    "value": 19.5,
-    "unit": "%vol",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
-  },
-  {
-    "gas_code": "O2",
+    "gas_code": "CO2",
     "level": "actuar",
-    "direction": "below",
-    "value": 19.0,
-    "unit": "%vol",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "direction": "above",
+    "value": 5000.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015, Art. 39",
+    "verified": false,
+    "metric": "twa_8h",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 39"
   },
   {
-    "gas_code": "O2",
-    "level": "evacuar",
-    "direction": "below",
-    "value": 17.0,
-    "unit": "%vol",
-    "source_reference": "Decreto 1886 de 2015 (artículo a confirmar; verified=false)",
-    "verified": false
+    "gas_code": "CO2",
+    "level": "actuar",
+    "direction": "above",
+    "value": 30000.0,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015, Art. 39",
+    "verified": false,
+    "metric": "stel_15min",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 39"
+  },
+  {
+    "gas_code": "NO2",
+    "level": "actuar",
+    "direction": "above",
+    "value": 0.2,
+    "unit": "ppm",
+    "source_reference": "Decreto 1886 de 2015, Art. 39",
+    "verified": false,
+    "metric": "twa_8h",
+    "site_kind": "cualquiera",
+    "kind": "normativo",
+    "article": "Art. 39"
   }
 ]

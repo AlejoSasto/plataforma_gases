@@ -6,7 +6,7 @@ import pytest
 
 from tests.e2e._helpers import BASE, EMAIL, PASSWORD, app_is_live, login_admin
 
-pytestmark = [pytest.mark.e2e, pytest.mark.plan23]
+pytestmark = [pytest.mark.e2e, pytest.mark.plan23, pytest.mark.plan25]
 
 
 PAGES = [
@@ -73,15 +73,46 @@ def test_charts_render_after_login(browser_page) -> None:
     assert not errs, f"errores de consola: {errs}"
 
 
+def _series_points(page) -> int:
+    return page.evaluate(
+        """() => {
+            if (!window.echarts) return 0;
+            const nodes = document.querySelectorAll('[data-chart]');
+            let total = 0;
+            nodes.forEach((el) => {
+                const inst = echarts.getInstanceByDom(el);
+                if (!inst) return;
+                const series = inst.getOption().series || [];
+                series.forEach((s) => {
+                    const data = s.data || [];
+                    total += data.filter((p) => p != null && p !== '-').length;
+                });
+            });
+            return total;
+        }"""
+    )
+
+
 def test_sensor_detail_chart(browser_page) -> None:
     page = browser_page
     login_admin(page, EMAIL, PASSWORD)
-    # Sensor con datos reales densos en DEV (si existe); si no, /sensores/47 suele ser H2S
-    page.goto(f"{BASE}/sensores/47", wait_until="networkidle")
+    page.goto(f"{BASE}/", wait_until="networkidle")
+    html = page.content()
+    import re
+
+    ids = re.findall(r"/sensores/(\d+)", html)
+    assert ids, "no hay un sensor real enlazado en Hoy"
+    chosen = None
+    for sensor_id in ids:
+        res = page.request.get(f"{BASE}/dashboard/api/series/{sensor_id}?hours=2160")
+        if not res.ok:
+            continue
+        body = res.json()
+        points = body.get("points") or body.get("series") or []
+        if isinstance(points, list) and len(points) > 0:
+            chosen = sensor_id
+            break
+    assert chosen, "ningún sensor real devolvió puntos de serie"
+    page.goto(f"{BASE}/sensores/{chosen}", wait_until="networkidle")
     page.wait_for_timeout(800)
-    if page.locator("[data-chart]").count() == 0:
-        page.goto(f"{BASE}/", wait_until="networkidle")
-        page.wait_for_timeout(500)
-    _assert_charts(page)
-    body = page.content()
-    assert "Datos hasta el" in body or "Ahora y lo que viene" in body
+    assert _series_points(page) > 0

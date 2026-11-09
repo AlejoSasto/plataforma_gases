@@ -45,6 +45,9 @@ def get_or_create_sensor(
         sensor.unit = unit
         db.add(sensor)
         db.flush()
+    from app.modules.sensors_ingestion.instruments import attach_sensor
+
+    attach_sensor(db, sensor)
     return sensor
 
 

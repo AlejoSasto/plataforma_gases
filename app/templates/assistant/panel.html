@@ -1,0 +1,12 @@
+<aside id="ask-panel" class="ask" hidden aria-labelledby="ask-title">
+  <div class="ask__bar">
+    <h2 id="ask-title">{{ copy.ASK }}</h2>
+    <button type="button" class="icon-btn" data-ask-close aria-label="Cerrar">{{ icon("x") }}</button>
+  </div>
+  <div id="ask-log" class="ask__log" aria-live="polite"></div>
+  <form id="ask-form" class="ask__form">
+    <label class="sr-only" for="ask-input">{{ copy.ASK }}</label>
+    <textarea id="ask-input" rows="2" maxlength="2000" required></textarea>
+    <button class="btn btn--primary" type="submit" id="ask-send">{{ copy.ASK }}</button>
+  </form>
+</aside>

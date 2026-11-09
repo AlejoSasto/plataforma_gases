@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-01T23:21:16.812873+00:00",
-  "source": "csv:Procesamiento_de_Datos.csv",
+  "generated_at": "2026-11-08T01:55:22.342251+00:00",
+  "source": "postgresql.gas_readings[is_synthetic=false]",
   "n_rows": 13894,
   "n_sensors": 50,
   "gases": [
@@ -8,8 +8,8 @@
     "CO",
     "CO2",
     "H2S",
-    "O2",
-    "UNKNOWN"
+    "NO2",
+    "O2"
   ],
   "t_min": "2023-03-31T14:37:09+00:00",
   "t_max": "2025-12-11T14:17:44+00:00",
@@ -96,7 +96,7 @@
       "dt_p90_min": 1.5533,
       "gap_gt_3median_pct": 42.86,
       "sensor_code": "1807482030#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2023-03-31T14:37:09+00:00",
       "t_max": "2023-03-31T14:41:57+00:00",
       "kind": "portatil",
@@ -156,7 +156,7 @@
       "dt_p90_min": 11539.785,
       "gap_gt_3median_pct": 16.67,
       "sensor_code": "20091E1013#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2025-08-25T09:28:51+00:00",
       "t_max": "2025-09-16T08:59:01+00:00",
       "kind": "portatil",
@@ -261,7 +261,7 @@
       "dt_p90_min": 7297.785,
       "gap_gt_3median_pct": 25.0,
       "sensor_code": "21080LJ005#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2025-10-10T09:21:45+00:00",
       "t_max": "2025-10-17T15:12:47+00:00",
       "kind": "portatil",
@@ -381,7 +381,7 @@
       "dt_p90_min": 6.905,
       "gap_gt_3median_pct": 37.8,
       "sensor_code": "22083AF012#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2024-09-06T12:42:34+00:00",
       "t_max": "2024-09-13T16:03:08+00:00",
       "kind": "fijo",
@@ -501,7 +501,7 @@
       "dt_p90_min": 2.5,
       "gap_gt_3median_pct": 23.37,
       "sensor_code": "2210031012#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2024-11-13T04:00:39+00:00",
       "t_max": "2024-12-11T15:15:52+00:00",
       "kind": "portatil",
@@ -561,7 +561,7 @@
       "dt_p90_min": 118.9667,
       "gap_gt_3median_pct": 36.02,
       "sensor_code": "23081F0018#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2025-11-11T09:42:40+00:00",
       "t_max": "2025-12-11T12:25:44+00:00",
       "kind": "fijo",
@@ -621,7 +621,7 @@
       "dt_p90_min": null,
       "gap_gt_3median_pct": null,
       "sensor_code": "23110Z4010#S0004",
-      "gas": "UNKNOWN",
+      "gas": "NO2",
       "t_min": "2025-10-24T14:59:55+00:00",
       "t_max": "2025-10-24T14:59:55+00:00",
       "kind": "desconocido",
@@ -778,13 +778,13 @@
     },
     {
       "month": "2023-03",
-      "gas": "O2",
-      "n": 15
+      "gas": "NO2",
+      "n": 8
     },
     {
       "month": "2023-03",
-      "gas": "UNKNOWN",
-      "n": 8
+      "gas": "O2",
+      "n": 15
     },
     {
       "month": "2024-09",
@@ -808,13 +808,13 @@
     },
     {
       "month": "2024-09",
-      "gas": "O2",
-      "n": 63
+      "gas": "NO2",
+      "n": 83
     },
     {
       "month": "2024-09",
-      "gas": "UNKNOWN",
-      "n": 83
+      "gas": "O2",
+      "n": 63
     },
     {
       "month": "2024-11",
@@ -838,13 +838,13 @@
     },
     {
       "month": "2024-11",
-      "gas": "O2",
-      "n": 1470
+      "gas": "NO2",
+      "n": 473
     },
     {
       "month": "2024-11",
-      "gas": "UNKNOWN",
-      "n": 473
+      "gas": "O2",
+      "n": 1470
     },
     {
       "month": "2024-12",
@@ -868,12 +868,12 @@
     },
     {
       "month": "2024-12",
-      "gas": "O2",
+      "gas": "NO2",
       "n": 3
     },
     {
       "month": "2024-12",
-      "gas": "UNKNOWN",
+      "gas": "O2",
       "n": 3
     },
     {
@@ -898,13 +898,13 @@
     },
     {
       "month": "2025-08",
-      "gas": "O2",
-      "n": 42
+      "gas": "NO2",
+      "n": 3
     },
     {
       "month": "2025-08",
-      "gas": "UNKNOWN",
-      "n": 3
+      "gas": "O2",
+      "n": 42
     },
     {
       "month": "2025-09",
@@ -928,13 +928,13 @@
     },
     {
       "month": "2025-09",
-      "gas": "O2",
-      "n": 59
+      "gas": "NO2",
+      "n": 10
     },
     {
       "month": "2025-09",
-      "gas": "UNKNOWN",
-      "n": 10
+      "gas": "O2",
+      "n": 59
     },
     {
       "month": "2025-10",
@@ -958,13 +958,13 @@
     },
     {
       "month": "2025-10",
-      "gas": "O2",
-      "n": 28
+      "gas": "NO2",
+      "n": 6
     },
     {
       "month": "2025-10",
-      "gas": "UNKNOWN",
-      "n": 6
+      "gas": "O2",
+      "n": 28
     },
     {
       "month": "2025-11",
@@ -988,13 +988,13 @@
     },
     {
       "month": "2025-11",
-      "gas": "O2",
-      "n": 635
+      "gas": "NO2",
+      "n": 116
     },
     {
       "month": "2025-11",
-      "gas": "UNKNOWN",
-      "n": 116
+      "gas": "O2",
+      "n": 635
     },
     {
       "month": "2025-12",
@@ -1018,13 +1018,13 @@
     },
     {
       "month": "2025-12",
-      "gas": "O2",
-      "n": 379
+      "gas": "NO2",
+      "n": 46
     },
     {
       "month": "2025-12",
-      "gas": "UNKNOWN",
-      "n": 46
+      "gas": "O2",
+      "n": 379
     }
   ],
   "units_by_gas": {
@@ -1041,11 +1041,11 @@
     "H2S": [
       "ppm"
     ],
+    "NO2": [
+      "ppm"
+    ],
     "O2": [
       "%vol"
-    ],
-    "UNKNOWN": [
-      "ppm"
     ]
   },
   "duplicates": {
@@ -1064,7 +1064,7 @@
     },
     {
       "gas": "CH4",
-      "level": "actuar",
+      "level": "evacuar",
       "direction": "above",
       "threshold": 1.0,
       "onsets": 1,
@@ -1072,20 +1072,20 @@
       "policy": "no_event_metrics"
     },
     {
-      "gas": "CH4",
+      "gas": "O2",
       "level": "evacuar",
-      "direction": "above",
-      "threshold": 1.5,
-      "onsets": 1,
-      "sensors_with_onsets": 1,
-      "policy": "no_event_metrics"
+      "direction": "below",
+      "threshold": 19.5,
+      "onsets": 53,
+      "sensors_with_onsets": 6,
+      "policy": "bootstrap_ic"
     },
     {
-      "gas": "CO",
-      "level": "vigilar",
+      "gas": "O2",
+      "level": "evacuar",
       "direction": "above",
-      "threshold": 25.0,
-      "onsets": 7,
+      "threshold": 23.5,
+      "onsets": 2,
       "sensors_with_onsets": 2,
       "policy": "no_event_metrics"
     },
@@ -1093,23 +1093,14 @@
       "gas": "CO",
       "level": "actuar",
       "direction": "above",
-      "threshold": 50.0,
-      "onsets": 4,
-      "sensors_with_onsets": 2,
-      "policy": "no_event_metrics"
-    },
-    {
-      "gas": "CO",
-      "level": "evacuar",
-      "direction": "above",
-      "threshold": 100.0,
-      "onsets": 3,
+      "threshold": 25.0,
+      "onsets": 7,
       "sensors_with_onsets": 2,
       "policy": "no_event_metrics"
     },
     {
       "gas": "H2S",
-      "level": "vigilar",
+      "level": "actuar",
       "direction": "above",
       "threshold": 1.0,
       "onsets": 59,
@@ -1126,39 +1117,30 @@
       "policy": "no_event_metrics"
     },
     {
-      "gas": "H2S",
-      "level": "evacuar",
-      "direction": "above",
-      "threshold": 10.0,
-      "onsets": 5,
-      "sensors_with_onsets": 2,
-      "policy": "no_event_metrics"
-    },
-    {
-      "gas": "O2",
-      "level": "vigilar",
-      "direction": "below",
-      "threshold": 19.5,
-      "onsets": 53,
-      "sensors_with_onsets": 6,
-      "policy": "bootstrap_ic"
-    },
-    {
-      "gas": "O2",
+      "gas": "CO2",
       "level": "actuar",
-      "direction": "below",
-      "threshold": 19.0,
-      "onsets": 24,
-      "sensors_with_onsets": 4,
+      "direction": "above",
+      "threshold": 5000.0,
+      "onsets": 23,
+      "sensors_with_onsets": 3,
       "policy": "wide_ic_warning"
     },
     {
-      "gas": "O2",
-      "level": "evacuar",
-      "direction": "below",
-      "threshold": 17.0,
-      "onsets": 14,
-      "sensors_with_onsets": 3,
+      "gas": "CO2",
+      "level": "actuar",
+      "direction": "above",
+      "threshold": 30000.0,
+      "onsets": 13,
+      "sensors_with_onsets": 1,
+      "policy": "wide_ic_warning"
+    },
+    {
+      "gas": "NO2",
+      "level": "actuar",
+      "direction": "above",
+      "threshold": 0.2,
+      "onsets": 23,
+      "sensors_with_onsets": 4,
       "policy": "wide_ic_warning"
     }
   ],

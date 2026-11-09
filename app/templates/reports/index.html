@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components/macros.html" import page_header, data_table %}
+{% from "components/macros.html" import page_header %}
 {% block page_title %}Informes{% endblock %}
 {% block content %}
 {{ page_header("Informes", "Genera un resumen para el equipo o para gerencia.") }}
@@ -42,7 +42,23 @@
   </div>
   <div class="card">
     <h2>Generados</h2>
-    {{ data_table(["Tipo", "Periodo", "Fecha", ""], report_rows) }}
+    <table class="table">
+      <thead>
+        <tr><th>Tipo</th><th>Periodo</th><th>Fecha</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for r in generated %}
+        <tr>
+          <td>{{ r.type_label }}</td>
+          <td>{{ r.period }}</td>
+          <td>{{ r.created }}</td>
+          <td>{% if r.download_url %}<a class="btn" href="{{ r.download_url }}">Descargar</a>{% endif %}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="muted">Sin filas</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 {% endblock %}

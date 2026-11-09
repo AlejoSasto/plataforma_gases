@@ -34,6 +34,11 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install -r requirements-dev.txt
+      - name: PyTorch CPU
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Navegadores de Playwright
+        if: github.event_name == 'schedule'
+        run: python -m playwright install --with-deps chromium
       - run: python scripts/ensure_test_db.py
       - name: verify
         run: |

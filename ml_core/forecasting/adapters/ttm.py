@@ -1,25 +1,38 @@
-"""Tiny Time Mixers. Mixer nativo en CPU (~pocos miles de parámetros)."""
+"""Tiny Time Mixer. Sin la librería del modelo, falla. No entrena otra red con este nombre."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from ml_core.forecasting.adapters._torch_quantile import TorchQuantileAdapter
+import pandas as pd
+
 from ml_core.forecasting.base import Family
+from ml_core.forecasting.errors import ModelUnavailableError
+from ml_core.forecasting.problem import ProblemSpec
 
 
-class TTMForecaster(TorchQuantileAdapter):
+class TTMForecaster:
     name = "ttm"
     family: Family = "fundacional"
-    net_kind = "mixer"
-    backend = "torch-ttm-lite"
+    backend = "granite-tsfm"
+
+    def fit(self, train: pd.DataFrame, spec: ProblemSpec) -> None:
+        del train, spec
+        try:
+            import granite_tsfm  # noqa: F401
+        except Exception as exc:  # noqa: BLE001
+            raise ModelUnavailableError(self.name, f"falta granite-tsfm ({type(exc).__name__})") from exc
+        raise ModelUnavailableError(self.name, "no hay pesos locales de TTM; no se sustituye el modelo")
+
+    def predict_quantiles(self, context: pd.DataFrame, spec: ProblemSpec) -> pd.DataFrame:
+        del context, spec
+        raise ModelUnavailableError(self.name, "TTM no está cargado")
+
+    def save(self, path: Path) -> None:
+        del path
+        raise ModelUnavailableError(self.name, "no hay artefacto que guardar")
 
     @classmethod
     def load(cls, path: Path) -> "TTMForecaster":
-        base = TorchQuantileAdapter.load(path)
-        obj = cls()
-        obj.__dict__.update(base.__dict__)
-        obj.name = cls.name
-        obj.family = cls.family
-        obj.net_kind = cls.net_kind
-        return obj
+        del path
+        raise ModelUnavailableError(cls.name, "no hay artefacto de TTM")

@@ -54,21 +54,42 @@ class PersistenceForecaster:
 class ETSForecaster:
     name = "ets"
     family: Family = "baseline"
-    backend = "holt-native"
+    backend = "statsforecast"
 
     def __init__(self) -> None:
         self.spreads: dict[str, float] = residual_scale(np.array([0.0, 0.1]))
         self.alpha = 0.4
         self.beta = 0.1
+        self._ready = False
 
     def fit(self, train: pd.DataFrame, spec: ProblemSpec) -> None:
+        from ml_core.forecasting.errors import ModelUnavailableError
+
+        try:
+            import statsforecast  # noqa: F401
+        except Exception as exc:  # noqa: BLE001
+            raise ModelUnavailableError("ets", f"falta statsforecast ({type(exc).__name__})") from exc
         del spec
         y = train_values(train)
         self.spreads = residual_scale(y)
-        if y.size >= 4:
-            self.alpha, self.beta = _fit_holt(y)
+        try:
+            from statsforecast.models import AutoETS
+
+            del AutoETS
+        except Exception as exc:  # noqa: BLE001
+            raise ModelUnavailableError(
+                "ets", f"statsforecast no expone AutoETS ({type(exc).__name__})"
+            ) from exc
+        raise ModelUnavailableError(
+            "ets",
+            "el ajuste con statsforecast no está cableado; no se usa otro suavizado con este nombre",
+        )
 
     def predict_quantiles(self, context: pd.DataFrame, spec: ProblemSpec) -> pd.DataFrame:
+        from ml_core.forecasting.errors import ModelUnavailableError
+
+        if not self._ready:
+            raise ModelUnavailableError(self.name, "ETS no está ajustado con statsforecast")
         groups = series_by_id(context)
         alpha, beta = self.alpha, self.beta
 
@@ -95,6 +116,7 @@ class ETSForecaster:
         obj.spreads = {k: float(v) for k, v in payload["spreads"].items()}
         obj.alpha = float(payload.get("alpha", 0.4))
         obj.beta = float(payload.get("beta", 0.1))
+        obj._ready = True
         return obj
 
 

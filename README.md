@@ -38,7 +38,7 @@ Tras cambiar código Python montado: `docker compose restart app` (Gunicorn no r
 Credenciales locales (solo DEV):
 
 - Correo: `admin@vigia.local`
-- Contraseña: `AdminPass123!`
+- Contraseña: la de `SUPERADMIN_PASSWORD` en `.env` (no se documenta aquí)
 - Entrada: http://localhost:8000/ingresar
 
 Si no existen: `python scripts/create_superadmin.py` (usa `SUPERADMIN_*` de `.env`).  
@@ -76,6 +76,14 @@ python -m pytest -q tests/e2e/test_login_playwright.py tests/e2e/test_aceptacion
 ```
 
 DB de pruebas: `proyecto_gases_test` (`TEST_DATABASE_URL`). Nunca apunta a la DB de desarrollo.
+
+## Reconstruir la plataforma con datos reales
+
+```bash
+python scripts/build_real_platform.py --confirm
+```
+
+También: `make real`. Es idempotente. Si un paso falla, se detiene y dice cuál. El informe queda en `reports/real_platform/build_report.md`.
 
 ## Estado de planes (resumen)
 

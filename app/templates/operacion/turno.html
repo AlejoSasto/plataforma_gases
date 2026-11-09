@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header, empty_state %}
+{% block page_title %}Revisar un turno{% endblock %}
+{% block content %}
+{{ page_header("Revisión de datos reales del " ~ day_label, "Lecturas, lo que se esperaba y lo que pasó en ese turno.") }}
+{{ empty_state("history", "Elige una fecha con lecturas", "Cuando la reproducción histórica termine, aquí se ve el turno paso a paso.") }}
+{% endblock %}

@@ -1,0 +1,666 @@
+{
+  "generated_at": "2026-11-08T01:57:07.754300+00:00",
+  "n_rows": 13894,
+  "instruments": [
+    {
+      "serial": "1807482030#S0004",
+      "gases": [
+        "NO2"
+      ],
+      "first": "2023-03-31T14:37:09+00:00",
+      "last": "2023-03-31T14:41:57+00:00",
+      "n_segments": 4,
+      "steps_p50": 1.5
+    },
+    {
+      "serial": "1908138189#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2023-03-31T14:37:09+00:00",
+      "last": "2023-03-31T14:41:57+00:00",
+      "n_segments": 3,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "21071TQ142#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2023-03-31T14:37:09+00:00",
+      "last": "2023-03-31T14:42:17+00:00",
+      "n_segments": 4,
+      "steps_p50": 4.0
+    },
+    {
+      "serial": "2206309128#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2023-03-31T14:37:09+00:00",
+      "last": "2023-03-31T14:41:57+00:00",
+      "n_segments": 1,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "22101YV009#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2024-09-06T12:42:34+00:00",
+      "last": "2024-09-13T16:03:08+00:00",
+      "n_segments": 21,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "22101J7044#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2024-09-06T12:42:34+00:00",
+      "last": "2024-09-13T16:03:08+00:00",
+      "n_segments": 7,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "22083AF012#S0004",
+      "gases": [
+        "NO2"
+      ],
+      "first": "2024-09-06T12:42:34+00:00",
+      "last": "2024-09-13T16:03:08+00:00",
+      "n_segments": 32,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "2209366013#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2024-09-06T12:42:34+00:00",
+      "last": "2024-09-13T16:03:08+00:00",
+      "n_segments": 29,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "2209364013#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2024-09-06T12:42:34+00:00",
+      "last": "2024-09-13T16:03:08+00:00",
+      "n_segments": 33,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "2209366013#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2024-09-06T12:42:34+00:00",
+      "last": "2024-09-13T16:03:08+00:00",
+      "n_segments": 7,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "17020PE013#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2024-11-13T04:00:39+00:00",
+      "last": "2024-12-11T15:15:52+00:00",
+      "n_segments": 615,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "2210031012#S0004",
+      "gases": [
+        "NO2"
+      ],
+      "first": "2024-11-13T04:00:39+00:00",
+      "last": "2024-12-11T15:15:52+00:00",
+      "n_segments": 112,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "160541U005#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2024-11-13T04:00:39+00:00",
+      "last": "2024-12-11T15:15:52+00:00",
+      "n_segments": 297,
+      "steps_p50": 4.0
+    },
+    {
+      "serial": "160541U005#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2024-11-13T04:00:39+00:00",
+      "last": "2024-12-11T15:15:52+00:00",
+      "n_segments": 196,
+      "steps_p50": 4.0
+    },
+    {
+      "serial": "24062BR010#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2024-11-13T04:00:39+00:00",
+      "last": "2024-12-11T15:15:52+00:00",
+      "n_segments": 16,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "23050W8028#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2024-11-13T04:00:39+00:00",
+      "last": "2024-12-11T15:15:52+00:00",
+      "n_segments": 318,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "22082AR056#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2025-08-25T09:28:51+00:00",
+      "last": "2025-09-16T08:59:01+00:00",
+      "n_segments": 3,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "25040J7141#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2025-08-25T09:28:51+00:00",
+      "last": "2025-09-16T09:18:01+00:00",
+      "n_segments": 24,
+      "steps_p50": 4.0
+    },
+    {
+      "serial": "20100MY003#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2025-08-25T09:28:51+00:00",
+      "last": "2025-09-16T09:09:01+00:00",
+      "n_segments": 23,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "20100B2010#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2025-08-25T09:28:51+00:00",
+      "last": "2025-09-16T08:37:01+00:00",
+      "n_segments": 22,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "20100B2010#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2025-08-25T09:28:51+00:00",
+      "last": "2025-09-16T09:30:01+00:00",
+      "n_segments": 34,
+      "steps_p50": 4.5
+    },
+    {
+      "serial": "20091E1013#S0004",
+      "gases": [
+        "NO2"
+      ],
+      "first": "2025-08-25T09:28:51+00:00",
+      "last": "2025-09-16T08:59:01+00:00",
+      "n_segments": 3,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "2412083053#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2025-10-10T09:21:45+00:00",
+      "last": "2025-10-17T15:12:47+00:00",
+      "n_segments": 2,
+      "steps_p50": 3.5
+    },
+    {
+      "serial": "231215G022#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2025-10-10T09:21:45+00:00",
+      "last": "2025-10-17T15:12:47+00:00",
+      "n_segments": 2,
+      "steps_p50": 2.5
+    },
+    {
+      "serial": "21080LJ005#S0004",
+      "gases": [
+        "NO2"
+      ],
+      "first": "2025-10-10T09:21:45+00:00",
+      "last": "2025-10-17T15:12:47+00:00",
+      "n_segments": 2,
+      "steps_p50": 2.5
+    },
+    {
+      "serial": "210802X034#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2025-10-10T09:21:45+00:00",
+      "last": "2025-10-17T15:12:47+00:00",
+      "n_segments": 2,
+      "steps_p50": 2.5
+    },
+    {
+      "serial": "210802X034#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2025-10-10T09:21:45+00:00",
+      "last": "2025-10-17T15:12:47+00:00",
+      "n_segments": 2,
+      "steps_p50": 2.5
+    },
+    {
+      "serial": "17030B6004#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2025-10-10T09:21:45+00:00",
+      "last": "2025-10-17T15:12:47+00:00",
+      "n_segments": 2,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "24011Y1009#S0011",
+      "n_segments": 1,
+      "steps": 1
+    },
+    {
+      "serial": "2510140176#S0020",
+      "n_segments": 1,
+      "steps": 1
+    },
+    {
+      "serial": "23110Z4010#S0004",
+      "n_segments": 1,
+      "steps": 1
+    },
+    {
+      "serial": "23110AS018#S0021",
+      "n_segments": 1,
+      "steps": 1
+    },
+    {
+      "serial": "231025H023#S0001",
+      "n_segments": 1,
+      "steps": 1
+    },
+    {
+      "serial": "231025H023#S0002",
+      "n_segments": 1,
+      "steps": 1
+    },
+    {
+      "serial": "22061PG059#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2025-10-27T10:07:52+00:00",
+      "last": "2025-10-27T11:12:51+00:00",
+      "n_segments": 6,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "22061PG059#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2025-10-27T10:07:52+00:00",
+      "last": "2025-10-27T11:12:51+00:00",
+      "n_segments": 9,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "22081FT036#S0022",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2025-10-27T10:07:52+00:00",
+      "last": "2025-10-27T11:12:51+00:00",
+      "n_segments": 5,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "22081JU008#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2025-10-27T10:07:52+00:00",
+      "last": "2025-10-27T11:12:51+00:00",
+      "n_segments": 4,
+      "steps_p50": 1.5
+    },
+    {
+      "serial": "220929G001#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2025-10-27T10:07:52+00:00",
+      "last": "2025-10-27T11:12:51+00:00",
+      "n_segments": 9,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "25031AY140#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2025-10-27T14:46:47+00:00",
+      "last": "2025-10-27T15:17:31+00:00",
+      "n_segments": 3,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "161107V011#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2025-10-27T14:46:47+00:00",
+      "last": "2025-10-27T15:14:31+00:00",
+      "n_segments": 2,
+      "steps_p50": 4.5
+    },
+    {
+      "serial": "25042V7005#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2025-10-27T14:46:47+00:00",
+      "last": "2025-10-27T15:04:31+00:00",
+      "n_segments": 1,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "19052Q1004#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2025-10-27T14:46:47+00:00",
+      "last": "2025-10-27T15:16:31+00:00",
+      "n_segments": 2,
+      "steps_p50": 4.0
+    },
+    {
+      "serial": "19052Q1004#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2025-10-27T14:46:47+00:00",
+      "last": "2025-10-27T15:04:31+00:00",
+      "n_segments": 1,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "22082AR052#S0021",
+      "gases": [
+        "CH4"
+      ],
+      "first": "2025-11-11T09:42:40+00:00",
+      "last": "2025-12-11T12:25:44+00:00",
+      "n_segments": 78,
+      "steps_p50": 2.0
+    },
+    {
+      "serial": "23081F0018#S0004",
+      "gases": [
+        "NO2"
+      ],
+      "first": "2025-11-11T09:42:40+00:00",
+      "last": "2025-12-11T12:25:44+00:00",
+      "n_segments": 59,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "2209366026#S0002",
+      "gases": [
+        "H2S"
+      ],
+      "first": "2025-11-11T09:42:40+00:00",
+      "last": "2025-12-11T14:17:44+00:00",
+      "n_segments": 91,
+      "steps_p50": 3.0
+    },
+    {
+      "serial": "2209366026#S0001",
+      "gases": [
+        "CO"
+      ],
+      "first": "2025-11-11T09:42:40+00:00",
+      "last": "2025-12-11T12:25:44+00:00",
+      "n_segments": 44,
+      "steps_p50": 1.0
+    },
+    {
+      "serial": "2209364017#S0011",
+      "gases": [
+        "CO2"
+      ],
+      "first": "2025-11-11T09:42:40+00:00",
+      "last": "2025-12-11T14:11:44+00:00",
+      "n_segments": 91,
+      "steps_p50": 4.0
+    },
+    {
+      "serial": "241033Q134#S0020",
+      "gases": [
+        "O2"
+      ],
+      "first": "2025-11-11T09:42:40+00:00",
+      "last": "2025-12-11T14:11:44+00:00",
+      "n_segments": 158,
+      "steps_p50": 2.0
+    }
+  ],
+  "segments": {
+    "p10": 1.0,
+    "p50": 2.0,
+    "p90": 13.0
+  },
+  "episodes": [
+    {
+      "gas": "CH4",
+      "level": "vigilar",
+      "metric": "instantaneo",
+      "n_episodes": 1,
+      "single_step": 0,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "CH4",
+      "level": "evacuar",
+      "metric": "instantaneo",
+      "n_episodes": 1,
+      "single_step": 0,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "O2",
+      "level": "evacuar",
+      "metric": "instantaneo",
+      "n_episodes": 53,
+      "single_step": 21,
+      "event_eval": "por_episodio"
+    },
+    {
+      "gas": "O2",
+      "level": "evacuar",
+      "metric": "instantaneo",
+      "n_episodes": 2,
+      "single_step": 2,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "CO",
+      "level": "actuar",
+      "metric": "twa_8h",
+      "n_episodes": 7,
+      "single_step": 2,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "H2S",
+      "level": "actuar",
+      "metric": "twa_8h",
+      "n_episodes": 59,
+      "single_step": 31,
+      "event_eval": "por_episodio"
+    },
+    {
+      "gas": "H2S",
+      "level": "actuar",
+      "metric": "stel_15min",
+      "n_episodes": 7,
+      "single_step": 2,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "CO2",
+      "level": "actuar",
+      "metric": "twa_8h",
+      "n_episodes": 0,
+      "single_step": 0,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "CO2",
+      "level": "actuar",
+      "metric": "stel_15min",
+      "n_episodes": 0,
+      "single_step": 0,
+      "event_eval": "solo_pronostico"
+    },
+    {
+      "gas": "NO2",
+      "level": "actuar",
+      "metric": "twa_8h",
+      "n_episodes": 23,
+      "single_step": 12,
+      "event_eval": "por_episodio"
+    }
+  ],
+  "leyendo": {
+    "conclusion": "instantáneo",
+    "detail": "No hay STEL ni TWA del instrumento para comparar."
+  },
+  "bump_tests": [],
+  "parameters": {
+    "lookback_steps": 12,
+    "k_max": 3,
+    "eligible_models": [
+      "persistencia",
+      "ets"
+    ],
+    "excluded_models": [
+      {
+        "model": "lgbm_q",
+        "reason": "contexto mínimo documentado 30 supera w=12"
+      },
+      {
+        "model": "lstm",
+        "reason": "contexto mínimo documentado 30 supera w=12"
+      },
+      {
+        "model": "tft",
+        "reason": "contexto mínimo documentado 48 supera w=12"
+      },
+      {
+        "model": "chronos",
+        "reason": "contexto mínimo documentado 64 supera w=12"
+      },
+      {
+        "model": "chronos2",
+        "reason": "contexto mínimo documentado 64 supera w=12"
+      },
+      {
+        "model": "timesfm",
+        "reason": "contexto mínimo documentado 32 supera w=12"
+      },
+      {
+        "model": "patchtst",
+        "reason": "contexto mínimo documentado 48 supera w=12; queda fuera de la ablación"
+      },
+      {
+        "model": "itransformer",
+        "reason": "contexto mínimo documentado 48 supera w=12; queda fuera de la ablación"
+      },
+      {
+        "model": "ttm",
+        "reason": "contexto mínimo documentado 32 supera w=12; queda fuera de la ablación"
+      }
+    ],
+    "event_eval": {
+      "CH4:vigilar:instantaneo": "solo_pronostico",
+      "CH4:evacuar:instantaneo": "solo_pronostico",
+      "O2:evacuar:instantaneo": "solo_pronostico",
+      "CO:actuar:twa_8h": "solo_pronostico",
+      "H2S:actuar:twa_8h": "por_episodio",
+      "H2S:actuar:stel_15min": "solo_pronostico",
+      "CO2:actuar:twa_8h": "solo_pronostico",
+      "CO2:actuar:stel_15min": "solo_pronostico",
+      "NO2:actuar:twa_8h": "por_episodio"
+    },
+    "folds": [
+      {
+        "months": [
+          "2023-03",
+          "2024-09"
+        ],
+        "n_valid": 553,
+        "role": "validacion"
+      },
+      {
+        "months": [
+          "2024-11"
+        ],
+        "n_valid": 8937,
+        "role": "validacion"
+      },
+      {
+        "months": [
+          "2024-12",
+          "2025-08",
+          "2025-09"
+        ],
+        "n_valid": 576,
+        "role": "validacion"
+      },
+      {
+        "months": [
+          "2025-10",
+          "2025-11"
+        ],
+        "n_valid": 2528,
+        "role": "validacion"
+      },
+      {
+        "months": [
+          "2025-12"
+        ],
+        "n_valid": 1300,
+        "role": "final_test"
+      }
+    ]
+  }
+}

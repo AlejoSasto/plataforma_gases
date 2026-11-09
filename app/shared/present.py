@@ -216,6 +216,7 @@ def reliability_snapshot(db: Session) -> dict[str, Any]:
             "fa_phrase": "Todavía no contamos avisos innecesarios por turno.",
             "missed": 0,
             "timely": 0,
+            "unnecessary": 0,
             "total": 0,
             "lead_avg": None,
             "trend": [],
@@ -226,7 +227,7 @@ def reliability_snapshot(db: Session) -> dict[str, Any]:
     leads: list[float] = []
     for row in rows:
         outcome = (row.outcome or "").lower()
-        if outcome in {"acierto", "timely", "a_tiempo"}:
+        if outcome in {"acierto", "timely", "a_tiempo", "acertado"}:
             timely += 1
         elif outcome in {"omitido", "fn", "no_avisado"}:
             missed += 1
@@ -244,6 +245,7 @@ def reliability_snapshot(db: Session) -> dict[str, Any]:
         "fa_phrase": copy.reliability_fa(fa),
         "missed": missed,
         "timely": timely,
+        "unnecessary": fa,
         "total": len(rows),
         "lead_avg": lead_avg,
         "trend": [],
@@ -303,7 +305,13 @@ def list_limits(db: Session) -> list[dict[str, Any]]:
                 "level": copy.status_word(row.level),
                 "status_key": copy.status_key(row.level),
                 "value": copy.number_es(float(row.value)),
-                "source": row.source_reference,
+                "source": row.article or row.source_reference,
+                "metric": row.metric,
+                "metric_plain": {
+                    "instantaneo": "lectura del momento",
+                    "twa_8h": "promedio de 8 horas",
+                    "stel_15min": "promedio de 15 minutos",
+                }.get(row.metric, row.metric),
                 "verified": bool(row.verified),
                 "verified_label": "Verificado" if row.verified else "Por verificar",
             }

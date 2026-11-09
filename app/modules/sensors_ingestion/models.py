@@ -31,6 +31,22 @@ from app.modules.roles_permissions import models as _roles_models  # noqa: F401
 from app.modules.users import models as _users_models  # noqa: F401
 
 
+class Instrument(Base):
+    __tablename__ = "instruments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    serial: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    model: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    first_seen: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_seen: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    assigned_to: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    site_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("sites.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
+    sensors: Mapped[list["Sensor"]] = relationship(back_populates="instrument", lazy="selectin")
+
+
 class Site(Base):
     __tablename__ = "sites"
 
@@ -60,8 +76,12 @@ class Sensor(Base):
     is_active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default="true"
     )
+    instrument_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("instruments.id", ondelete="SET NULL"), nullable=True, index=True
+    )
 
     site: Mapped[Site] = relationship(back_populates="sensors")
+    instrument: Mapped[Optional[Instrument]] = relationship(back_populates="sensors")
     readings: Mapped[list[GasReading]] = relationship(back_populates="sensor", lazy="noload")
 
 
@@ -177,6 +197,8 @@ class ReadingGrid(Base):
     source_etl_run_id: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("etl_runs.id", ondelete="SET NULL"), nullable=True
     )
+    twa_8h: Mapped[Optional[float]] = mapped_column(Numeric(18, 6), nullable=True)
+    stel_15min: Mapped[Optional[float]] = mapped_column(Numeric(18, 6), nullable=True)
 
 
 class ThresholdEvent(Base):

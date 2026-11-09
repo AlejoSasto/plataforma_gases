@@ -158,6 +158,9 @@ def get_recipients_for_alert(db: Session, alert: Alert) -> list[Stakeholder]:
 
 
 def dispatch_alert_notifications(db: Session, alert: Alert) -> int:
+    origin = getattr(alert, "origin", "en_vivo") or "en_vivo"
+    if origin == "historico":
+        return 0
     recipients = get_recipients_for_alert(db, alert)
     return notify_alert_recipients(db, alert, recipients)
 

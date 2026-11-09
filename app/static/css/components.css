@@ -253,6 +253,7 @@
 .banner-vigilar { border-left-color: var(--st-vigilar); background: var(--st-vigilar-soft); color: var(--st-vigilar-ink); }
 .banner-normal { border-left-color: var(--st-normal); }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-panel); padding: var(--sp-5); }
+a.card, a.card:hover { text-decoration: none; }
 a.card.stretched:hover { border-color: var(--accent); }
 .zone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-4); }
 .metric-big { display: flex; flex-direction: column; gap: 4px; }
@@ -304,4 +305,36 @@ dialog::backdrop { background: rgba(26, 30, 36, 0.35); }
 }
 html[data-theme=sala] .app-sidebar, html[data-theme=sala] .bottom-nav { display: none; }
 html[data-theme=sala] .app-shell { grid-template-columns: 1fr; background: none; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.ask {
+  position: fixed; top: 0; right: 0; z-index: 30;
+  width: 420px; max-width: 100%; height: 100vh;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--surface); color: var(--text);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-float);
+}
+.ask[hidden] { display: none; }
+.ask__bar { display: flex; align-items: center; justify-content: space-between; }
+.ask__log { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: var(--sp-3); }
+.ask__bubble { padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-panel); }
+.ask__bubble--user { background: var(--surface-2); }
+.ask__form { display: grid; gap: var(--sp-2); }
+.ask__form textarea {
+  width: 100%; min-height: 72px; resize: vertical;
+  border: 1px solid var(--border-strong); border-radius: var(--r-ctrl);
+  padding: var(--sp-3); font: inherit; color: var(--text); background: var(--surface);
+}
+.ask__sources { font-size: var(--fs-small); color: var(--text-2); }
+.ask__block { min-height: 220px; }
+.manual-fig img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: var(--r-panel); }
+@media (max-width: 900px) {
+  .ask { top: auto; bottom: 0; width: 100%; height: 78vh; border-left: 0; border-top: 1px solid var(--border); }
+}
+
 

@@ -221,3 +221,87 @@ def get_report_for_download(db: Session, user: User, report_id: int) -> tuple[Re
     )
     db.commit()
     return row, path
+
+
+def create_assistant_report(
+    db: Session,
+    user: User,
+    *,
+    kind: str,
+    start: datetime,
+    end: datetime,
+    gas: str | None,
+    sensor_ids: list[int],
+    formato: str,
+    data_until: str | None,
+    historic: bool,
+) -> dict[str, Any]:
+    """Informe pedido por el asistente. La escritura sigue en este módulo."""
+    from app.modules.reports.assistant_pdf import build_pdf
+
+    if end < start:
+        raise ValidationError("La fecha final tiene que ser posterior a la inicial.")
+    content, _meta = build_pdf(
+        db,
+        user,
+        kind=kind,
+        start=start,
+        end=end,
+        gas=gas,
+        sensor_ids=sensor_ids,
+        data_until=data_until,
+        historic=historic,
+    )
+    ext = "xlsx" if formato == "xlsx" else "pdf"
+    if formato == "xlsx":
+        content = _assistant_xlsx(kind, data_until, historic, start, end)
+    row = _save_bytes(
+        db,
+        report_type=kind,
+        content=content,
+        ext=ext,
+        user=user,
+        period_start=start,
+        period_end=end,
+    )
+    record_audit(
+        db,
+        action="report.generate",
+        user_id=user.id,
+        resource_type="report",
+        resource_id=row.id,
+        metadata={"type": kind, "via": "asistente", "format": ext},
+    )
+    db.commit()
+    titles = {
+        "avisos_periodo": "Avisos del periodo",
+        "resumen_gerencia": "Resumen para gerencia",
+        "confiabilidad": "Confiabilidad",
+        "comportamiento_gas": "Comportamiento del gas",
+    }
+    payload = _to_response(row)
+    return {
+        "report_id": row.id,
+        "format": ext,
+        "title": titles.get(kind, "Informe"),
+        "download_url": payload["download_url"],
+        "n": 1,
+    }
+
+
+def _assistant_xlsx(kind: str, data_until: str | None, historic: bool, start: datetime, end: datetime) -> bytes:
+    from io import BytesIO
+
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "Informe"
+    origin = "histórico" if historic else "en vivo"
+    sheet.append(["tipo", kind])
+    sheet.append(["periodo", f"{start.date().isoformat()} a {end.date().isoformat()}"])
+    sheet.append(["datos_hasta", data_until or ""])
+    sheet.append(["origen", origin])
+    buffer = BytesIO()
+    book.save(buffer)
+    return buffer.getvalue()

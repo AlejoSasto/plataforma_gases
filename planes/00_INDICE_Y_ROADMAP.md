@@ -4,8 +4,9 @@
 > **Destino (reformulación jurado):** [`14_REFORMULACION_INDICE.md`](14_REFORMULACION_INDICE.md) y planes **15–20**.  
 > **Auditoría científica / ajustes:** [`23_AUDITORIA_Y_AJUSTES_TESIS.md`](23_AUDITORIA_Y_AJUSTES_TESIS.md) — **prioridad** sobre 14–22 cuando haya conflicto.  
 > **Identidad visual:** [`21_SISTEMA_DE_DISENO_VIGIA.md`](21_SISTEMA_DE_DISENO_VIGIA.md) + [`22_MOCKUPS_Y_GUIA_DE_IMPLEMENTACION.md`](22_MOCKUPS_Y_GUIA_DE_IMPLEMENTACION.md) (kit en `mockups/vigia-design-kit/`).  
-> Ante conflicto: **Plan 23 > paquete 14–22 > planes 04, 05, 07, 11, 12 y 13**; el **código** describe lo que hay hoy. Planes **01–03, 06 y 08** siguen como base.  
-> Marca de trabajo en UI: **Vigía · Gases en la mina**. Alembic head: `c1d2e3f4a5b6`.
+> **Paquete documental de diseño (lo ejecuta Claude):** [`documentacion/claude/27_PAQUETE_DISENO_INDICE.md`](../documentacion/claude/27_PAQUETE_DISENO_INDICE.md) y planes **28–35** en esa carpeta. No cambian la aplicación. Producen draw.io, Word, Excel, mockups y los manuales. `planes/` queda para la arquitectura y la ejecución del sistema.  
+> Ante conflicto: **Plan 25 > Plan 23 > paquete 14–22**. El Plan 25 absorbe lo pendiente de 23 y de 24. El código describe lo que hay hoy. En el paquete 27–34, si un plan viejo contradice el código, gana el código.
+> Marca de trabajo en UI: **Vigía · Gases en la mina**. Alembic head: `d2e3f4a5b6c7`.
 
 Este archivo es el mapa de ejecución. Cada plan tiene objetivo, prerrequisitos, pasos, artefactos y definición de terminado. No se salta una **compuerta**.
 

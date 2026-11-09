@@ -23,32 +23,25 @@ from ml_core.forecasting.problem import ProblemSpec
 
 
 def _make_regressor(alpha: float):
+    from ml_core.forecasting.errors import ModelUnavailableError
+
     try:
         import lightgbm as lgb
-
-        return lgb.LGBMRegressor(
-            objective="quantile",
-            alpha=alpha,
-            n_estimators=40,
-            min_child_samples=4,
-            verbosity=-1,
-        ), "lightgbm"
-    except Exception:  # noqa: BLE001
-        from sklearn.ensemble import GradientBoostingRegressor
-
-        return GradientBoostingRegressor(
-            loss="quantile",
-            alpha=alpha,
-            n_estimators=40,
-            max_depth=2,
-            random_state=17,
-        ), "sklearn-gbr"
+    except Exception as exc:  # noqa: BLE001
+        raise ModelUnavailableError("lgbm_q", f"falta lightgbm ({type(exc).__name__})") from exc
+    return lgb.LGBMRegressor(
+        objective="quantile",
+        alpha=alpha,
+        n_estimators=40,
+        min_child_samples=4,
+        verbosity=-1,
+    ), "lightgbm"
 
 
 class LightGBMQuantileForecaster:
     name = "lgbm_q"
     family: Family = "tabular"
-    backend = "sklearn-gbr"
+    backend = "lightgbm"
 
     def __init__(self) -> None:
         self.spreads: dict[str, float] = residual_scale(np.array([0.0, 0.1]))

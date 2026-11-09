@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "components/macros.html" import page_header %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block content %}
+<p><a href="/ayuda">{{ copy.NAV.ayuda }}</a></p>
+{{ page_header(page_title, "") }}
+<article class="manual">{{ body_html | safe }}</article>
+{% endblock %}

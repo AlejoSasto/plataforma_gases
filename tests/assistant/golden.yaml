@@ -1,0 +1,302 @@
+# Conjunto dorado del asistente (Plan 26). La respuesta numérica se calcula en la base;
+# aquí queda la herramienta que debe usarse. Las cifras se contrastan al correr --live.
+- id: av01
+  role: operador
+  kind: avisos
+  question: "¿Qué avisos hubo en noviembre de 2024?"
+  expect: buscar_avisos
+- id: av02
+  role: supervisor_seguridad
+  kind: avisos
+  question: "Avisos de ácido sulfhídrico de noviembre de 2024"
+  expect: buscar_avisos
+- id: av03
+  role: operador
+  kind: avisos
+  question: "¿Qué avisos de metano hubo?"
+  expect: buscar_avisos
+- id: av04
+  role: gerencia
+  kind: avisos
+  question: "Lista los avisos de octubre de 2024"
+  expect: buscar_avisos
+- id: av05
+  role: analista
+  kind: avisos
+  question: "Avisos confirmados de monóxido de diciembre de 2024"
+  expect: buscar_avisos
+- id: av06
+  role: auditor
+  kind: avisos
+  question: "¿Cuántos avisos de oxígeno hay en septiembre de 2024?"
+  expect: buscar_avisos
+- id: av07
+  role: operador
+  kind: avisos
+  question: "Avisos del último turno con datos"
+  expect: buscar_avisos
+- id: av08
+  role: supervisor_seguridad
+  kind: avisos
+  question: "Avisos de nivel vigilar en noviembre de 2024"
+  expect: buscar_avisos
+- id: av09
+  role: gerencia
+  kind: avisos
+  question: "¿Hubo avisos de sulfuro de hidrógeno en 2024-11-01?"
+  expect: buscar_avisos
+- id: av10
+  role: operador
+  kind: avisos
+  question: "Muéstrame los avisos abiertos"
+  expect: buscar_avisos
+- id: av11
+  role: analista
+  kind: avisos
+  question: "Avisos históricos de metano de noviembre de 2024"
+  expect: buscar_avisos
+- id: av12
+  role: supervisor_seguridad
+  kind: avisos
+  question: "¿Qué avisos se cerraron en diciembre de 2024?"
+  expect: buscar_avisos
+- id: av13
+  role: auditor
+  kind: avisos
+  question: "Avisos de dióxido de carbono de agosto de 2024"
+  expect: buscar_avisos
+- id: av14
+  role: gerencia
+  kind: avisos
+  question: "Resumen de avisos de noviembre de 2024"
+  expect: buscar_avisos
+- id: av15
+  role: operador
+  kind: avisos
+  question: "¿Hay avisos de metano para revisar?"
+  expect: buscar_avisos
+- id: gas01
+  role: operador
+  kind: gases
+  question: "¿Cómo se comportó el metano en noviembre de 2024?"
+  expect: serie_gas
+- id: gas02
+  role: supervisor_seguridad
+  kind: gases
+  question: "Lecturas de ácido sulfhídrico en octubre de 2024"
+  expect: serie_gas
+- id: gas03
+  role: gerencia
+  kind: gases
+  question: "Comportamiento del monóxido en diciembre de 2024"
+  expect: serie_gas
+- id: gas04
+  role: analista
+  kind: gases
+  question: "Serie de oxígeno entre 2024-11-01 y 2024-11-15"
+  expect: serie_gas
+- id: gas05
+  role: operador
+  kind: gases
+  question: "¿Qué lecturas de metano hay?"
+  expect: serie_gas
+- id: gas06
+  role: auditor
+  kind: gases
+  question: "Comportamiento del dióxido de carbono en septiembre de 2024"
+  expect: serie_gas
+- id: gas07
+  role: operador
+  kind: gases
+  question: "Promedio de metano por día en noviembre de 2024"
+  expect: estadisticas_gas
+- id: gas08
+  role: supervisor_seguridad
+  kind: gases
+  question: "Estadísticas de ácido sulfhídrico por semana"
+  expect: estadisticas_gas
+- id: gas09
+  role: gerencia
+  kind: gases
+  question: "Promedio de monóxido por equipo"
+  expect: estadisticas_gas
+- id: gas10
+  role: analista
+  kind: gases
+  question: "Estadísticas de oxígeno por turno en noviembre de 2024"
+  expect: estadisticas_gas
+- id: gas11
+  role: operador
+  kind: gases
+  question: "¿Cuáles fueron los episodios de metano en noviembre de 2024?"
+  expect: episodios
+- id: gas12
+  role: supervisor_seguridad
+  kind: gases
+  question: "Episodios de ácido sulfhídrico en octubre de 2024"
+  expect: episodios
+- id: gas13
+  role: analista
+  kind: gases
+  question: "Episodios de monóxido de diciembre de 2024"
+  expect: episodios
+- id: gas14
+  role: gerencia
+  kind: gases
+  question: "Lecturas de metano del 2024-12-01"
+  expect: serie_gas
+- id: gas15
+  role: operador
+  kind: gases
+  question: "¿Cómo estuvo el oxígeno en las lecturas de noviembre de 2024?"
+  expect: serie_gas
+- id: lim01
+  role: operador
+  kind: limites
+  question: "¿Cuál es el límite de metano?"
+  expect: limites
+- id: lim02
+  role: supervisor_seguridad
+  kind: limites
+  question: "Límites del Decreto 1886 para el ácido sulfhídrico"
+  expect: limites
+- id: lim03
+  role: gerencia
+  kind: limites
+  question: "¿Qué dice el decreto sobre el monóxido?"
+  expect: limites
+- id: lim04
+  role: analista
+  kind: limites
+  question: "Límite de oxígeno del Decreto 1886"
+  expect: limites
+- id: lim05
+  role: auditor
+  kind: limites
+  question: "¿Qué límites hay cargados?"
+  expect: limites
+- id: lim06
+  role: operador
+  kind: limites
+  question: "Explícame el promedio de 8 horas del decreto"
+  expect: limites
+- id: lim07
+  role: supervisor_seguridad
+  kind: limites
+  question: "Artículo del límite de metano"
+  expect: limites
+- id: lim08
+  role: gerencia
+  kind: limites
+  question: "¿El límite de sulfhídrico ya está verificado en el decreto?"
+  expect: limites
+- id: con01
+  role: gerencia
+  kind: confiabilidad
+  question: "¿Qué tan confiable es el sistema?"
+  expect: confiabilidad
+- id: con02
+  role: supervisor_seguridad
+  kind: confiabilidad
+  question: "Quiero ver la confiabilidad del sistema"
+  expect: confiabilidad
+- id: con03
+  role: analista
+  kind: confiabilidad
+  question: "¿Qué cifras de confiabilidad hay?"
+  expect: confiabilidad
+- id: con04
+  role: auditor
+  kind: confiabilidad
+  question: "Explícame la confiabilidad"
+  expect: confiabilidad
+- id: con05
+  role: gerencia
+  kind: confiabilidad
+  question: "¿Cuántos avisos a tiempo marca la confiabilidad?"
+  expect: confiabilidad
+- id: con06
+  role: admin
+  kind: confiabilidad
+  question: "Resumen de confiabilidad"
+  expect: confiabilidad
+- id: inf01
+  role: supervisor_seguridad
+  kind: informes
+  question: "Genera el informe de avisos de noviembre de 2024 en PDF"
+  expect: generar_informe
+- id: inf02
+  role: gerencia
+  kind: informes
+  question: "Resumen para gerencia de noviembre de 2024 en PDF"
+  expect: generar_informe
+- id: inf03
+  role: analista
+  kind: informes
+  question: "Informe de confiabilidad de noviembre de 2024 en PDF"
+  expect: generar_informe
+- id: inf04
+  role: admin
+  kind: informes
+  question: "Genera el PDF de avisos de octubre de 2024"
+  expect: generar_informe
+- id: inf05
+  role: gerencia
+  kind: informes
+  question: "Necesito el informe PDF del mes de diciembre de 2024"
+  expect: generar_informe
+- id: inf06
+  role: supervisor_seguridad
+  kind: informes
+  question: "Informe del comportamiento del metano de noviembre de 2024 en PDF"
+  expect: generar_informe
+- id: man01
+  role: operador
+  kind: manual
+  question: "¿Cómo cierro un aviso?"
+  expect: buscar_manual
+- id: man02
+  role: supervisor_seguridad
+  kind: manual
+  question: "¿Dónde dice el manual cómo entro a la plataforma?"
+  expect: buscar_manual
+- id: man03
+  role: gerencia
+  kind: manual
+  question: "Ayuda para leer la confiabilidad"
+  expect: buscar_manual
+- id: man04
+  role: operador
+  kind: manual
+  question: "¿Cómo uso los filtros de avisos? Busca en el manual"
+  expect: buscar_manual
+- id: man05
+  role: analista
+  kind: manual
+  question: "Manual para cargar datos"
+  expect: buscar_manual
+- id: man06
+  role: auditor
+  kind: manual
+  question: "¿Qué dice el manual sobre los roles?"
+  expect: buscar_manual
+- id: off01
+  role: operador
+  kind: fuera
+  question: "¿Cuál es la contraseña del servidor?"
+  expect: fuera
+- id: off02
+  role: gerencia
+  kind: fuera
+  question: "¿Qué tiempo hace en la ciudad?"
+  expect: fuera
+- id: em01
+  role: operador
+  kind: emergencia
+  question: "Hay olor a gas en el frente"
+  expect: emergencia
+- id: em02
+  role: supervisor_seguridad
+  kind: emergencia
+  question: "Alguien se desmayó en la vía"
+  expect: emergencia

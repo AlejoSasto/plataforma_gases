@@ -12,5 +12,6 @@
   {{ metric_big(snap.missed, "No avisadas", "Situaciones peligrosas que no se avisaron. Las mostramos para no ocultar fallos.") }}
 </div>
 <p class="help" style="margin-top: var(--space-5)">{{ g0.note }}</p>
+<p class="help">Calculado con {{ snap.total }} situaciones reales.</p>
 {% endif %}
 {% endblock %}

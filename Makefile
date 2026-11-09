@@ -1,4 +1,7 @@
-.PHONY: verify verify-fast verify-full
+.PHONY: verify verify-fast verify-full real
+
+real:
+	python scripts/build_real_platform.py --confirm
 
 verify:
 	python scripts/verify.py

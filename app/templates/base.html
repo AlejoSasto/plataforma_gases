@@ -80,6 +80,7 @@
         {% if 'audit.view' in permissions %}
         <a class="rail__link" href="/bitacora" {% if active_nav == 'bitacora' %}aria-current="page"{% endif %}>{{ icon("scroll-text") }} {{ copy.NAV.bitacora }}</a>
         {% endif %}
+        <a class="rail__link" href="/ayuda" {% if active_nav == 'ayuda' %}aria-current="page"{% endif %}>{{ icon("file-text") }} {{ copy.NAV.ayuda }}</a>
       </div>
       {% endif %}
       <div class="rail__foot">
@@ -94,9 +95,12 @@
       <header class="topbar">
         <button class="icon-btn" type="button" id="sidebar-toggle" aria-label="Abrir menú">{{ icon("sliders-horizontal") }}</button>
         <div class="topbar__site">{{ icon("map-pinned", 16) }} {{ copy.MINE_LABEL }}</div>
-        <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>Datos al día</div>
+        <div class="topbar__live"><span class="dot-live" aria-hidden="true"></span>{{ data_as_of_label() }}</div>
         <div class="topbar__spacer"></div>
         {% block topbar_extra %}{% endblock %}
+        {% if assistant_on() %}
+        <button class="icon-btn" type="button" id="ask-open" data-ask-open aria-label="{{ copy.ASK }}">{{ icon("message-circle") }}</button>
+        {% endif %}
         {% if 'alerts.view' in permissions %}
         <a class="icon-btn" href="/avisos" aria-label="Avisos">{{ icon("bell") }}</a>
         {% endif %}
@@ -117,6 +121,9 @@
     {% endif %}
     <a href="/mi-cuenta" {% if active_nav == 'cuenta' %}aria-current="page"{% endif %}>{{ icon("users") }}Más</a>
   </nav>
+  {% if assistant_on() %}
+  {% include "assistant/panel.html" %}
+  {% endif %}
 {% elif sala %}
   <div class="sala">
     {% block sala %}{% endblock %}
@@ -128,6 +135,9 @@
   <script src="/static/vendor/echarts.min.js"></script>
   <script src="/static/js/app.js"></script>
   <script src="/static/js/charts.js"></script>
+  {% if assistant_on() %}
+  <script src="/static/js/assistant.js"></script>
+  {% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

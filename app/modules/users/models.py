@@ -108,6 +108,21 @@ class UserSiteScope(Base):
     )
 
 
+class UserInstrumentScope(Base):
+    """Alcance del operador por equipo, mientras no haya zonas reales."""
+
+    __tablename__ = "user_instrument_scopes"
+    __table_args__ = (UniqueConstraint("user_id", "instrument_id", name="uq_user_instrument_scope"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    instrument_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("instruments.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
+
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
     __table_args__ = (

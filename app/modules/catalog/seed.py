@@ -11,7 +11,7 @@ from app.modules.roles_permissions import models as _roles_models  # noqa: F401
 from app.modules.users import models as _users_models  # noqa: F401
 from app.modules.catalog.models import AppSetting, GasType, NormativeThreshold
 from app.shared.gas_catalog import apply_db_catalog
-from ml_core.domain.thresholds import MAX_RATE_PER_MIN, PHYSICAL_MAX, THRESHOLD_SEED
+from ml_core.domain.thresholds import MAX_RATE_PER_MIN, PHYSICAL_MAX, THRESHOLD_SEED, seed_key
 
 GAS_TYPE_SEED: tuple[dict[str, Any], ...] = (
     {
@@ -122,21 +122,33 @@ def seed_gas_types(db: Session) -> int:
 def seed_thresholds(db: Session) -> int:
     n = 0
     now = datetime.now(timezone.utc)
+    wanted = {seed_key(spec): spec for spec in THRESHOLD_SEED}
+    for row in db.query(NormativeThreshold).all():
+        if (row.kind or "normativo") != "normativo":
+            continue
+        key = (row.gas_code, row.level, row.metric or "instantaneo", row.direction, row.site_kind or "cualquiera")
+        if key not in wanted:
+            db.delete(row)
+    db.flush()
     for spec in THRESHOLD_SEED:
         existing = (
             db.query(NormativeThreshold)
             .filter(
                 NormativeThreshold.gas_code == spec.gas_code,
                 NormativeThreshold.level == spec.level,
+                NormativeThreshold.metric == spec.metric,
+                NormativeThreshold.direction == spec.direction,
+                NormativeThreshold.site_kind == spec.site_kind,
+                NormativeThreshold.kind == "normativo",
             )
             .order_by(NormativeThreshold.valid_from.desc())
             .first()
         )
         if existing is not None:
-            existing.direction = spec.direction
             existing.value = spec.value
             existing.source_reference = spec.source_reference
-            existing.verified = spec.verified
+            existing.article = spec.article
+            existing.kind = spec.kind
             n += 1
             continue
         db.add(
@@ -148,6 +160,10 @@ def seed_thresholds(db: Session) -> int:
                 source_reference=spec.source_reference,
                 verified=spec.verified,
                 valid_from=now,
+                metric=spec.metric,
+                site_kind=spec.site_kind,
+                kind=spec.kind,
+                article=spec.article,
             )
         )
         n += 1

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+from functools import cache
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import torch
-from torch import nn
 
 from ml_core.forecasting.adapters._common import (
     dump_json,
@@ -22,87 +21,95 @@ from ml_core.forecasting.adapters._common import (
 from ml_core.forecasting.dataset import horizon_steps
 from ml_core.forecasting.problem import ProblemSpec
 
-DEVICE = torch.device("cpu")
+
+def _torch():
+    """PyTorch solo cuando se entrena, se predice o se cargan pesos."""
+    import torch
+    from torch import nn
+
+    return torch, nn
 
 
-class QuantileHead(nn.Module):
-    def __init__(self, hidden: int) -> None:
-        super().__init__()
-        self.net = nn.Linear(hidden, 4)
+@cache
+def _nets():
+    torch, nn = _torch()
 
-    def forward(self, h: torch.Tensor) -> torch.Tensor:
-        return self.net(h)
+    class QuantileHead(nn.Module):
+        def __init__(self, hidden: int) -> None:
+            super().__init__()
+            self.net = nn.Linear(hidden, 4)
+
+        def forward(self, h: torch.Tensor) -> torch.Tensor:
+            return self.net(h)
+
+    class LSTMNet(nn.Module):
+        def __init__(self, hidden: int = 16) -> None:
+            super().__init__()
+            self.rnn = nn.LSTM(1, hidden, batch_first=True)
+            self.head = QuantileHead(hidden)
+
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            out, _ = self.rnn(x)
+            return self.head(out[:, -1, :])
+
+    class PatchNet(nn.Module):
+        def __init__(self, lookback: int, hidden: int = 16, heads: int = 2) -> None:
+            super().__init__()
+            self.proj = nn.Linear(1, hidden)
+            self.attn = nn.MultiheadAttention(hidden, heads, batch_first=True)
+            self.head = QuantileHead(hidden)
+            self.lookback = lookback
+
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            h = self.proj(x)
+            a, _ = self.attn(h, h, h, need_weights=False)
+            return self.head(a.mean(dim=1))
+
+    class MixerNet(nn.Module):
+        """TTM-like: mezcla parches temporales con MLP (muy pequeño)."""
+
+        def __init__(self, lookback: int, hidden: int = 16) -> None:
+            super().__init__()
+            self.fc1 = nn.Linear(lookback, hidden)
+            self.fc2 = nn.Linear(hidden, hidden)
+            self.head = QuantileHead(hidden)
+
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            z = torch.relu(self.fc1(x.squeeze(-1)))
+            z = torch.relu(self.fc2(z))
+            return self.head(z)
+
+    class GRNLSTM(nn.Module):
+        """TFT-lite: puerta de selección de la ventana + LSTM."""
+
+        def __init__(self, hidden: int = 16) -> None:
+            super().__init__()
+            self.gate = nn.Linear(1, 1)
+            self.rnn = nn.LSTM(1, hidden, batch_first=True)
+            self.head = QuantileHead(hidden)
+
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            g = torch.sigmoid(self.gate(x))
+            out, _ = self.rnn(x * g)
+            return self.head(out[:, -1, :])
+
+    return {
+        "lstm": LSTMNet,
+        "patch": PatchNet,
+        "mixer": MixerNet,
+        "tft": GRNLSTM,
+    }
 
 
-class LSTMNet(nn.Module):
-    def __init__(self, hidden: int = 16) -> None:
-        super().__init__()
-        self.rnn = nn.LSTM(1, hidden, batch_first=True)
-        self.head = QuantileHead(hidden)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        out, _ = self.rnn(x)
-        return self.head(out[:, -1, :])
-
-
-class PatchNet(nn.Module):
-    def __init__(self, lookback: int, hidden: int = 16, heads: int = 2) -> None:
-        super().__init__()
-        self.proj = nn.Linear(1, hidden)
-        self.attn = nn.MultiheadAttention(hidden, heads, batch_first=True)
-        self.head = QuantileHead(hidden)
-        self.lookback = lookback
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        h = self.proj(x)
-        a, _ = self.attn(h, h, h, need_weights=False)
-        return self.head(a.mean(dim=1))
-
-
-class MixerNet(nn.Module):
-    """TTM-like: mezcla parches temporales con MLP (muy pequeño)."""
-
-    def __init__(self, lookback: int, hidden: int = 16) -> None:
-        super().__init__()
-        self.fc1 = nn.Linear(lookback, hidden)
-        self.fc2 = nn.Linear(hidden, hidden)
-        self.head = QuantileHead(hidden)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        z = torch.relu(self.fc1(x.squeeze(-1)))
-        z = torch.relu(self.fc2(z))
-        return self.head(z)
-
-
-class GRNLSTM(nn.Module):
-    """TFT-lite: puerta de selección de la ventana + LSTM."""
-
-    def __init__(self, hidden: int = 16) -> None:
-        super().__init__()
-        self.gate = nn.Linear(1, 1)
-        self.rnn = nn.LSTM(1, hidden, batch_first=True)
-        self.head = QuantileHead(hidden)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        g = torch.sigmoid(self.gate(x))
-        out, _ = self.rnn(x * g)
-        return self.head(out[:, -1, :])
-
-
-def pinball_batch(pred: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+def pinball_batch(pred, y):
+    torch, _nn = _torch()
     taus = pred.new_tensor([0.10, 0.50, 0.90, 0.95]).view(1, 4)
     err = y.unsqueeze(1) - pred
     return torch.mean(torch.maximum(taus * err, (taus - 1) * err))
 
 
-def train_net(
-    net: nn.Module,
-    X: np.ndarray,
-    y: np.ndarray,
-    *,
-    epochs: int = 12,
-    lr: float = 1e-2,
-) -> nn.Module:
+def train_net(net, X: np.ndarray, y: np.ndarray, *, epochs: int = 12, lr: float = 1e-2):
+    torch, _nn = _torch()
     if len(X) == 0:
         return net
     opt = torch.optim.Adam(net.parameters(), lr=lr)
@@ -130,18 +137,19 @@ class TorchQuantileAdapter:
         self.hidden = hidden
         self.lookback = 8
         self.spreads = residual_scale(np.array([0.0, 0.1]))
-        self.net: nn.Module | None = None
+        self.net = None
         self.k_step = 1
 
-    def _build(self, lookback: int) -> nn.Module:
+    def _build(self, lookback: int):
         kind = self.net_kind
+        nets = _nets()
         if kind == "patch":
-            return PatchNet(lookback, self.hidden)
+            return nets["patch"](lookback, self.hidden)
         if kind == "tft":
-            return GRNLSTM(self.hidden)
+            return nets["tft"](self.hidden)
         if kind == "mixer":
-            return MixerNet(lookback, self.hidden)
-        return LSTMNet(self.hidden)
+            return nets["mixer"](lookback, self.hidden)
+        return nets["lstm"](self.hidden)
 
     def fit(self, train: pd.DataFrame, spec: ProblemSpec) -> None:
         y = train_values(train)
@@ -155,6 +163,7 @@ class TorchQuantileAdapter:
             self.net = train_net(self.net, X, yt, epochs=self.epochs)
 
     def predict_quantiles(self, context: pd.DataFrame, spec: ProblemSpec) -> pd.DataFrame:
+        torch, _nn = _torch()
         groups = series_by_id(context)
         net = self.net
         lookback = self.lookback
@@ -186,6 +195,7 @@ class TorchQuantileAdapter:
             },
         )
         if self.net is not None:
+            torch, _nn = _torch()
             torch.save(self.net.state_dict(), path)
 
     @classmethod
@@ -202,6 +212,7 @@ class TorchQuantileAdapter:
         obj.family = meta.get("family", obj.family)
         obj.net = obj._build(obj.lookback)
         if path.exists():
+            torch, _nn = _torch()
             obj.net.load_state_dict(torch.load(path, map_location="cpu"))
             obj.net.eval()
         return obj

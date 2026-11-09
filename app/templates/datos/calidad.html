@@ -7,6 +7,12 @@
   <h2>Horizonte que podemos mirar</h2>
   <p>{{ quality.g0.note }}</p>
 </div>
+{% if g1 %}
+<div class="card" style="margin-bottom: var(--space-5)">
+  <h2>Parámetros elegidos</h2>
+  <p>Ventana de {{ g1.parameters.lookback_steps }} pasos. Semántica de la lectura: {{ g1.leyendo.conclusion }}. {{ g1.leyendo.detail }}</p>
+</div>
+{% endif %}
 <div class="layout-2">
   <div class="card">
     <h2>Lecturas del último día</h2>

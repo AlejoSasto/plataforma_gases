@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="tech-banner">{{ copy.LAB_BADGE }}. {{ copy.TECHNICAL_NOTE }}</div>
+<header class="page-header">
+  <div>
+    <h1>{{ title }}</h1>
+    <p class="page-subtitle">{{ body }}</p>
+  </div>
+</header>
+<p class="{% if not beats_persistence %}help{% endif %}" {% if not beats_persistence %}style="color: var(--st-evacuar)"{% endif %}>
+  Modelo activo: {{ active_model }}{% if not beats_persistence %}. No supera a la persistencia.{% endif %}
+</p>
+<div class="card">
+  <h2>Por qué ganó</h2>
+  <pre>{{ report }}</pre>
+</div>
+<div class="card" style="margin-top: var(--space-4)">
+  <h2>Corridas</h2>
+  {% if runs %}
+  <ul>
+    {% for run in runs %}
+    <li>Corrida {{ run.id }} · prueba final: {{ "sí" if run.is_final_test else "no" }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">Todavía no hay corridas. El comando de reconstrucción las crea.</p>
+  {% endif %}
+</div>
+{% endblock %}

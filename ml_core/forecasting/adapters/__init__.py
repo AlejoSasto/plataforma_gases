@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Callable
 
 from ml_core.forecasting.adapters.baselines import ETSForecaster, PersistenceForecaster
-from ml_core.forecasting.adapters.chronos import ChronosForecaster
+from ml_core.forecasting.adapters.chronos import ChronosBoltForecaster, ChronosForecaster
 from ml_core.forecasting.adapters.gbm import LightGBMQuantileForecaster
 from ml_core.forecasting.adapters.neural import (
     ITransformerForecaster,
@@ -24,6 +24,7 @@ ADAPTERS: dict[str, Callable] = {
     "tft": TFTForecaster,
     "patchtst": PatchTSTForecaster,
     "itransformer": ITransformerForecaster,
+    "chronos": ChronosBoltForecaster,
     "chronos2": ChronosForecaster,
     "timesfm": TimesFMForecaster,
     "ttm": TTMForecaster,

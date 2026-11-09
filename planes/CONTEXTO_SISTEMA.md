@@ -14,8 +14,8 @@
 | Versión app | `0.1.0` (`app/main.py`, título FastAPI `Vigía`) |
 | Runtime | Python 3.11+ |
 | Base de datos | `proyecto_gases` (Compose: host `5433`); tests: `proyecto_gases_test` |
-| Alembic head | `c1d2e3f4a5b6` |
-| Actualizado | 2026-11-02 (Plan 23 en curso: F7 gráficas; índice honesto) |
+| Alembic head | `e3f4a5b6c7d8` |
+| Actualizado | 2026-11-08 (Plan 26: asistente con herramientas; proveedor apagado por defecto) |
 
 ### Índice rápido
 
@@ -37,14 +37,14 @@
 
 Sistema web para:
 
-1. **Ingestar** lecturas de sensores de gases (Excel `dls_report` / CSV processed).
-2. **Entrenar y promover** modelos de ML (riesgo + forecast de concentración 5–10 min).
-3. **Predecir** concentración a 6/12/18 min con cuantiles; **generar avisos** en lenguaje natural.
-4. **Notificar** a partes interesadas (email / WhatsApp stub).
-5. **Visualizar** proyección por tipo de gas, semáforo operativo, ejecutivo e histórico.
-6. **Exportar** reportes PDF/Excel.
+1. **Ingestar** lecturas reales de detectores portátiles (Excel `dls_report` / CSV consolidado).
+2. **Comparar** el zoo de pronóstico (persistencia, ETS, LightGBM cuantílico, LSTM, TFT, Chronos, TimesFM) sin sustituir un modelo que no está instalado.
+3. **Pronosticar** concentración a 6, 12 y 18 minutos con cuantiles, y **avisar** en lenguaje natural según el Decreto 1886.
+4. **Notificar** avisos en vivo (los históricos solo se registran).
+5. **Mostrar** el estado por equipo y gas, el turno revisado y la confiabilidad con su fuente.
+6. **Exportar** la evidencia de la corrida desde la base.
 
-No es un microservicio; toda la lógica vive en un solo proceso FastAPI con módulos de dominio. **No usa LLMs**: el Model Zoo es sklearn / XGBoost / PyTorch propio. Detalle de algoritmos, features, métricas thesis, promote e inferencia: **§8.3–8.4**.
+No es un microservicio. El asistente de Preguntar (Plan 26) es opcional y viene apagado (`ASSISTANT_PROVIDER=off`): no inventa cifras y no escribe en la base, salvo el informe que pide el módulo de reportes. El zoo vigente está en `ml_core/forecasting/`. Lo retirado (entrenamiento tabular y de secuencias anterior) está en `legacy/`.
 
 ---
 
@@ -77,6 +77,8 @@ No es un microservicio; toda la lógica vive en un solo proceso FastAPI con mód
 | **22** Mockups → app | OE4 UI | ✅ Kit en `mockups/vigia-design-kit/`; cascarón aplicado en `app/` |
 | Login / CSP (tramo Plan 10) | seguridad UI | ✅ POST `/ingresar`, strip query, CSRF ASGI, recursos locales |
 | **23** Auditoría / ajustes tesis | científico + UI | 🔄 F7 parcialmente ✅ (`reference_time`, E2E charts); faltan F5→F1→F2→F3→F8→F4/F6 |
+| **25** Plataforma con datos reales | equipos, decreto, benchmark | 🔄 F0–F7 y F6 en código; F10 E2E de gráficas bloqueado por Playwright |
+| **26** Asistente conversacional | Preguntar | 🔄 Herramientas, manual, PDF y suite en verde. Gemini y capturas reales pendientes |
 | 09 Despliegue GCP | F8 | ⬜ edge-first pendiente |
 | 10 Hardening (resto) | F9 | ⬜ k6, pip-audit, HSTS prod, backups |
 
@@ -196,7 +198,7 @@ Fuente de verdad para entrenamiento/ingesta: `gas_readings` en PostgreSQL. Los a
 | `data/processed/Procesamiento_de_Datos.csv` | Consolidado **real** | Sí (`--consolidado`) |
 | `data/processed/Procesamiento_de_Datos_YYYY-MM.csv` | Mismo consolidado partido por mes (9 archivos) | Origen del consolidado |
 | `data/processed/Procesamiento de Datos.xlsx` | Copia Excel del consolidado | No (el loader usa CSV) |
-| `data/processed/Procesamiento_de_Datos_24m.csv` | Zoo aumentado a 24 meses | Sí (`--augmented-24m`, marca `is_synthetic`) |
+| `data/processed/Procesamiento_de_Datos_24m.csv` | Aumentado a 24 meses, **retirado** | No. El cargador lo rechaza. El código viejo está en `legacy/`. |
 | `data/processed/augmentation_manifest.json` | Trazabilidad source_month → target_month | Solo al marcar sintéticos (`ml_core/augmentation.py`) |
 | `data/inbox/` | Cola automática (.xlsx/.xls) + `processed/` y `failed/` | Sí, si `ETL_INBOX_ENABLED` |
 | `data/curated/` | Carpeta vacía (legado de un diseño anterior) | No |
@@ -398,7 +400,7 @@ Superadmin: `scripts/create_superadmin.py` + `SUPERADMIN_EMAIL` / `SUPERADMIN_PA
 
 | Origen | Email | Password | Notas |
 |--------|-------|----------|-------|
-| Superadmin local | `admin@vigia.local` | `AdminPass123!` | Creado con `create_superadmin.py` / `SUPERADMIN_*` |
+| Superadmin local | `admin@vigia.local` | solo en `.env` (`SUPERADMIN_PASSWORD`) | Creado con `create_superadmin.py`. El valor no se copia a documentos. |
 | Fixtures pytest | `test.admin@example.com` etc. | — | **Solo** DB de pruebas; audit los rechaza en DEV |
 
 Recrear: `python scripts/create_superadmin.py` → http://localhost:8000/ingresar
@@ -499,17 +501,14 @@ Todo sale de PostgreSQL (`load_readings_df`), no del CSV directo.
 
 #### 8.3.3 Cómo se entrena dentro del sistema
 
-```
-UI /ml/train  o  POST /api/ml/train  o  scripts/train_*.py
-        ↓ permiso models.train
-ml_training.service.start_training
-        ↓ crea training_jobs (pending → success/failed)
-ml_core.models.train_model.train
-        ├── tabulares → train_tabular.py (sklearn/XGB) + MLflow sklearn/xgboost
-        └── secuencias → train_sequence.py (PyTorch CPU) + artifact model.pt
-        ↓ cada algoritmo → fila model_registry status=staging
-        ↓ best_result() elige el mejor (no lo promueve solo)
-```
+El camino vigente es `ml_core/forecasting/` y `python -m ml_core.experiments.run_benchmark`. El entrenamiento tabular y de secuencias anterior está en `legacy/`.
+
+- Si falta la librería o el peso, el adaptador lanza `ModelUnavailableError` y el benchmark lo anota como no disponible.
+- La promoción es explícita. Si nadie supera a la persistencia, esa queda activa y el Laboratorio lo dice.
+- Horizontes: 6, 12 y 18 minutos. Umbrales: Decreto 1886, con artículo. Lo no definido no se inventa.
+- Sin fuga: `train_end + embargo < issued_at`. El último bloque real queda reservado hasta `run_benchmark --final-test`.
+
+Comando único: `python scripts/build_real_platform.py --confirm`.
 
 `POST /api/ml/train` body (`TrainRequest`): `dataset_version`, `scope` (default `global`), `task` (`classification` \| `regression` \| `both`), `algorithms[]`, `lookback_steps`, `horizon_minutes`, `params` extra (`max_rows`, `test_months`, `epochs` default 12 en DL).
 
@@ -634,18 +633,7 @@ Si no hay modelo production, el ETL **no falla** (stats `skipped=1`).
 3. Decisión operativa: Normal / Vigilar / Actuar ya / Evacuar según umbrales del catálogo.
 4. Persistencia en `forecasts` / `forecast_quantiles` (no en la tabla retirada `predictions`).
 
-**Camino tabular legado (sklearn/XGB, zoo / laboratorio)**
-
-Sigue en `ml_core/models/` y MLflow para entrenamiento y comparación. Inferencia home ya no escribe `predictions`. Detalle de features/métricas: §8.3.
-
-**Riesgo / estados operativos** (umbrales de probabilidad o excedencia; nombres UI en `copy.py`):
-
-| Estado UI | Idea | Env (legado probabilidad) |
-|-----------|------|---------------------------|
-| Normal | bajo riesgo | — |
-| Vigilar | atención | `RISK_THRESHOLD_PRECAUTION` (~0.3) |
-| Actuar ya | alto | `RISK_THRESHOLD_ALERT` (~0.6) |
-| Evacuar | crítico | `RISK_THRESHOLD_CRITICAL` (~0.85) |
+**Estados operativos** (nombres en `copy.py`): Normal, Vigilar, Actuar ya, Evacuar, Sin datos. Salen de los umbrales del decreto, no de variables de entorno.
 
 **Avisos** (`alerts/rules.py`): se crean ante riesgo alto/crítico o hard-alarm (alarma / STEL / TWA). Recomendación textual por gas.
 
@@ -847,10 +835,8 @@ Ver `.env.example`. Resumen:
 | `ENVIRONMENT` | `local` / `prod` |
 | `MLFLOW_TRACKING_URI` | Tracking ML |
 | `ETL_INBOX_*` | Scheduler inbox |
-| `RISK_THRESHOLD_*` | Umbrales de riesgo |
+| `RISK` ya no se usa | Los límites viven en `normative_thresholds` |
 | `PREDICTION_*` | Inferencia post-ETL / job |
-| `ML_LOOKBACK_STEPS`, `ML_LEAD_MINUTES_MIN/MAX` | Series / lead time |
-| `THESIS_RECALL_MIN`, `THESIS_PRECISION_MIN`, `THESIS_F1_MIN`, `THESIS_FN_MAX`, `THESIS_RMSE_MAX` | Gates thesis |
 | `NOTIFICATIONS_DRY_RUN`, `SMTP_*`, `WHATSAPP_*` | Notificaciones |
 | `REPORTS_DIR` | Salida reportes |
 | `GCS_BUCKET` | Reservado Plan 09 (opcional) |
@@ -984,7 +970,8 @@ Comando: `python scripts/verify.py` (`--plan NN`, `--fast`, `--full`). `pytest` 
   → b7c8d9e0f1a2  alerts_v2_outcomes
   → b8c9d0e1f2a3  access_v2
   → b9d0e1f2a3b4  drop_predictions
-  → c1d2e3f4a5b6  access_v3          ← HEAD
+  → c1d2e3f4a5b6  access_v3
+  → d2e3f4a5b6c7  plan25_instruments_thresholds_benchmark   ← HEAD
 ```
 
 `0001_init` no crea tablas (esqueleto Plan 01).

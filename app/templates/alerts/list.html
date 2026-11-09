@@ -31,11 +31,22 @@
   </div>
   <button class="btn" type="submit">Filtrar</button>
 </form>
+<p class="help">Origen</p>
+<form method="get" class="row-flex">
+  <input type="hidden" name="status" value="{{ status }}">
+  <select name="origin" aria-label="Origen">
+    <option value="" {% if not origin %}selected{% endif %}>Todos</option>
+    <option value="en_vivo" {% if origin == 'en_vivo' %}selected{% endif %}>En vivo</option>
+    <option value="historico" {% if origin == 'historico' %}selected{% endif %}>Histórico</option>
+  </select>
+  <button class="btn btn-ghost" type="submit">Ver origen</button>
+</form>
 {% endcall %}
 
 {% if alerts %}
 <div class="stack">
   {% for a in alerts %}
+    {% if a.origin == 'historico' %}<p class="help">Histórico. No está abierto en el turno de hoy.</p>{% endif %}
     {{ alert_card(a, can_resolve) }}
   {% endfor %}
 </div>

@@ -59,7 +59,7 @@ STATUS_ICON = {
 NAV = {
     "hoy": "Hoy",
     "avisos": "Avisos",
-    "zonas": "Zonas",
+    "zonas": "Equipos",
     "historial": "Historial",
     "informes": "Informes",
     "confiabilidad": "Confiabilidad",
@@ -71,10 +71,32 @@ NAV = {
     "cuenta": "Mi cuenta",
     "cargar": "Cargar datos",
     "calidad": "Calidad de los datos",
+    "ayuda": "Ayuda",
 }
 
 BRAND = "Vigía"
 BRAND_SUB = "Gases en la mina"
+ASK = "Preguntar"
+ASK_WELCOME = "Pregúntame por los gases, los avisos o cómo usar Vigía. Los datos llegan hasta el {fecha}."
+ASK_OFFLINE = "El asistente no está disponible sin conexión. Puedes usar los filtros de cada pantalla."
+ASK_EMERGENCY = (
+    "Si hay una emergencia, activa ya el protocolo de la mina y avisa al supervisor de turno. "
+    "Este asistente no reemplaza la comunicación de emergencia."
+)
+ASK_OFF_TOPIC = (
+    "Solo puedo ayudarte con información de los gases, los avisos, los informes y el uso de Vigía. "
+    "¿Qué necesitas consultar?"
+)
+ASK_SAFETY = (
+    "No puedo decidir si es seguro entrar. Esa decisión es del supervisor de turno con la medición en sitio."
+)
+ASK_PROTOCOL = "Sigue el protocolo de seguridad de la mina."
+ASK_SOURCES = "De dónde sale esta respuesta"
+ASK_WORKING = "Consultando datos…"
+ASK_USEFUL = "¿Te sirvió?"
+ASK_HISTORIC = "Es una revisión histórica, no la situación en vivo."
+ASK_LIVE = "Esto corresponde a los datos en vivo."
+ASK_DENIED = "No puedes consultar eso con tu rol."
 NO_MODEL = "Por ahora mostramos solo lo que marcan los sensores"
 NO_FORECAST = NO_MODEL
 CHART_EMPTY = "Este sensor no tiene lecturas en este periodo"
@@ -93,8 +115,8 @@ LOGIN_LOCKED = "Por seguridad bloqueamos el acceso por 15 minutos. Si necesitas 
 LOGIN_TOTP = "Escribe el código de 6 dígitos de tu aplicación de autenticación"
 KEEP_SESSION = "Mantener la sesión durante mi turno"
 SHOW_PASSWORD = "Mostrar"
-EMPTY_SENSORS_TITLE = "Aún no hay zonas con sensores"
-EMPTY_SENSORS_TEXT = "Cuando se carguen lecturas, aquí veremos si todo está en orden."
+EMPTY_SENSORS_TITLE = "Aún no hay equipos con lecturas"
+EMPTY_SENSORS_TEXT = "Cuando lleguen lecturas de un detector, aquí veremos cada gas de ese equipo."
 EMPTY_ALERTS_TITLE = "No hay avisos abiertos"
 EMPTY_ALERTS_TEXT = "Si algo cambia, aparecerá aquí con qué hacer."
 ACK = "Ya lo vi"
@@ -330,6 +352,18 @@ def operative_strings() -> list[str]:
         confidence_phrase("baja"),
         g0_note([6, 12, 18]),
         "Por ahora mostramos solo lo que marcan los sensores",
+        ASK,
+        ASK_WELCOME,
+        ASK_OFFLINE,
+        ASK_EMERGENCY,
+        ASK_OFF_TOPIC,
+        ASK_SAFETY,
+        ASK_PROTOCOL,
+        ASK_SOURCES,
+        ASK_WORKING,
+        ASK_USEFUL,
+        ASK_HISTORIC,
+        ASK_LIVE,
         "Cargar datos",
         "Ya lo vi",
         "Cerrar aviso",

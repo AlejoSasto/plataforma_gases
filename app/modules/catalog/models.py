@@ -30,7 +30,17 @@ class GasType(Base):
 
 class NormativeThreshold(Base):
     __tablename__ = "normative_thresholds"
-    __table_args__ = (UniqueConstraint("gas_code", "level", "valid_from", name="uq_threshold_gas_level_from"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "gas_code",
+            "level",
+            "metric",
+            "direction",
+            "site_kind",
+            "valid_from",
+            name="uq_threshold_gas_level_metric_from",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     gas_code: Mapped[str] = mapped_column(
@@ -39,6 +49,16 @@ class NormativeThreshold(Base):
     level: Mapped[str] = mapped_column(String(16), nullable=False)  # vigilar|actuar|evacuar
     direction: Mapped[str] = mapped_column(String(8), nullable=False)  # above|below
     value: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False)
+    metric: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="instantaneo", server_default="instantaneo"
+    )
+    site_kind: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="cualquiera", server_default="cualquiera"
+    )
+    kind: Mapped[str] = mapped_column(
+        String(24), nullable=False, default="normativo", server_default="normativo"
+    )
+    article: Mapped[str] = mapped_column(Text, nullable=False, default="", server_default="")
     source_reference: Mapped[str] = mapped_column(Text, nullable=False, default="")
     verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     valid_from: Mapped[datetime] = mapped_column(

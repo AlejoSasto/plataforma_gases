@@ -1,6 +1,9 @@
 {% from "components/macros.html" import status_banner, zone_card, alert_card, empty_state, chart %}
 {{ status_banner(banner, banner_level) }}
 <p class="help">{{ copy.ahead_minutes(horizon) }}</p>
+{% if assistant_on() %}
+<p><button type="button" class="btn" data-ask-open>{{ copy.ASK }}</button></p>
+{% endif %}
 
 <div class="home-grid">
   <div class="stack">

@@ -57,6 +57,28 @@ def persist_events(events: pd.DataFrame) -> int:
         db.close()
 
 
+def _from_db() -> pd.DataFrame:
+    from app.core.database import SessionLocal
+    from app.modules.sensors_ingestion.models import GasReading, Sensor
+
+    db = SessionLocal()
+    try:
+        rows = (
+            db.query(
+                Sensor.code.label("sensor_code"),
+                Sensor.gas_type.label("gas"),
+                GasReading.tiempo_inicio.label("ts"),
+                GasReading.value_canonical.label("value"),
+            )
+            .join(Sensor, Sensor.id == GasReading.sensor_id)
+            .filter(GasReading.is_synthetic.is_(False))
+            .all()
+        )
+    finally:
+        db.close()
+    return pd.DataFrame([r._mapping for r in rows])
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -64,14 +86,20 @@ def main() -> int:
         default=str(ROOT / "data" / "processed" / "Procesamiento_de_Datos.csv"),
     )
     parser.add_argument("--step", type=int, default=6)
+    parser.add_argument("--from-db", action="store_true", help="Usa gas_readings canónicas")
     parser.add_argument("--persist", action="store_true")
     args = parser.parse_args()
-    path = Path(args.input)
-    if not path.exists():
-        print(f"SKIP no hay {path}")
-        return 0
-    df = _from_csv(path)
-    grid = rebuild_grid_frame(df, step_minutes=args.step)
+    if args.from_db:
+        grid = _from_db()
+        grid["value"] = pd.to_numeric(grid["value"], errors="coerce")
+        grid = grid.dropna(subset=["value", "ts"])
+    else:
+        path = Path(args.input)
+        if not path.exists():
+            print(f"SKIP no hay {path}")
+            return 0
+        df = _from_csv(path)
+        grid = rebuild_grid_frame(df, step_minutes=args.step)
     first = rebuild_events_frame(grid)
     second = rebuild_events_frame(grid)
     assert frame_signature(first) == frame_signature(second), "episodios no reproducibles"

@@ -40,3 +40,5 @@ artifacts/
 # Generated reports
 storage/
 
+# Se versionan a propósito (no ignorar): planes/, documentacion/claude/ y mockups/
+

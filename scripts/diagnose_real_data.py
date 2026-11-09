@@ -151,8 +151,8 @@ def main() -> int:
         try:
             df, source_note = _load_from_db()
         except Exception as exc:
-            print(f"DB no disponible ({exc}); se usa el consolidado CSV.", file=sys.stderr)
-            df, source_note = _load_from_csv()
+            print(f"DETENIDO: la base no respondió ({exc}). Use --from-csv solo si quiere el consolidado.", file=sys.stderr)
+            return 1
 
     report = run_diagnosis(df, source=source_note)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -163,9 +163,17 @@ def main() -> int:
     (OUT_DIR / "g0_decision.json").write_text(
         json.dumps(report["g0"], ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    from ml_core.diagnosis_g1 import render_g1_markdown, run_g1
+
+    g1 = run_g1(df)
+    (OUT_DIR / "diagnostico_g1.json").write_text(
+        json.dumps(g1, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
+    )
+    (OUT_DIR / "diagnostico_g1.md").write_text(render_g1_markdown(g1), encoding="utf-8")
     print(f"OK {md_path}")
     print(f"OK {json_path}")
     print(f"G0 band={report['g0']['band']} horizons={report['g0']['horizons_min']}")
+    print(f"G1 lookback={g1['parameters']['lookback_steps']}")
     return 0
 
 

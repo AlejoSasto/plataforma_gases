@@ -128,6 +128,49 @@ def stage_slow() -> int:
     return _pytest(["-m", "slow"])
 
 
+def stage_dev_audit() -> int:
+    """Solo lectura sobre la base de desarrollo indicada en .env."""
+    from sqlalchemy import create_engine, text
+
+    from scripts.archive_legacy_models import is_legacy_production
+
+    env_file = ROOT / ".env"
+    url = ""
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            if line.startswith("DATABASE_URL="):
+                url = line.split("=", 1)[1].strip().strip("'\"")
+    if not url:
+        print("DETENIDO dev-audit: falta DATABASE_URL en .env")
+        return 1
+    engine = create_engine(url)
+    try:
+        with engine.connect() as conn:
+            legacy = conn.execute(
+                text("SELECT algorithm, status FROM model_registry WHERE status = 'production'")
+            ).all()
+            bad = [row[0] for row in legacy if is_legacy_production(row[0], row[1])]
+            missing_article = conn.execute(
+                text(
+                    "SELECT count(*) FROM normative_thresholds "
+                    "WHERE kind = 'normativo' AND (article IS NULL OR article = '')"
+                )
+            ).scalar()
+            demo = conn.execute(
+                text("SELECT count(*) FROM users WHERE email LIKE '%@example.com'")
+            ).scalar()
+    except Exception as exc:  # noqa: BLE001
+        print(f"DETENIDO dev-audit: {exc}")
+        return 1
+    finally:
+        engine.dispose()
+    if bad or missing_article or demo:
+        print(f"FAIL dev-audit legacy={bad} sin_articulo={missing_article} demo_users={demo}")
+        return 1
+    print("OK dev-audit")
+    return 0
+
+
 STAGES = [
     ("1. formato", stage_format),
     ("2. tipos", stage_types),
@@ -160,11 +203,15 @@ def _plan_pytest_args(plan: int) -> list[str]:
         return ["-m", "plan23"]
     if plan == 24:
         return ["-m", "plan24"]
+    if plan == 25:
+        return ["-m", "plan25"]
+    if plan == 26:
+        return ["-m", "plan26 and not live_llm and not e2e"]
     if plan == 15:
         return [
             "-m",
             "plan and not plan16 and not plan17 and not plan18 and not plan19 "
-            "and not plan20 and not plan23 and not plan24",
+            "and not plan20 and not plan23 and not plan24 and not plan25 and not plan26",
         ]
     return ["-m", f"plan{plan} or plan"]
 
@@ -174,7 +221,11 @@ def main() -> int:
     parser.add_argument("--plan", type=int, default=None)
     parser.add_argument("--fast", action="store_true")
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--dev-audit", action="store_true")
     args = parser.parse_args()
+
+    if args.dev_audit:
+        return stage_dev_audit()
 
     if args.plan:
         code = _pytest(_plan_pytest_args(args.plan))

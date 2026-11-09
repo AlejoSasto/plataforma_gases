@@ -9,6 +9,7 @@ import pytest
 
 from ml_core.forecasting.adapters import ADAPTERS, make_forecaster
 from ml_core.forecasting.base import PRED_COLUMNS, ZOO_KEYS, assert_prediction_frame
+from ml_core.forecasting.errors import ModelUnavailableError
 from ml_core.forecasting.problem import ProblemSpec
 
 
@@ -39,7 +40,13 @@ def test_adapter_contract(key, tmp_path) -> None:
     model = make_forecaster(key)
     assert model.name == key
     assert model.family in {"baseline", "tabular", "recurrente", "transformer", "fundacional"}
-    model.fit(frame.iloc[:-6], spec)
+    assert model.backend not in {"torch-lite", "fallback-conformal", "sklearn-gbr", "torch-ttm-lite"}
+    try:
+        model.fit(frame.iloc[:-6], spec)
+    except ModelUnavailableError as exc:
+        assert exc.model == key
+        assert "no disponible" in str(exc)
+        return
     pred = model.predict_quantiles(frame.iloc[:-3], spec)
     assert_prediction_frame(pred)
     for col in PRED_COLUMNS:

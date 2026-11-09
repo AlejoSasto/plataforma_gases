@@ -253,12 +253,39 @@
     return chart;
   }
 
-  PG.charts = { nowAndNext, history, reliability, dispose };
+  function assistant(el, data) {
+    if (!data) return null;
+    if (data.kind === "serie") return history(el, data);
+    if (data.kind === "confiabilidad") {
+      return reliability(el, { items: data.items || [], empty_message: data.empty_message });
+    }
+    const categories = data.categories || [];
+    const values = data.values || [];
+    if (!categories.length) {
+      showMessage(el, data.empty_message || "No hay datos para este gráfico");
+      return null;
+    }
+    dispose(el);
+    const chart = echarts.init(el, null, { renderer: "svg" });
+    chart.setOption(Object.assign(baseOption(), {
+      xAxis: { type: "category", data: categories, axisLabel: { color: cssVar("--chart-axis", "#5C6770") } },
+      yAxis: { type: "value", axisLabel: { color: cssVar("--chart-axis", "#5C6770") }, splitLine: { lineStyle: { color: cssVar("--chart-grid", "#E6E1D8") } } },
+      series: [{
+        type: "bar",
+        data: values,
+        itemStyle: { color: cssVar("--accent", "#1E3A5F") },
+      }],
+    }), true);
+    return chart;
+  }
+
+  PG.charts = { nowAndNext, history, reliability, assistant, dispose };
 
   function runKind(el, kind, data) {
     if (kind === "now") return PG.charts.nowAndNext(el, data);
     if (kind === "history") return PG.charts.history(el, data);
     if (kind === "reliability") return PG.charts.reliability(el, data);
+    if (kind === "assistant") return PG.charts.assistant(el, data);
     return null;
   }
 

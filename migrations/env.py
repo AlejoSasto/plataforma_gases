@@ -21,6 +21,7 @@ from app.modules.roles_permissions import models as roles_models  # noqa: F401
 from app.modules.sensors_ingestion import models as sensors_models  # noqa: F401
 from app.modules.stakeholders import models as stakeholders_models  # noqa: F401
 from app.modules.reports import models as reports_models  # noqa: F401
+from app.modules.assistant import models as assistant_models  # noqa: F401
 from app.modules.users import models as users_models  # noqa: F401
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)
